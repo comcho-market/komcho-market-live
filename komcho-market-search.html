@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>探す - こむちょマーケット</title>
+<style>
+  :root {
+    --bg:          #F8F5EF;
+    --bg-card:     #FFFFFF;
+    --green-dark:  #3D5A3E;
+    --green-mid:   #5A7A5B;
+    --green-light: #EAF0E8;
+    --gold:        #B8973A;
+    --text-main:   #2C2C2C;
+    --text-sub:    #6B6B6B;
+    --border:      #E2DDD5;
+    --radius-card: 12px;
+    --shadow-card: 0 2px 12px rgba(0,0,0,0.07);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Yu Gothic', 'Meiryo', sans-serif;
+    background: var(--bg);
+    color: var(--text-main);
+    max-width: 430px;
+    margin: 0 auto;
+    min-height: 100vh;
+    padding-bottom: 80px;
+  }
+  a { text-decoration: none; color: inherit; }
+  button { cursor: pointer; border: none; background: none; font-family: inherit; }
+
+  /* ===== HEADER ===== */
+  .header {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 16px 0;
+  }
+  .header-top {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .header-logo {
+    display: flex; align-items: center; gap: 7px;
+  }
+  .header-logo .logo-icon {
+    width: 24px; height: 19px; flex-shrink: 0;
+  }
+  .header-logo .logo-icon path {
+    fill: none; stroke: var(--green-dark);
+    stroke-width: 3; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .header-logo .logo-text {
+    font-size: 15px; font-weight: 700; letter-spacing: 0.04em;
+    color: var(--text-main);
+  }
+  .header-icons { display: flex; align-items: center; gap: 18px; }
+  .header-icons svg {
+    width: 22px; height: 22px;
+    stroke: var(--text-main); fill: none;
+    stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .cart-wrap { position: relative; }
+  .cart-badge {
+    position: absolute; top: -5px; right: -6px;
+    background: var(--green-dark); color: #fff;
+    font-size: 9px; font-weight: 700;
+    width: 16px; height: 16px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* SEARCH BAR */
+  .search-bar-wrap {
+    display: flex; align-items: center; gap: 8px;
+    padding-bottom: 10px;
+  }
+  .search-bar {
+    flex: 1;
+    display: flex; align-items: center; gap: 8px;
+    background: var(--bg-card);
+    border: 1.5px solid var(--border);
+    border-radius: 24px;
+    padding: 9px 14px;
+    transition: border-color 0.15s;
+  }
+  .search-bar:focus-within { border-color: var(--green-dark); }
+  .search-bar svg {
+    width: 16px; height: 16px;
+    stroke: var(--text-sub); fill: none;
+    stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+    flex-shrink: 0;
+  }
+  .search-bar input {
+    flex: 1; border: none; background: none;
+    font-size: 14px; color: var(--text-main);
+    outline: none; font-family: inherit;
+  }
+  .search-bar input::placeholder { color: var(--text-sub); }
+  .search-clear {
+    width: 18px; height: 18px;
+    background: var(--border); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; cursor: pointer;
+    font-size: 10px; color: var(--text-sub); font-weight: 700;
+    display: none;
+  }
+  .search-clear.visible { display: flex; }
+  .filter-toggle-btn {
+    flex-shrink: 0;
+    display: flex; align-items: center; gap: 5px;
+    background: var(--bg-card);
+    border: 1.5px solid var(--border);
+    border-radius: 20px;
+    padding: 9px 12px;
+    font-size: 12px; color: var(--text-main); font-weight: 600;
+    transition: border-color 0.15s, background 0.15s;
+    position: relative;
+  }
+  .filter-toggle-btn.active {
+    border-color: var(--green-dark);
+    background: var(--green-light);
+    color: var(--green-dark);
+  }
+  .filter-toggle-btn svg {
+    width: 14px; height: 14px;
+    stroke: currentColor; fill: none;
+    stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .filter-count-badge {
+    position: absolute; top: -5px; right: -5px;
+    background: var(--green-dark); color: #fff;
+    font-size: 9px; font-weight: 700;
+    width: 16px; height: 16px; border-radius: 50%;
+    display: none; align-items: center; justify-content: center;
+  }
+  .filter-count-badge.visible { display: flex; }
+
+  /* 詳細フィルターボタン行（削除済み） */
+
+  /* ===== SEASONAL BANNERS ===== */
+  .seasonal-section {
+    padding: 16px 0 4px;
+  }
+  .seasonal-label {
+    font-size: 11px; color: var(--text-sub);
+    letter-spacing: 0.1em; font-weight: 500;
+    padding: 0 16px; margin-bottom: 10px;
+  }
+  .seasonal-scroll {
+    display: flex;
+    overflow-x: auto;
+    padding: 2px 16px 4px;
+    gap: 10px;
+    scrollbar-width: none;
+  }
+  .seasonal-scroll::-webkit-scrollbar { display: none; }
+  .seasonal-banner {
+    flex: 0 0 auto;
+    width: 160px;
+    aspect-ratio: 1 / 1;
+    border-radius: 10px;
+    position: relative; overflow: hidden;
+    cursor: pointer;
+    display: flex; align-items: flex-end;
+    padding: 12px;
+  }
+  .seasonal-banner.b1 { background: linear-gradient(145deg, #c8d8b8, #8aaa6a); }
+  .seasonal-banner.b2 { background: linear-gradient(145deg, #e8d4b0, #c4a060); }
+  .seasonal-banner.b3 { background: linear-gradient(145deg, #b8d4d0, #6aa0a0); }
+  .seasonal-banner.b4 { background: linear-gradient(145deg, #d8c4b4, #a87850); }
+  .seasonal-banner-text {
+    font-size: 13px; font-weight: 700; color: #fff;
+    line-height: 1.5; text-shadow: 0 1px 6px rgba(0,0,0,0.25);
+  }
+  .seasonal-banner-emoji {
+    position: absolute; top: 12px; right: 12px;
+    font-size: 36px;
+    opacity: 0.9;
+  }
+
+  /* ===== INLINE FILTER BAR ===== */
+  .inline-filter-bar {
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border);
+  }
+  .inline-filter-bar-inner { padding: 0 16px; }
+
+  /* Accordion items */
+  .accordion-item { border-bottom: 1px solid var(--border); }
+  .accordion-item:last-child { border-bottom: none; }
+  .accordion-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 13px 0;
+    cursor: pointer; user-select: none;
+  }
+  .accordion-title {
+    font-size: 13px; font-weight: 700; color: var(--text-main);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .accordion-selected-count {
+    font-size: 10px; background: var(--green-dark); color: #fff;
+    border-radius: 10px; padding: 1px 7px; font-weight: 700;
+    display: none;
+  }
+  .accordion-selected-count.visible { display: inline-block; }
+  .accordion-arrow {
+    width: 18px; height: 18px;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.25s ease;
+  }
+  .accordion-arrow svg {
+    width: 14px; height: 14px;
+    stroke: var(--text-sub); fill: none;
+    stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .accordion-arrow.open { transform: rotate(180deg); }
+  .accordion-body {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.3s ease;
+  }
+  .accordion-body.open { max-height: 1000px; }
+  .accordion-body-inner { padding-bottom: 14px; }
+
+  /* ===== FILTER PANEL（アレルギー・配送：詳細ボタンから） ===== */
+  .filter-panel {
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.35s ease;
+  }
+  .filter-panel.open { max-height: 2000px; }
+  .filter-panel-inner { padding: 0 16px 16px; }
+
+  /* Category chips */
+  .category-chips {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+  }
+  .cat-chip {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    padding: 10px 4px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    background: var(--bg);
+    cursor: pointer;
+    transition: all 0.15s;
+    font-size: 10px; color: var(--text-main); text-align: center; line-height: 1.3;
+  }
+  .cat-chip.selected {
+    border-color: var(--green-dark);
+    background: var(--green-light);
+    color: var(--green-dark); font-weight: 700;
+  }
+  .cat-chip-icon {
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .cat-chip-icon svg {
+    width: 30px; height: 30px;
+    stroke: var(--green-dark); fill: none;
+    stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round;
+    transition: stroke 0.15s;
+  }
+  .cat-chip.selected .cat-chip-icon svg { stroke: var(--green-dark); }
+
+  /* Tag chips */
+  .tag-section-label {
+    font-size: 11px; font-weight: 700; color: var(--text-sub);
+    margin-bottom: 8px; margin-top: 12px;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .tag-section-label:first-child { margin-top: 0; }
+  .tag-section-label svg {
+    width: 14px; height: 14px;
+    stroke: var(--text-sub); fill: none;
+    stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
+    flex-shrink: 0;
+  }
+  .tag-chips-wrap {
+    display: flex; flex-wrap: wrap; gap: 7px;
+  }
+  .tag-chip-filter {
+    display: inline-flex; align-items: center;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 5px 11px;
+    font-size: 11px; color: var(--text-main);
+    cursor: pointer;
+    background: var(--bg);
+    transition: all 0.15s;
+    user-select: none;
+    gap: 4px;
+  }
+  .tag-chip-filter.selected {
+    border-color: var(--green-dark);
+    background: var(--green-dark);
+    color: #fff; font-weight: 600;
+  }
+  .tag-chip-filter .check-icon {
+    display: none;
+    font-size: 10px;
+  }
+  .tag-chip-filter.selected .check-icon { display: inline; }
+
+  /* Allergy */
+  .allergy-note {
+    font-size: 11px; color: var(--text-sub);
+    background: #FFF9EC;
+    border: 1px solid #E8D898;
+    border-radius: 8px;
+    padding: 8px 10px;
+    line-height: 1.6;
+    margin-bottom: 10px;
+  }
+  .allergy-chips-wrap {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+  }
+  .allergy-chip {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 4px;
+    font-size: 11px; color: var(--text-main);
+    cursor: pointer; background: var(--bg);
+    transition: all 0.15s; text-align: center; line-height: 1.3;
+    position: relative;
+  }
+  .allergy-chip.excluded {
+    border-color: #CC4444;
+    background: #FFF0F0; color: #CC4444; font-weight: 700;
+  }
+  .allergy-chip .exclude-x {
+    position: absolute; top: 3px; right: 4px;
+    font-size: 10px; font-weight: 700; color: #CC4444;
+    display: none;
+  }
+  .allergy-chip.excluded .exclude-x { display: block; }
+
+  /* Delivery */
+  .delivery-opts {
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .delivery-opt {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px; background: var(--bg);
+    cursor: pointer; transition: all 0.15s;
+    font-size: 13px; color: var(--text-main);
+  }
+  .delivery-opt.selected {
+    border-color: var(--green-dark);
+    background: var(--green-light);
+    color: var(--green-dark); font-weight: 600;
+  }
+  .delivery-opt-check {
+    width: 18px; height: 18px;
+    border-radius: 50%; border: 1.5px solid var(--border);
+    flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+  .delivery-opt.selected .delivery-opt-check {
+    background: var(--green-dark); border-color: var(--green-dark);
+  }
+  .delivery-opt.selected .delivery-opt-check::after {
+    content: '';
+    display: block; width: 5px; height: 9px;
+    border-right: 2px solid #fff; border-bottom: 2px solid #fff;
+    transform: rotate(40deg) translate(-1px, -1px);
+  }
+
+  /* SEARCH BUTTON */
+  .search-submit-wrap {
+    padding: 14px 0 2px;
+    border-top: 1px solid var(--border);
+    margin: 12px -16px 0;
+    padding: 12px 16px 0;
+  }
+  .search-submit-btn {
+    width: 100%;
+    height: 48px; border-radius: 24px;
+    background: var(--green-dark); color: #fff;
+    font-size: 14px; font-weight: 700;
+    letter-spacing: 0.04em;
+    cursor: pointer; border: none;
+    transition: opacity 0.15s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .search-submit-btn:active { opacity: 0.85; }
+
+  /* Reset */
+  .filter-reset-btn {
+    display: block; width: 100%;
+    text-align: center;
+    font-size: 12px; color: var(--text-sub);
+    padding: 10px 0 4px;
+    cursor: pointer; text-decoration: underline;
+  }
+
+  /* ===== ACTIVE FILTERS BAR ===== */
+  .active-filters-bar {
+    padding: 8px 16px 0;
+    display: none;
+  }
+  .active-filters-bar.visible {
+    display: block;
+  }
+  .active-filters-scroll {
+    display: flex;
+    overflow-x: auto; gap: 6px;
+    scrollbar-width: none;
+    padding-bottom: 8px;
+  }
+  .active-filters-scroll::-webkit-scrollbar { display: none; }
+  .active-filter-pill {
+    flex: 0 0 auto;
+    display: flex; align-items: center; gap: 4px;
+    background: var(--green-dark); color: #fff;
+    font-size: 11px; font-weight: 600;
+    border-radius: 20px; padding: 4px 10px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .active-filter-pill.allergy-pill {
+    background: #CC4444;
+  }
+  .active-filter-pill span { font-size: 11px; }
+
+  /* ===== RESULTS ===== */
+  .results-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px 8px;
+  }
+  .results-count {
+    font-size: 12px; color: var(--text-sub);
+  }
+  .results-count strong { color: var(--text-main); font-weight: 700; }
+  .sort-select-wrap {
+    display: flex; align-items: center; gap: 4px;
+    font-size: 12px; color: var(--text-sub);
+  }
+  .sort-select {
+    font-size: 12px; color: var(--text-main);
+    border: 1px solid var(--border); border-radius: 6px;
+    padding: 4px 8px;
+    background: var(--bg-card); outline: none;
+    font-family: inherit; cursor: pointer;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%236B6B6B' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 6px center;
+    padding-right: 22px;
+  }
+
+  /* PRODUCTS GRID */
+  .products-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 12px; padding: 0 16px 12px;
+  }
+  .product-card-grid {
+    background: var(--bg-card); border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card); overflow: hidden; position: relative;
+    cursor: pointer;
+  }
+  .new-badge {
+    position: absolute; top: 8px; left: 8px; z-index: 1;
+    background: var(--gold); color: #fff;
+    font-size: 10px; font-weight: 700;
+    padding: 3px 7px; border-radius: 4px; letter-spacing: 0.05em;
+  }
+  .product-img-grid {
+    width: 100%; aspect-ratio: 1;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 38px; position: relative;
+  }
+  .g1 { background: linear-gradient(135deg,#f0e8d8,#d4c4a8); }
+  .g2 { background: linear-gradient(135deg,#e0e8d0,#b8c890); }
+  .g3 { background: linear-gradient(135deg,#e8e8e8,#c0c0b8); }
+  .g4 { background: linear-gradient(135deg,#f4e8d0,#d4b880); }
+  .g5 { background: linear-gradient(135deg,#e4d8e8,#b8a0c0); }
+  .g6 { background: linear-gradient(135deg,#e0d8cc,#c0a888); }
+  .g7 { background: linear-gradient(135deg,#d8e8e0,#90c0a8); }
+  .g8 { background: linear-gradient(135deg,#f4e4d4,#d0a878); }
+  .wish-btn {
+    position: absolute; bottom: 8px; right: 8px;
+    width: 26px; height: 26px;
+    background: rgba(255,255,255,0.85); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+    cursor: pointer; border: none;
+  }
+  .wish-btn svg { width: 13px; height: 13px; stroke: #999; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .wish-btn.active svg { stroke: #E05A5A; fill: #E05A5A; }
+  .product-info-grid { padding: 8px 10px 10px; }
+  .product-shop-grid { font-size: 10px; color: var(--text-sub); margin-bottom: 2px; }
+  .product-name-grid { font-size: 12px; font-weight: 600; line-height: 1.4; color: var(--text-main); }
+  .tag-pills { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+  .tag-pill {
+    font-size: 9px; background: var(--green-light); color: var(--green-dark);
+    border-radius: 20px; padding: 2px 7px; font-weight: 500;
+  }
+  .allergy-tag-pill {
+    font-size: 9px; background: #FFF0F0; color: #CC4444;
+    border-radius: 20px; padding: 2px 7px; font-weight: 500;
+    border: 1px solid #FFCCCC;
+  }
+  .product-price { font-size: 13px; font-weight: 700; margin-top: 5px; color: var(--text-main); }
+
+  /* EMPTY STATE */
+  .empty-state {
+    display: none;
+    padding: 60px 16px 40px;
+    text-align: center;
+  }
+  .empty-state.visible { display: block; }
+  .empty-state-icon { font-size: 48px; margin-bottom: 16px; }
+  .empty-state-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; color: var(--text-main); }
+  .empty-state-sub { font-size: 13px; color: var(--text-sub); line-height: 1.8; }
+
+  /* ===== BOTTOM NAV ===== */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 430px;
+    background: var(--bg-card); border-top: 1px solid var(--border);
+    display: flex; z-index: 200;
+  }
+  .nav-item {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+    padding: 10px 0 14px; color: var(--text-sub);
+    font-size: 10px; letter-spacing: 0.04em; cursor: pointer;
+  }
+  .nav-item.active { color: var(--green-dark); }
+  .nav-item svg {
+    width: 22px; height: 22px;
+    stroke: currentColor; fill: none;
+    stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
+  }
+
+  /* ============ DESKTOP (≥900px) ============ */
+  @media (min-width: 900px) {
+    body { max-width: 1160px; padding-bottom: 60px; }
+    .header { padding: 16px 40px 0; }
+    .search-bar-wrap { padding: 0 40px; }
+    .filter-panel-inner { padding: 0 40px 16px; }
+    .category-chips { grid-template-columns: repeat(8, 1fr); }
+    .results-header { padding-left: 40px; padding-right: 40px; }
+    .products-grid {
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px; padding: 0 40px 16px;
+    }
+    .bottom-nav { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header class="header">
+  <div class="header-top">
+    <a class="header-logo" href="komcho-market-top.html">
+    <svg class="logo-icon" viewBox="0 0 60 48">
+      <path transform="translate(30,24)" d="M -26 7 C -17 -17 5 -24 24 -10 C 12 5 -2 19 -21 24"/>
+    </svg>
+    <span class="logo-text">こむちょマーケット</span>
+  </a>
+    <div class="header-icons">
+      <a href="komcho-market-mypage.html" style="display:flex;"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></a>
+      <a href="komcho-market-cart.html" style="display:flex;"><div class="cart-wrap">
+        <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        <div class="cart-badge">1</div>
+      </div></a>
+      <a href="komcho-market-mypage.html" style="display:flex;"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></a>
+    </div>
+  </div>
+
+  <!-- 検索バー -->
+  <div class="search-bar-wrap">
+    <div class="search-bar">
+      <a href="komcho-market-search.html" style="display:flex;"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></a>
+      <input type="text" id="searchInput" placeholder="商品名・ショップ名で探す" autocomplete="off">
+      <div class="search-clear" id="searchClear">✕</div>
+    </div>
+  </div>
+</header>
+
+<!-- ===== INLINE FILTER BAR（常時表示） ===== -->
+<div class="inline-filter-bar">
+  <div class="inline-filter-bar-inner">
+
+    <!-- カテゴリー -->
+    <div class="accordion-item">
+      <div class="accordion-header" onclick="toggleAccordion('cat')">
+        <div class="accordion-title">
+          カテゴリー
+          <span class="accordion-selected-count" id="catCount">0</span>
+        </div>
+        <div class="accordion-arrow open" id="catArrow">
+          <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>
+      <div class="accordion-body open" id="catBody">
+        <div class="accordion-body-inner">
+          <div class="category-chips" id="catChips">
+            <div class="cat-chip" data-val="生鮮食品" onclick="toggleCat(this)">
+              <div class="cat-chip-icon">
+                <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#EAF0E8"/><g transform="translate(50,50)" fill="none" stroke="#3D5A3E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M -13 -16 C -13 -21 13 -21 13 -16 L 4 22 L 0 30 L -4 22 Z"/><path d="M 0 -21 L -4 -35"/><path d="M 0 -21 L 4 -37"/><path d="M 0 -21 L -9 -32"/></g></svg>
+              </div>
+              生鮮食品
+            </div>
+            <div class="cat-chip" data-val="惣菜" onclick="toggleCat(this)">
+              <div class="cat-chip-icon">
+                <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#EAF0E8"/><g transform="translate(50,50)" fill="none" stroke="#3D5A3E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M -22 10 C -22 -12 22 -12 22 10 L 18 18 L -18 18 Z"/><path d="M -6 -18 C -6 -24 -10 -28 -8 -34"/><path d="M 6 -18 C 6 -24 10 -28 8 -34"/></g></svg>
+              </div>
+              惣菜
+            </div>
+            <div class="cat-chip" data-val="調味料" onclick="toggleCat(this)">
+              <div class="cat-chip-icon">
+                <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#EAF0E8"/><g transform="translate(50,50)" fill="none" stroke="#3D5A3E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M -8 -28 L -8 -20 L -16 -8 L -16 28 L 16 28 L 16 -8 L 8 -20 L 8 -28 Z"/><path d="M -8 -28 L 8 -28"/></g></svg>
+              </div>
+              調味料
+            </div>
+            <div class="cat-chip" data-val="お菓子" onclick="toggleCat(this)">
+              <div class="cat-chip-icon">
+                <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#EAF0E8"/><g transform="translate(50,50)" fill="none" stroke="#3D5A3E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="0" cy="0" r="28"/><path d="M 0 0 L 0 -20"/><path d="M 0 0 L 16 0"/></g></svg>
+              </div>
+              お菓子
+            </div>
+            <div class="cat-chip" data-val="飲み物" onclick="toggleCat(this)">
+              <div class="cat-chip-icon">
+                <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#EAF0E8"/><g transform="translate(50,50)" fill="none" stroke="#3D5A3E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M -12 -22 L 12 -22 L 10 20 C 10 26 -10 26 -10 20 Z"/><path d="M 0 -22 L 0 -35"/><path d="M -8 -35 C -4 -42 4 -42 8 -35"/></g></svg>
+              </div>
+              飲み物
+            </div>
+            <div class="cat-chip" data-val="日用品" onclick="toggleCat(this)">
+              <div class="cat-chip-icon">
+                <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#EAF0E8"/><g transform="translate(50,50)" fill="none" stroke="#3D5A3E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M -22 -18 L 22 -18 L 18 22 L -18 22 Z"/><path d="M -22 -18 L 0 -30 L 22 -18"/></g></svg>
+              </div>
+              日用品
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- こだわりタグ -->
+    <div class="accordion-item">
+      <div class="accordion-header" onclick="toggleAccordion('tag')">
+        <div class="accordion-title">
+          こだわりタグ
+          <span class="accordion-selected-count" id="tagCount">0</span>
+        </div>
+        <div class="accordion-arrow open" id="tagArrow">
+          <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>
+      <div class="accordion-body open" id="tagBody">
+        <div class="accordion-body-inner">
+          <div class="tag-section-label">
+            <svg viewBox="0 0 24 24"><line x1="8" y1="2" x2="8" y2="22"/><path d="M6 2 C6 2 5 6 5 8 C5 10.5 6.5 12 8 12 C9.5 12 11 10.5 11 8 C11 6 10 2 10 2"/><path d="M17 2 L19 6 C19.8 8 19 10 17 11 L17 22"/></svg>
+            食品
+          </div>
+          <div class="tag-chips-wrap">
+            <div class="tag-chip-filter" onclick="toggleTag(this)"><span class="check-icon">✓</span>着色料不使用</div>
+            <div class="tag-chip-filter" onclick="toggleTag(this)"><span class="check-icon">✓</span>保存料不使用</div>
+            <div class="tag-chip-filter" onclick="toggleTag(this)"><span class="check-icon">✓</span>人工甘味料不使用</div>
+            <div class="tag-chip-filter" onclick="toggleTag(this)"><span class="check-icon">✓</span>化学調味料不使用</div>
+            <div class="tag-chip-filter" onclick="toggleTag(this)"><span class="check-icon">✓</span>無農薬</div>
+            <div class="tag-chip-filter" onclick="toggleTag(this)"><span class="check-icon">✓</span>減農薬</div>
+            <div class="tag-chip-filter" onclick="toggleTag(this)"><span class="check-icon">✓</span>有機・オーガニック</div>
+            <div class="tag-chip-filter" onclick="toggleTag(this)"><span class="check-icon">✓</span>国産100%</div>
+            <div class="tag-chip-filter" onclick="toggleTag(this)"><span class="check-icon">✓</span>砂糖不使用</div>
+            <div class="tag-chip-filter" onclick="toggleTag(this)"><span class="check-icon">✓</span>白砂糖不使用</div>
+            <div class="tag-chip-filter" onclick="toggleTag(this)"><span class="check-icon">✓</span>グルテンフリー</div>
+            <div class="tag-chip-filter" onclick="toggleTag(this)"><span class="check-icon">✓</span>卵不使用</div>
+            <div class="tag-chip-filter" onclick="toggleTag(this)"><span class="check-icon">✓</span>乳製品不使用</div>
+            <div class="tag-chip-filter" onclick="toggleTag(this)"><span class="check-icon">✓</span>ビーガン</div>
+            <div class="tag-chip-filter" onclick="toggleTag(this)"><span class="check-icon">✓</span>ペスカタリアン</div>
+            <div class="tag-chip-filter" onclick="toggleTag(this)"><span class="check-icon">✓</span>放牧・平飼い</div>
+          </div>
+
+          <div class="tag-section-label">
+            <svg viewBox="0 0 24 24"><path d="M9 2 H15 L17 6 H7 Z"/><rect x="7" y="6" width="10" height="16" rx="1.5"/><path d="M11 6 V9 A1 1 0 0 0 13 9 V6"/></svg>
+            日用品
+          </div>
+          <div class="tag-chips-wrap">
+            <div class="tag-chip-filter" onclick="toggleTag(this)"><span class="check-icon">✓</span>合成界面活性剤不使用</div>
+            <div class="tag-chip-filter" onclick="toggleTag(this)"><span class="check-icon">✓</span>合成香料不使用</div>
+            <div class="tag-chip-filter" onclick="toggleTag(this)"><span class="check-icon">✓</span>石油由来成分不使用</div>
+            <div class="tag-chip-filter" onclick="toggleTag(this)"><span class="check-icon">✓</span>無香料</div>
+            <div class="tag-chip-filter" onclick="toggleTag(this)"><span class="check-icon">✓</span>天然素材100%</div>
+            <div class="tag-chip-filter" onclick="toggleTag(this)"><span class="check-icon">✓</span>有機・オーガニック素材</div>
+            <div class="tag-chip-filter" onclick="toggleTag(this)"><span class="check-icon">✓</span>赤ちゃん・子ども向け</div>
+            <div class="tag-chip-filter" onclick="toggleTag(this)"><span class="check-icon">✓</span>プラスチックフリー</div>
+          </div>
+
+          <div class="tag-section-label">
+            <svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="13" rx="1.5"/><rect x="2" y="6" width="20" height="3" rx="1"/><line x1="12" y1="6" x2="12" y2="21"/><path d="M12 6 C12 6 10 2 7.5 3 C6 3.5 6 6 7.5 6 C9.5 6 11 5 12 6"/><path d="M12 6 C12 6 14 2 16.5 3 C18 3.5 18 6 16.5 6 C14.5 6 13 5 12 6"/></svg>
+            共通
+          </div>
+          <div class="tag-chips-wrap">
+            <div class="tag-chip-filter" onclick="toggleTag(this)"><span class="check-icon">✓</span>ギフト</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- アレルギー除外 -->
+    <div class="accordion-item">
+      <div class="accordion-header" onclick="toggleAccordion('allergy')">
+        <div class="accordion-title">
+          アレルギー除外
+          <span class="accordion-selected-count" id="allergyCount">0</span>
+        </div>
+        <div class="accordion-arrow" id="allergyArrow">
+          <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>
+      <div class="accordion-body" id="allergyBody">
+        <div class="accordion-body-inner">
+          <div class="allergy-note">
+            ⚠️ 選んだ食材を含む商品を検索結果から除外します。<br>
+            ※「グルテンフリー」タグとは異なります。小麦アレルギーの方は「小麦」を除外設定してください。
+          </div>
+          <div class="allergy-chips-wrap" id="allergyChips">
+            <div class="allergy-chip" data-val="卵" onclick="toggleAllergy(this)"><span class="exclude-x">×</span>卵</div>
+            <div class="allergy-chip" data-val="乳" onclick="toggleAllergy(this)"><span class="exclude-x">×</span>乳</div>
+            <div class="allergy-chip" data-val="小麦" onclick="toggleAllergy(this)"><span class="exclude-x">×</span>小麦</div>
+            <div class="allergy-chip" data-val="そば" onclick="toggleAllergy(this)"><span class="exclude-x">×</span>そば</div>
+            <div class="allergy-chip" data-val="落花生" onclick="toggleAllergy(this)"><span class="exclude-x">×</span>落花生</div>
+            <div class="allergy-chip" data-val="えび" onclick="toggleAllergy(this)"><span class="exclude-x">×</span>えび</div>
+            <div class="allergy-chip" data-val="かに" onclick="toggleAllergy(this)"><span class="exclude-x">×</span>かに</div>
+            <div class="allergy-chip" data-val="くるみ" onclick="toggleAllergy(this)"><span class="exclude-x">×</span>くるみ</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 配送 -->
+    <div class="accordion-item">
+      <div class="accordion-header" onclick="toggleAccordion('delivery')">
+        <div class="accordion-title">
+          配送
+          <span class="accordion-selected-count" id="deliveryCount">0</span>
+        </div>
+        <div class="accordion-arrow" id="deliveryArrow">
+          <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>
+      <div class="accordion-body" id="deliveryBody">
+        <div class="accordion-body-inner">
+          <div class="delivery-opts">
+            <div class="delivery-opt" onclick="toggleDelivery(this, '通常便')">
+              <div class="delivery-opt-check"></div>通常便
+            </div>
+            <div class="delivery-opt" onclick="toggleDelivery(this, 'クール便（冷蔵）')">
+              <div class="delivery-opt-check"></div>クール便（冷蔵）
+            </div>
+            <div class="delivery-opt" onclick="toggleDelivery(this, 'クール便（冷凍）')">
+              <div class="delivery-opt-check"></div>クール便（冷凍）
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== SEASONAL SECTION ===== -->
+<div class="seasonal-section" id="seasonalSection">
+  <div class="seasonal-label">季節の特集</div>
+  <div class="seasonal-scroll">
+    <div class="seasonal-banner b1" onclick="applySpecial('夏野菜')">
+      <span class="seasonal-banner-emoji">🥒</span>
+      <span class="seasonal-banner-text">旬の夏野菜<br>特集</span>
+    </div>
+    <div class="seasonal-banner b2" onclick="applySpecial('梅仕事')">
+      <span class="seasonal-banner-emoji">🫙</span>
+      <span class="seasonal-banner-text">梅仕事<br>セレクション</span>
+    </div>
+    <div class="seasonal-banner b3" onclick="applySpecial('冷たい飲みもの')">
+      <span class="seasonal-banner-emoji">🍵</span>
+      <span class="seasonal-banner-text">夏の冷たい<br>飲みもの</span>
+    </div>
+    <div class="seasonal-banner b4" onclick="applySpecial('ギフト')">
+      <span class="seasonal-banner-emoji">🎁</span>
+      <span class="seasonal-banner-text">お中元<br>ギフト</span>
+    </div>
+  </div>
+</div>
+
+<!-- ===== INLINE FILTER BAR（常時表示） ===== -->
+
+<!-- ===== ACTIVE FILTERS BAR ===== -->
+<div class="active-filters-bar" id="activeFiltersBar">
+  <div class="active-filters-scroll" id="activeFiltersList"></div>
+</div>
+
+<!-- ===== RESULTS ===== -->
+<div class="results-header">
+  <div class="results-count" id="resultsCountLabel"><strong>8件</strong>の商品</div>
+  <div class="sort-select-wrap">
+    <select class="sort-select" onchange="sortProducts(this.value)">
+      <option value="new">新着順</option>
+      <option value="popular">人気順</option>
+      <option value="price_asc">価格が安い順</option>
+      <option value="price_desc">価格が高い順</option>
+      <option value="rating">評価順</option>
+    </select>
+  </div>
+</div>
+
+<div class="products-grid" id="productsGrid">
+  <!-- JS で描画 -->
+</div>
+
+<div class="empty-state" id="emptyState">
+  <div class="empty-state-icon">🌿</div>
+  <div class="empty-state-title">商品が見つかりませんでした</div>
+  <div class="empty-state-sub">条件を変えて<br>もう一度お試しください</div>
+</div>
+
+<!-- ===== BOTTOM NAV ===== -->
+<nav class="bottom-nav">
+  <a class="nav-item" href="komcho-market-top.html">
+    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <span>ホーム</span>
+  </a>
+  <a class="nav-item active" href="komcho-market-search.html">
+    <svg viewBox="0 0 24 24" style="stroke:var(--green-dark);"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <span>探す</span>
+  </a>
+  <a class="nav-item" href="komcho-market-mypage.html">
+    <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    <span>お気に入り</span>
+  </a>
+  <a class="nav-item" href="komcho-market-cart.html">
+    <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+    <span>カゴ</span>
+  </a>
+  <a class="nav-item" href="komcho-market-orders.html">
+    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    <span>履歴</span>
+  </a>
+</nav>
+
+<script>
+// ===== サンプル商品データ =====
+const allProducts = [
+  {
+    id: 1, emoji: '🥕', grade: 'g2', isNew: true,
+    shop: '〇〇農園', name: '無農薬にんじん 1kg',
+    tags: ['無農薬', '国産100%'], allergy: [],
+    category: '生鮮食品', delivery: '通常便', price: 680, rating: 4.9, popular: 95
+  },
+  {
+    id: 2, emoji: '🫙', grade: 'g1', isNew: true,
+    shop: '〇〇農園', name: '無添加 自家製味噌 500g',
+    tags: ['化学調味料不使用', '砂糖不使用', 'グルテンフリー', '国産100%'], allergy: ['大豆'],
+    category: '調味料', delivery: 'クール便（冷蔵）', price: 1800, rating: 4.8, popular: 88
+  },
+  {
+    id: 3, emoji: '🍵', grade: 'g2', isNew: false,
+    shop: '京の茶屋', name: '無農薬ほうじ茶 100g',
+    tags: ['無農薬'], allergy: [],
+    category: '飲み物', delivery: '通常便', price: 1080, rating: 4.7, popular: 72
+  },
+  {
+    id: 4, emoji: '🧼', grade: 'g3', isNew: true,
+    shop: '草木屋', name: '無添加石鹸 ひのき',
+    tags: ['天然素材100%', '合成界面活性剤不使用'], allergy: [],
+    category: '日用品', delivery: '通常便', price: 680, rating: 4.6, popular: 65
+  },
+  {
+    id: 5, emoji: '🍪', grade: 'g4', isNew: false,
+    shop: 'てとてベーカリー', name: 'グルテンフリー クッキー',
+    tags: ['グルテンフリー', '卵不使用'], allergy: [],
+    category: 'お菓子', delivery: '通常便', price: 840, rating: 4.5, popular: 60
+  },
+  {
+    id: 6, emoji: '💧', grade: 'g3', isNew: false,
+    shop: 'ナチュラルケア', name: '有機オリーブオイル 200ml',
+    tags: ['有機・オーガニック', '国産100%'], allergy: [],
+    category: '調味料', delivery: '通常便', price: 1480, rating: 4.7, popular: 80
+  },
+  {
+    id: 7, emoji: '🍯', grade: 'g1', isNew: true,
+    shop: '〇〇農園', name: '完熟梅の無添加シロップ',
+    tags: ['砂糖不使用', '着色料不使用', '保存料不使用'], allergy: [],
+    category: '飲み物', delivery: '通常便', price: 1800, rating: 4.9, popular: 92
+  },
+  {
+    id: 8, emoji: '🌾', grade: 'g4', isNew: false,
+    shop: '〇〇農園', name: '無農薬コシヒカリ玄米 2kg',
+    tags: ['無農薬', '国産100%'], allergy: [],
+    category: '生鮮食品', delivery: '通常便', price: 2100, rating: 4.8, popular: 85
+  },
+];
+
+// ===== 状態管理 =====
+let state = {
+  keyword: '',
+  categories: [],
+  tags: [],
+  allergyExcludes: [],
+  delivery: null,
+  sort: 'new'
+};
+let filterPanelOpen = false;
+let accordionState = { cat: true, tag: true, allergy: false, delivery: false };
+let wishSet = new Set();
+
+// ===== 初期描画 =====
+renderProducts(allProducts);
+updateResultCount(allProducts.length);
+
+// ===== 検索バー =====
+const searchInput = document.getElementById('searchInput');
+const searchClear = document.getElementById('searchClear');
+
+searchInput.addEventListener('input', () => {
+  state.keyword = searchInput.value.trim();
+  searchClear.classList.toggle('visible', state.keyword.length > 0);
+  if (!filterPanelOpen) {
+    runSearch();
+  } else {
+    updateResultCount(getFilteredProducts().length);
+  }
+});
+searchInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') { applyFilters(); }
+});
+searchClear.addEventListener('click', () => {
+  searchInput.value = '';
+  state.keyword = '';
+  searchClear.classList.remove('visible');
+  runSearch();
+});
+
+// ===== アコーディオン =====
+function toggleAccordion(key) {
+  accordionState[key] = !accordionState[key];
+  document.getElementById(key + 'Body').classList.toggle('open', accordionState[key]);
+  document.getElementById(key + 'Arrow').classList.toggle('open', accordionState[key]);
+}
+
+// ===== カテゴリー選択 =====
+function toggleCat(el) {
+  el.classList.toggle('selected');
+  state.categories = Array.from(document.querySelectorAll('.cat-chip.selected')).map(e => e.dataset.val);
+  updateBadge('catCount', state.categories.length);
+  updateResultCount(getFilteredProducts().length);
+  updateFilterCountBadge();
+}
+
+// ===== タグ選択 =====
+function toggleTag(el) {
+  el.classList.toggle('selected');
+  state.tags = Array.from(document.querySelectorAll('.tag-chip-filter.selected'))
+    .map(e => e.textContent.replace('✓', '').trim());
+  updateBadge('tagCount', state.tags.length);
+  updateResultCount(getFilteredProducts().length);
+  updateFilterCountBadge();
+}
+
+// ===== アレルギー除外 =====
+function toggleAllergy(el) {
+  el.classList.toggle('excluded');
+  state.allergyExcludes = Array.from(document.querySelectorAll('.allergy-chip.excluded')).map(e => e.dataset.val);
+  updateBadge('allergyCount', state.allergyExcludes.length);
+  updateResultCount(getFilteredProducts().length);
+  updateFilterCountBadge();
+}
+
+// ===== 配送 =====
+function toggleDelivery(el, val) {
+  const wasSelected = el.classList.contains('selected');
+  document.querySelectorAll('.delivery-opt').forEach(o => o.classList.remove('selected'));
+  if (!wasSelected) {
+    el.classList.add('selected');
+    state.delivery = val;
+  } else {
+    state.delivery = null;
+  }
+  updateBadge('deliveryCount', state.delivery ? 1 : 0);
+  updateResultCount(getFilteredProducts().length);
+  updateFilterCountBadge();
+}
+
+// ===== バッジ更新 =====
+function updateBadge(id, count) {
+  const el = document.getElementById(id);
+  el.textContent = count;
+  el.classList.toggle('visible', count > 0);
+}
+function updateFilterCountBadge() {
+  const total = state.allergyExcludes.length + (state.delivery ? 1 : 0);
+  const badge = document.getElementById('filterCountBadge');
+  badge.textContent = total;
+  badge.classList.toggle('visible', total > 0);
+}
+
+// ===== 結果件数更新 =====
+function updateResultCount(n) {
+  document.getElementById('resultCount').textContent = n;
+}
+
+// ===== 絞り込み適用（ボタン押下） =====
+function applyFilters() {
+  filterPanelOpen = false;
+  document.getElementById('filterPanel').classList.remove('open');
+  document.getElementById('filterToggleBtn').classList.remove('active');
+  runSearch();
+  updateActivePills();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ===== 検索実行 =====
+function runSearch() {
+  const filtered = getFilteredProducts();
+  renderProducts(filtered);
+  updateResultCount(filtered.length);
+  document.getElementById('resultsCountLabel').innerHTML = `<strong>${filtered.length}件</strong>の商品`;
+  document.getElementById('emptyState').classList.toggle('visible', filtered.length === 0);
+  document.getElementById('productsGrid').style.display = filtered.length === 0 ? 'none' : 'grid';
+}
+
+function getFilteredProducts() {
+  let list = [...allProducts];
+  if (state.keyword) {
+    const kw = state.keyword;
+    list = list.filter(p => p.name.includes(kw) || p.shop.includes(kw) || p.tags.some(t => t.includes(kw)));
+  }
+  if (state.categories.length) {
+    list = list.filter(p => state.categories.includes(p.category));
+  }
+  if (state.tags.length) {
+    list = list.filter(p => state.tags.every(t => p.tags.includes(t)));
+  }
+  if (state.allergyExcludes.length) {
+    list = list.filter(p => !state.allergyExcludes.some(a => p.allergy.some(pa => pa.includes(a))));
+  }
+  if (state.delivery) {
+    list = list.filter(p => p.delivery === state.delivery);
+  }
+  // ソート
+  if (state.sort === 'price_asc') list.sort((a, b) => a.price - b.price);
+  else if (state.sort === 'price_desc') list.sort((a, b) => b.price - a.price);
+  else if (state.sort === 'popular') list.sort((a, b) => b.popular - a.popular);
+  else if (state.sort === 'rating') list.sort((a, b) => b.rating - a.rating);
+  else list.sort((a, b) => b.id - a.id);
+  return list;
+}
+
+// ===== 商品カード描画 =====
+function renderProducts(list) {
+  const grid = document.getElementById('productsGrid');
+  grid.innerHTML = list.map(p => `
+    <div class="product-card-grid" onclick="openProduct(${p.id})">
+      ${p.isNew ? '<div class="new-badge">NEW</div>' : ''}
+      <div class="product-img-grid ${p.grade}">${p.emoji}
+        <button class="wish-btn ${wishSet.has(p.id) ? 'active' : ''}" onclick="toggleWish(event, ${p.id})">
+          <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </button>
+      </div>
+      <div class="product-info-grid">
+        <div class="product-shop-grid">${p.shop}</div>
+        <div class="product-name-grid">${p.name}</div>
+        <div class="tag-pills">
+          ${p.tags.slice(0,2).map(t => `<span class="tag-pill">${t}</span>`).join('')}
+        </div>
+        <div class="product-price">¥${p.price.toLocaleString()}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ===== ウィッシュリスト =====
+function toggleWish(e, id) {
+  e.stopPropagation();
+  if (wishSet.has(id)) wishSet.delete(id);
+  else wishSet.add(id);
+  const btn = e.currentTarget;
+  btn.classList.toggle('active', wishSet.has(id));
+}
+
+// ===== 商品ページへ =====
+function openProduct(id) {
+  window.location.href = 'komcho-market-product.html';
+}
+
+// ===== ソート =====
+function sortProducts(val) {
+  state.sort = val;
+  runSearch();
+}
+
+// ===== アクティブフィルターピル =====
+function updateActivePills() {
+  const bar = document.getElementById('activeFiltersBar');
+  const list = document.getElementById('activeFiltersList');
+  const pills = [];
+  state.categories.forEach(c => pills.push({ label: c, type: 'cat', val: c }));
+  state.tags.forEach(t => pills.push({ label: t, type: 'tag', val: t }));
+  state.allergyExcludes.forEach(a => pills.push({ label: `${a}除外`, type: 'allergy', val: a }));
+  if (state.delivery) pills.push({ label: state.delivery, type: 'delivery', val: state.delivery });
+
+  if (pills.length === 0) {
+    bar.classList.remove('visible');
+    return;
+  }
+  bar.classList.add('visible');
+  list.innerHTML = pills.map(p => `
+    <div class="active-filter-pill ${p.type === 'allergy' ? 'allergy-pill' : ''}" onclick="removePill('${p.type}', '${p.val}')">
+      ${p.label} <span>×</span>
+    </div>
+  `).join('');
+}
+
+function removePill(type, val) {
+  if (type === 'cat') {
+    state.categories = state.categories.filter(c => c !== val);
+    document.querySelectorAll('.cat-chip').forEach(el => {
+      if (el.dataset.val === val) el.classList.remove('selected');
+    });
+    updateBadge('catCount', state.categories.length);
+  } else if (type === 'tag') {
+    state.tags = state.tags.filter(t => t !== val);
+    document.querySelectorAll('.tag-chip-filter').forEach(el => {
+      if (el.textContent.replace('✓','').trim() === val) el.classList.remove('selected');
+    });
+    updateBadge('tagCount', state.tags.length);
+  } else if (type === 'allergy') {
+    state.allergyExcludes = state.allergyExcludes.filter(a => a !== val);
+    document.querySelectorAll('.allergy-chip').forEach(el => {
+      if (el.dataset.val === val) el.classList.remove('excluded');
+    });
+    updateBadge('allergyCount', state.allergyExcludes.length);
+  } else if (type === 'delivery') {
+    state.delivery = null;
+    document.querySelectorAll('.delivery-opt').forEach(el => el.classList.remove('selected'));
+    updateBadge('deliveryCount', 0);
+  }
+  updateFilterCountBadge();
+  runSearch();
+  updateActivePills();
+}
+
+// ===== リセット =====
+function resetFilters() {
+  state = { keyword: searchInput.value.trim(), categories: [], tags: [], allergyExcludes: [], delivery: null, sort: state.sort };
+  document.querySelectorAll('.cat-chip.selected').forEach(el => el.classList.remove('selected'));
+  document.querySelectorAll('.tag-chip-filter.selected').forEach(el => el.classList.remove('selected'));
+  document.querySelectorAll('.allergy-chip.excluded').forEach(el => el.classList.remove('excluded'));
+  document.querySelectorAll('.delivery-opt.selected').forEach(el => el.classList.remove('selected'));
+  ['catCount','tagCount','allergyCount','deliveryCount'].forEach(id => updateBadge(id, 0));
+  updateFilterCountBadge();
+  updateResultCount(getFilteredProducts().length);
+}
+
+// ===== 季節の特集バナー =====
+function applySpecial(keyword) {
+  searchInput.value = keyword;
+  state.keyword = keyword;
+  searchClear.classList.add('visible');
+  runSearch();
+  document.getElementById('resultsCountLabel').innerHTML = `<strong>「${keyword}」</strong>の商品`;
+}
+</script>
+
+</body>
+</html>

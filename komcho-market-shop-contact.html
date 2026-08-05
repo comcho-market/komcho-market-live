@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>店舗にお問い合わせ - こむちょマーケット</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 48 48%27%3E%3Crect width=%2748%27 height=%2748%27 rx=%2710%27 fill=%27%233D5A3E%27/%3E%3Cg transform=%27translate(24,24) scale(0.55)%27%3E%3Cpath d=%27M -26 7 C -17 -17 5 -24 24 -10 C 12 5 -2 19 -21 24%27 fill=%27none%27 stroke=%27%23F8F5EF%27 stroke-width=%275%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/%3E%3C/g%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg:#F8F5EF; --bg-card:#FFFFFF; --green-dark:#3D5A3E; --green-mid:#5A7A5B;
+    --green-light:#EAF0E8; --gold:#B8973A; --text-main:#2C2C2C; --text-sub:#6B6B6B;
+    --border:#E2DDD5; --radius-card:12px; --shadow-card:0 2px 12px rgba(0,0,0,0.07);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Hiragino Kaku Gothic ProN','Hiragino Sans','Yu Gothic','Meiryo',sans-serif;
+    background: var(--bg); color: var(--text-main);
+    max-width: 430px; margin: 0 auto; min-height: 100vh; padding-bottom: 40px;
+  }
+  a { text-decoration: none; color: inherit; }
+  button { cursor: pointer; border: none; background: none; font-family: inherit; }
+  input, textarea { font-family: inherit; }
+
+  .header {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--bg); border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px;
+  }
+  .header-back { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; }
+  .header-back svg { width: 22px; height: 22px; stroke: var(--text-main); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .header-title { font-size: 15px; font-weight: 700; }
+  .header-spacer { width: 32px; }
+
+  .shop-banner {
+    display: flex; align-items: center; gap: 12px;
+    margin: 16px 16px 0; padding: 14px 16px;
+    background: var(--bg-card); border-radius: var(--radius-card); box-shadow: var(--shadow-card);
+  }
+  .shop-banner-logo {
+    width: 44px; height: 44px; border-radius: 10px; flex-shrink: 0;
+    background: linear-gradient(135deg,#e0e8d0,#b8c890);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; font-weight: 700; color: var(--green-dark); text-align: center; line-height: 1.3;
+  }
+  .shop-banner-name { font-size: 14px; font-weight: 700; }
+  .shop-banner-sub { font-size: 11px; color: var(--text-sub); margin-top: 2px; }
+
+  .notice-box {
+    margin: 12px 16px 0; padding: 12px 14px;
+    background: var(--green-light); border-radius: var(--radius-card);
+    font-size: 12px; color: var(--green-dark); line-height: 1.6;
+  }
+
+  .content { padding: 20px 16px; }
+  .form-field { margin-bottom: 20px; }
+  .form-label { font-size: 13px; font-weight: 700; margin-bottom: 8px; display: block; }
+  .form-input, .form-textarea {
+    width: 100%; border: 1px solid var(--border); border-radius: 10px;
+    padding: 12px 14px; font-size: 14px; background: var(--bg-card); color: var(--text-main);
+  }
+  .form-input:focus, .form-textarea:focus { outline: none; border-color: var(--green-dark); }
+  .form-textarea { min-height: 140px; resize: vertical; line-height: 1.7; }
+
+  .submit-wrap { padding: 4px 16px 0; }
+  .submit-btn {
+    width: 100%; height: 50px; border-radius: 25px;
+    background: var(--green-dark); color: #fff;
+    font-size: 15px; font-weight: 700;
+  }
+  .submit-btn:disabled { background: #C8C4BA; }
+
+  .success-screen {
+    display: none; padding: 60px 24px; text-align: center;
+  }
+  .success-screen.visible { display: block; }
+  .success-icon { font-size: 48px; margin-bottom: 16px; }
+  .success-title { font-size: 18px; font-weight: 700; margin-bottom: 10px; }
+  .success-text { font-size: 13px; color: var(--text-sub); line-height: 1.8; margin-bottom: 28px; }
+  .success-btn {
+    display: inline-block; background: var(--green-dark); color: #fff;
+    font-size: 14px; font-weight: 700; padding: 12px 28px; border-radius: 24px;
+  }
+  /* ============ DESKTOP (≥900px) ============ */
+  @media (min-width: 900px) {
+    body { max-width: 720px; padding-bottom: 40px; }
+    .header { padding: 16px 32px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <button class="header-back" onclick="history.back()">
+    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
+  <div class="header-title">店舗にお問い合わせ</div>
+  <div class="header-spacer"></div>
+</header>
+
+<div id="formScreen">
+
+  <div class="shop-banner">
+    <div class="shop-banner-logo">SHOP<br>LOGO</div>
+    <div>
+      <div class="shop-banner-name">〇〇農園</div>
+      <div class="shop-banner-sub">こちらのお店に直接質問できます</div>
+    </div>
+  </div>
+
+  <div class="notice-box">
+    商品や配送についてのご質問は、こちらから店舗に直接お送りいただけます。ご注文のキャンセル・返金など、店舗での対応が難しい内容は、注文詳細ページの案内もあわせてご確認ください。
+  </div>
+
+  <div class="content">
+    <div class="form-field">
+      <label class="form-label" for="nameInput">お名前</label>
+      <input class="form-input" type="text" id="nameInput" placeholder="山田 花子">
+    </div>
+    <div class="form-field">
+      <label class="form-label" for="emailInput">メールアドレス</label>
+      <input class="form-input" type="email" id="emailInput" placeholder="name@example.com">
+    </div>
+    <div class="form-field">
+      <label class="form-label" for="messageInput">お問い合わせ内容</label>
+      <textarea class="form-textarea" id="messageInput" placeholder="商品の在庫について質問があります。"></textarea>
+    </div>
+  </div>
+
+  <div class="submit-wrap">
+    <button class="submit-btn" onclick="submitForm()">店舗に送信する</button>
+  </div>
+
+</div>
+
+<div class="success-screen" id="successScreen">
+  <div class="success-icon">🌿</div>
+  <div class="success-title">送信しました</div>
+  <div class="success-text">
+    店舗からの返信をお待ちください。<br>
+    通常、数日以内にご登録のメールアドレス宛にご連絡があります。
+  </div>
+  <a class="success-btn" href="komcho-market-top.html">TOPへ戻る</a>
+</div>
+
+<script>
+function submitForm() {
+  const name = document.getElementById('nameInput').value.trim();
+  const email = document.getElementById('emailInput').value.trim();
+  const msg = document.getElementById('messageInput').value.trim();
+  if (!name || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !msg) {
+    alert('お名前・メールアドレス・お問い合わせ内容をご確認ください');
+    return;
+  }
+  document.getElementById('formScreen').style.display = 'none';
+  document.getElementById('successScreen').classList.add('visible');
+  window.scrollTo({ top: 0 });
+}
+</script>
+
+</body>
+</html>

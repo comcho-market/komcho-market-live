@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ショップ管理 - こむちょマーケット</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 48 48%27%3E%3Crect width=%2748%27 height=%2748%27 rx=%2710%27 fill=%27%233D5A3E%27/%3E%3Cg transform=%27translate(24,24) scale(0.55)%27%3E%3Cpath d=%27M -26 7 C -17 -17 5 -24 24 -10 C 12 5 -2 19 -21 24%27 fill=%27none%27 stroke=%27%23F8F5EF%27 stroke-width=%275%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/%3E%3C/g%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg:          #F8F5EF;
+    --bg-card:     #FFFFFF;
+    --green-dark:  #3D5A3E;
+    --green-mid:   #5A7A5B;
+    --green-light: #EAF0E8;
+    --gold:        #B8973A;
+    --text-main:   #2C2C2C;
+    --text-sub:    #6B6B6B;
+    --border:      #E2DDD5;
+    --radius-card: 12px;
+    --shadow-card: 0 2px 12px rgba(0,0,0,0.07);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Yu Gothic', 'Meiryo', sans-serif;
+    background: var(--bg);
+    color: var(--text-main);
+    max-width: 430px;
+    margin: 0 auto;
+    min-height: 100vh;
+    padding-bottom: 40px;
+  }
+  button { cursor: pointer; border: none; background: none; font-family: inherit; }
+  textarea, input { font-family: inherit; }
+
+  /* HEADER */
+  .header {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px;
+  }
+  .header-title {
+    font-size: 15px; font-weight: 700; letter-spacing: 0.04em;
+  }
+  .header-logo {
+    display: flex; align-items: center; gap: 7px;
+  }
+  .header-logo .logo-icon {
+    width: 24px; height: 19px; flex-shrink: 0;
+  }
+  .header-logo .logo-icon path {
+    fill: none; stroke: var(--green-dark);
+    stroke-width: 3; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .header-logo .logo-text {
+    font-size: 15px; font-weight: 700; letter-spacing: 0.04em;
+    color: var(--text-main);
+  }
+  .header-save {
+    background: var(--green-dark);
+    color: #fff;
+    font-size: 13px; font-weight: 700;
+    padding: 7px 16px; border-radius: 20px;
+    letter-spacing: 0.04em;
+  }
+
+  /* GAP */
+  .gap { height: 8px; background: var(--bg); }
+
+  /* SECTION BLOCK */
+  .section-block {
+    background: var(--bg-card);
+    padding: 20px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .block-title {
+    font-size: 14px; font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .block-title::after {
+    content: '';
+    flex: 1; height: 1px;
+    background: var(--border);
+  }
+
+  /* LOGO UPLOAD */
+  .logo-upload-area {
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+  }
+  .logo-preview {
+    width: 90px; height: 90px;
+    border-radius: 50%;
+    border: 2px dashed var(--green-dark);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: var(--bg);
+    gap: 6px; cursor: pointer;
+    position: relative; overflow: hidden;
+  }
+  .logo-preview svg {
+    width: 24px; height: 24px;
+    stroke: var(--green-mid); fill: none;
+    stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .logo-preview span {
+    font-size: 10px; color: var(--green-mid);
+    text-align: center; line-height: 1.4;
+  }
+  .logo-upload-btn {
+    font-size: 12px; color: var(--green-dark);
+    border: 1px solid var(--green-dark);
+    border-radius: 20px; padding: 6px 16px;
+    font-weight: 600;
+  }
+
+  /* FORM FIELDS */
+  .field { margin-bottom: 16px; }
+  .field:last-child { margin-bottom: 0; }
+  .field-label {
+    font-size: 12px; font-weight: 600;
+    color: var(--text-sub);
+    margin-bottom: 6px;
+    display: block;
+  }
+  .field-input {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 14px;
+    color: var(--text-main);
+    background: var(--bg);
+    outline: none;
+    transition: border-color 0.15s;
+    -webkit-appearance: none;
+  }
+  .field-input:focus { border-color: var(--green-dark); background: #fff; }
+  .field-textarea {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 13px;
+    color: var(--text-main);
+    background: var(--bg);
+    outline: none;
+    resize: vertical;
+    min-height: 100px;
+    line-height: 1.8;
+    transition: border-color 0.15s;
+    -webkit-appearance: none;
+  }
+  .field-textarea:focus { border-color: var(--green-dark); background: #fff; }
+  .field-hint {
+    font-size: 11px; color: var(--text-sub);
+    margin-top: 4px;
+  }
+
+  /* KODAWARI LIST */
+  .kodawari-list {
+    display: flex; flex-direction: column; gap: 8px;
+    margin-bottom: 12px;
+  }
+  .kodawari-item {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .kodawari-item input {
+    flex: 1;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 12px;
+    font-size: 13px;
+    color: var(--text-main);
+    background: var(--bg);
+    outline: none;
+    transition: border-color 0.15s;
+    -webkit-appearance: none;
+  }
+  .kodawari-item input:focus { border-color: var(--green-dark); background: #fff; }
+  .delete-btn {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    color: #ccc;
+    font-size: 18px; line-height: 1;
+    transition: color 0.15s;
+  }
+  .delete-btn:active { color: #E05A5A; }
+  .add-btn {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 13px; color: var(--green-dark);
+    font-weight: 600; padding: 4px 0;
+  }
+  .add-btn svg {
+    width: 18px; height: 18px;
+    stroke: var(--green-dark); fill: none;
+    stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+  }
+
+  /* NEWS LIST */
+  .news-admin-list {
+    display: flex; flex-direction: column; gap: 10px;
+    margin-bottom: 12px;
+  }
+  .news-admin-item {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+    padding: 12px;
+    background: var(--bg);
+  }
+  .news-admin-item-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .news-admin-item-header input {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 5px 8px;
+    font-size: 11px;
+    color: var(--text-sub);
+    background: #fff;
+    width: 90px;
+    outline: none;
+    -webkit-appearance: none;
+  }
+  .news-admin-item input.news-title-input {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 13px;
+    color: var(--text-main);
+    background: #fff;
+    outline: none;
+    -webkit-appearance: none;
+  }
+  .news-admin-item input.news-title-input:focus { border-color: var(--green-dark); }
+
+  /* PRODUCTS ADMIN */
+  .products-admin-list {
+    display: flex; flex-direction: column; gap: 10px;
+    margin-bottom: 14px;
+  }
+  .product-admin-item {
+    display: flex; align-items: center; gap: 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+    padding: 10px 12px;
+    background: var(--bg);
+    cursor: pointer;
+  }
+  .product-admin-thumb {
+    width: 52px; height: 52px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px;
+    flex-shrink: 0;
+  }
+  .product-admin-thumb.g1 { background: linear-gradient(135deg,#f0e8d0,#d8c8a0); }
+  .product-admin-thumb.g2 { background: linear-gradient(135deg,#e0e8d0,#b8c890); }
+  .product-admin-thumb.g3 { background: linear-gradient(135deg,#f4ead8,#d4c0a0); }
+  .product-admin-thumb.g4 { background: linear-gradient(135deg,#ece8e0,#c8c0b0); }
+  .product-admin-info { flex: 1; }
+  .product-admin-name {
+    font-size: 13px; font-weight: 600;
+    color: var(--text-main); margin-bottom: 3px;
+  }
+  .product-admin-price {
+    font-size: 12px; color: var(--text-sub);
+  }
+  .product-admin-badges {
+    display: flex; gap: 4px; margin-top: 4px;
+  }
+  .badge-new {
+    font-size: 9px; background: var(--gold); color: #fff;
+    border-radius: 4px; padding: 2px 6px; font-weight: 700;
+  }
+  .badge-soldout {
+    font-size: 9px; background: #ccc; color: #fff;
+    border-radius: 4px; padding: 2px 6px; font-weight: 700;
+  }
+  .edit-arrow svg {
+    width: 16px; height: 16px;
+    stroke: var(--text-sub); fill: none;
+    stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+  }
+
+  /* ADD PRODUCT BTN */
+  .add-product-btn {
+    width: 100%;
+    height: 48px;
+    border-radius: 24px;
+    border: 2px dashed var(--green-dark);
+    background: var(--green-light);
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    font-size: 14px; font-weight: 700; color: var(--green-dark);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .add-product-btn:active { background: #d4e4d0; }
+  .add-product-btn svg {
+    width: 18px; height: 18px;
+    stroke: var(--green-dark); fill: none;
+    stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;
+  }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 430px;
+    background: var(--bg-card); border-top: 1px solid var(--border);
+    display: flex; z-index: 200;
+  }
+  .nav-item {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+    padding: 8px 0 12px; color: var(--text-sub);
+    font-size: 10px; letter-spacing: 0.04em; cursor: pointer;
+  }
+  .nav-item.active { color: var(--green-dark); }
+  .nav-item svg {
+    width: 22px; height: 22px;
+    stroke: currentColor; fill: none;
+    stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
+  }
+
+  /* PRICE INPUT */
+  .price-input-wrap {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .price-yen {
+    font-size: 16px; font-weight: 700; color: var(--text-main); flex-shrink: 0;
+  }
+  .price-input-wrap .field-input { flex: 1; }
+  .free-shipping-row {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .free-shipping-preview {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--green-light);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13px; color: var(--green-dark); font-weight: 600;
+  }
+
+  /* TOAST */
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: var(--green-dark); color: #fff;
+    font-size: 13px; font-weight: 600;
+    padding: 10px 24px; border-radius: 20px;
+    z-index: 300;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+  }
+  .toast.show { opacity: 1; }
+  /* ============ DESKTOP (≥900px) ============ */
+  @media (min-width: 900px) {
+    body { max-width: 720px; padding-bottom: 40px; }
+    .header { padding: 16px 32px; }
+    .bottom-nav { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <a class="header-logo" href="komcho-market-top.html">
+    <svg class="logo-icon" viewBox="0 0 60 48">
+      <path transform="translate(30,24)" d="M -26 7 C -17 -17 5 -24 24 -10 C 12 5 -2 19 -21 24"/>
+    </svg>
+    <span class="logo-text">こむちょマーケット</span>
+  </a>
+  <div class="header-title">ショップ管理</div>
+  <button class="header-save" id="saveBtn">保存する</button>
+</header>
+
+<!-- ① ショップロゴ -->
+<div class="section-block">
+  <div class="block-title">ショップロゴ</div>
+  <div class="logo-upload-area">
+    <div class="logo-preview" id="logoPreview">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      <span>タップして<br>アップロード</span>
+    </div>
+    <button class="logo-upload-btn">画像を選択</button>
+  </div>
+</div>
+
+<div class="gap"></div>
+
+<!-- ② ショップ基本情報 -->
+<div class="section-block">
+  <div class="block-title">基本情報</div>
+  <div class="field">
+    <label class="field-label">ショップ名</label>
+    <input class="field-input" type="text" value="〇〇農園" placeholder="ショップ名を入力">
+  </div>
+  <div class="field">
+    <label class="field-label">所在地</label>
+    <input class="field-input" type="text" value="京都府京丹後市" placeholder="都道府県・市区町村">
+  </div>
+</div>
+
+<div class="gap"></div>
+
+<!-- ③ わたしたちについて -->
+<div class="section-block">
+  <div class="block-title">わたしたちについて</div>
+  <textarea class="field-textarea">京都の北、海と山に囲まれた京丹後市で、自然の恵みとともに野菜や果物を育てています。農薬や化学肥料を使わず、土の力を信じて、種から大切に育てた在来種の野菜たちをお届けします。日々の食卓に、自然本来の味わいと安心をお届けできれば幸いです。</textarea>
+</div>
+
+<div class="gap"></div>
+
+<!-- ④ こだわり -->
+<div class="section-block">
+  <div class="block-title">大切にしていること</div>
+  <div class="kodawari-list" id="kodawariList">
+    <div class="kodawari-item">
+      <input type="text" value="農薬・化学肥料を使わない土づくり">
+      <button class="delete-btn" onclick="deleteKodawari(this)">×</button>
+    </div>
+    <div class="kodawari-item">
+      <input type="text" value="種から育てる在来種野菜">
+      <button class="delete-btn" onclick="deleteKodawari(this)">×</button>
+    </div>
+    <div class="kodawari-item">
+      <input type="text" value="季節と向き合う手仕事">
+      <button class="delete-btn" onclick="deleteKodawari(this)">×</button>
+    </div>
+  </div>
+  <button class="add-btn" onclick="addKodawari()">
+    <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    項目を追加する
+  </button>
+</div>
+
+<div class="gap"></div>
+
+<!-- ⑤ お知らせ -->
+<div class="section-block">
+  <div class="block-title">お知らせ</div>
+  <div class="news-admin-list" id="newsList">
+    <div class="news-admin-item">
+      <div class="news-admin-item-header">
+        <input type="text" value="2026.6.10" placeholder="日付">
+        <button class="delete-btn" onclick="deleteNews(this)">×</button>
+      </div>
+      <input class="news-title-input" type="text" value="夏季休業のお知らせ（8/12〜8/16）" placeholder="お知らせ内容">
+    </div>
+    <div class="news-admin-item">
+      <div class="news-admin-item-header">
+        <input type="text" value="2026.6.1" placeholder="日付">
+        <button class="delete-btn" onclick="deleteNews(this)">×</button>
+      </div>
+      <input class="news-title-input" type="text" value="新商品 梅シロップの予約受付を開始しました" placeholder="お知らせ内容">
+    </div>
+  </div>
+  <button class="add-btn" onclick="addNews()">
+    <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    お知らせを追加する
+  </button>
+</div>
+
+<div class="gap"></div>
+
+<!-- ⑥ 商品管理 -->
+<div class="section-block">
+  <div class="block-title">商品管理</div>
+  <div class="products-admin-list">
+    <a class="product-admin-item" href="komcho-market-product-admin.html" style="text-decoration:none;color:inherit;display:flex;">
+      <div class="product-admin-thumb g1">🍯</div>
+      <div class="product-admin-info">
+        <div class="product-admin-name">完熟梅の無添加シロップ</div>
+        <div class="product-admin-price">¥1,800</div>
+        <div class="product-admin-badges"><span class="badge-new">NEW</span></div>
+      </div>
+      <div class="edit-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+    </div>
+    <div class="product-admin-item">
+      <div class="product-admin-thumb g2">🥕</div>
+      <div class="product-admin-info">
+        <div class="product-admin-name">季節の野菜セット（S）</div>
+        <div class="product-admin-price">¥3,200</div>
+        <div class="product-admin-badges"></div>
+      </div>
+      <div class="edit-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+    </div>
+    <div class="product-admin-item">
+      <div class="product-admin-thumb g3">🌾</div>
+      <div class="product-admin-info">
+        <div class="product-admin-name">無農薬コシヒカリ玄米 2kg</div>
+        <div class="product-admin-price">¥2,100</div>
+        <div class="product-admin-badges"><span class="badge-soldout">売り切れ</span></div>
+      </div>
+      <div class="edit-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+    </div>
+    <div class="product-admin-item">
+      <div class="product-admin-thumb g4">🫙</div>
+      <div class="product-admin-info">
+        <div class="product-admin-name">手作り干し柿（5個入り）</div>
+        <div class="product-admin-price">¥1,500</div>
+        <div class="product-admin-badges"></div>
+      </div>
+      <div class="edit-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div></div></a>
+  <button class="add-product-btn" onclick="window.location.href='komcho-market-product-admin.html'">
+    <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    商品を追加する
+  </button>
+</div>
+
+<div class="gap"></div>
+
+<!-- ⑦ 送料設定 -->
+<div class="section-block">
+  <div class="block-title">送料設定</div>
+  <p style="font-size:12px; color:var(--text-sub); margin-bottom:16px; line-height:1.7;">ここで設定した送料が商品編集ページに反映されます。</p>
+
+  <div class="field">
+    <label class="field-label">通常便（全国一律）</label>
+    <div class="price-input-wrap">
+      <span class="price-yen">¥</span>
+      <input class="field-input" type="number" value="800" inputmode="numeric">
+    </div>
+  </div>
+  <div class="field">
+    <label class="field-label">クール便・冷蔵（全国一律）</label>
+    <div class="price-input-wrap">
+      <span class="price-yen">¥</span>
+      <input class="field-input" type="number" value="1000" inputmode="numeric">
+    </div>
+  </div>
+  <div class="field">
+    <label class="field-label">クール便・冷凍（全国一律）</label>
+    <div class="price-input-wrap">
+      <span class="price-yen">¥</span>
+      <input class="field-input" type="number" value="1200" inputmode="numeric">
+    </div>
+  </div>
+
+  <div style="border-top:1px solid var(--border); margin: 4px 0 16px;"></div>
+
+  <div class="field">
+    <label class="field-label">送料無料ライン（任意）</label>
+    <div class="free-shipping-row">
+      <div class="price-input-wrap" style="flex:1;">
+        <span class="price-yen">¥</span>
+        <input class="field-input" type="number" value="5000" id="freeShippingInput" inputmode="numeric">
+      </div>
+      <span style="font-size:13px; color:var(--text-sub); white-space:nowrap;">以上で送料無料</span>
+    </div>
+    <p class="field-hint" style="margin-top:6px;">空欄にすると送料無料ラインは設定されません。</p>
+  </div>
+
+  <div class="free-shipping-preview">
+    <span>🎁</span>
+    <span id="freeShippingLabel">¥5,000以上のご注文で送料無料</span>
+  </div>
+</div>
+
+<!-- 運営サポート -->
+<div class="gap"></div>
+<div style="margin:0 16px 20px;">
+  <a href="komcho-market-contact.html" style="display:flex;align-items:center;justify-content:space-between;background:var(--bg-card);border-radius:var(--radius-card);box-shadow:var(--shadow-card);padding:16px 18px;text-decoration:none;color:inherit;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <svg viewBox="0 0 24 24" style="width:20px;height:20px;stroke:var(--green-dark);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <span style="font-size:13px;font-weight:700;">運営に問い合わせる</span>
+    </div>
+    <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:var(--text-sub);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;"><polyline points="9 18 15 12 9 6"/></svg>
+  </a>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">保存しました ✓</div>
+
+<script>
+  // こだわり追加
+  function addKodawari() {
+    const list = document.getElementById('kodawariList');
+    const item = document.createElement('div');
+    item.className = 'kodawari-item';
+    item.innerHTML = `
+      <input type="text" placeholder="こだわりを入力">
+      <button class="delete-btn" onclick="deleteKodawari(this)">×</button>
+    `;
+    list.appendChild(item);
+    item.querySelector('input').focus();
+  }
+  function deleteKodawari(btn) {
+    btn.closest('.kodawari-item').remove();
+  }
+
+  // お知らせ追加
+  function addNews() {
+    const list = document.getElementById('newsList');
+    const today = new Date();
+    const dateStr = `${today.getFullYear()}.${today.getMonth()+1}.${today.getDate()}`;
+    const item = document.createElement('div');
+    item.className = 'news-admin-item';
+    item.innerHTML = `
+      <div class="news-admin-item-header">
+        <input type="text" value="${dateStr}" placeholder="日付">
+        <button class="delete-btn" onclick="deleteNews(this)">×</button>
+      </div>
+      <input class="news-title-input" type="text" placeholder="お知らせ内容を入力">
+    `;
+    list.appendChild(item);
+    item.querySelector('.news-title-input').focus();
+  }
+  function deleteNews(btn) {
+    btn.closest('.news-admin-item').remove();
+  }
+
+  // 送料無料ラインプレビュー
+  const freeInput = document.getElementById('freeShippingInput');
+  const freeLabel = document.getElementById('freeShippingLabel');
+  if (freeInput) {
+    freeInput.addEventListener('input', () => {
+      const val = parseInt(freeInput.value);
+      if (!isNaN(val) && val > 0) {
+        freeLabel.textContent = `¥${val.toLocaleString()}以上のご注文で送料無料`;
+      } else {
+        freeLabel.textContent = '送料無料ラインなし';
+      }
+    });
+  }
+
+  // 保存トースト
+  document.getElementById('saveBtn').addEventListener('click', () => {
+    const toast = document.getElementById('toast');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2000);
+  });
+</script>
+</body>
+</html>

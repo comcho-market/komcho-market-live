@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>プライバシーポリシー - こむちょマーケット</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 48 48%27%3E%3Crect width=%2748%27 height=%2748%27 rx=%2710%27 fill=%27%233D5A3E%27/%3E%3Cg transform=%27translate(24,24) scale(0.55)%27%3E%3Cpath d=%27M -26 7 C -17 -17 5 -24 24 -10 C 12 5 -2 19 -21 24%27 fill=%27none%27 stroke=%27%23F8F5EF%27 stroke-width=%275%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/%3E%3C/g%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg:#F8F5EF; --bg-card:#FFFFFF; --green-dark:#3D5A3E; --green-mid:#5A7A5B;
+    --green-light:#EAF0E8; --gold:#B8973A; --text-main:#2C2C2C; --text-sub:#6B6B6B;
+    --border:#E2DDD5; --radius-card:12px; --shadow-card:0 2px 12px rgba(0,0,0,0.07);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Hiragino Kaku Gothic ProN','Hiragino Sans','Yu Gothic','Meiryo',sans-serif;
+    background: var(--bg); color: var(--text-main);
+    max-width: 430px; margin: 0 auto; min-height: 100vh; padding-bottom: 100px;
+  }
+  a { text-decoration: none; color: inherit; }
+  button { cursor: pointer; border: none; background: none; font-family: inherit; }
+
+  .header {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--bg); border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px;
+  }
+  .header-logo {
+    display: flex; align-items: center; gap: 7px;
+  }
+  .header-logo .logo-icon {
+    width: 24px; height: 19px; flex-shrink: 0;
+  }
+  .header-logo .logo-icon path {
+    fill: none; stroke: var(--green-dark);
+    stroke-width: 3; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .header-logo .logo-text {
+    font-size: 15px; font-weight: 700; letter-spacing: 0.04em;
+    color: var(--text-main);
+  }
+  .header-title { font-size: 15px; font-weight: 700; }
+  .header-spacer { width: 50px; }
+
+  .hero {
+    background: var(--green-dark); padding: 28px 20px 24px;
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: ''; position: absolute; top: -40px; right: -40px;
+    width: 180px; height: 180px; border-radius: 50%;
+    background: rgba(255,255,255,0.05);
+  }
+  .hero-label { font-size: 10px; color: rgba(255,255,255,0.6); letter-spacing: 0.15em; margin-bottom: 8px; }
+  .hero-title { font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+  .hero-sub { font-size: 12px; color: rgba(255,255,255,0.7); margin-bottom: 8px; }
+  .hero-date { font-size: 11px; color: rgba(255,255,255,0.5); }
+
+  .content { padding: 20px 16px; }
+
+  .draft-banner {
+    background: #FFF9EC; border: 1px solid #E8D898;
+    border-radius: 8px; padding: 12px 14px; margin-bottom: 20px;
+    font-size: 12px; color: #8A7000; line-height: 1.8;
+  }
+
+  .toc-card {
+    background: var(--bg-card); border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card); padding: 16px; margin-bottom: 24px;
+  }
+  .toc-title { font-size: 12px; font-weight: 700; color: var(--text-sub); margin-bottom: 10px; letter-spacing: 0.08em; }
+  .toc-list { display: flex; flex-direction: column; gap: 6px; }
+  .toc-item { font-size: 12px; color: var(--green-dark); display: flex; align-items: center; gap: 8px; }
+  .toc-item::before { content: '▸'; font-size: 10px; }
+
+  .section { margin-bottom: 24px; }
+  .section-title {
+    font-size: 14px; font-weight: 700; color: var(--green-dark);
+    padding: 10px 14px; background: var(--green-light);
+    border-radius: 8px; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-title::before { content: ''; width: 3px; height: 16px; background: var(--green-dark); border-radius: 2px; flex-shrink: 0; }
+  .section-body {
+    background: var(--bg-card); border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card); padding: 16px;
+    font-size: 13px; line-height: 1.9; color: var(--text-main);
+  }
+  .section-body p { margin-bottom: 10px; }
+  .section-body p:last-child { margin-bottom: 0; }
+  .section-body ul { padding-left: 18px; margin: 8px 0; }
+  .section-body ul li { margin-bottom: 6px; }
+  .section-body .note {
+    font-size: 11px; color: var(--text-sub); background: var(--bg);
+    border-radius: 6px; padding: 10px 12px; margin-top: 10px; line-height: 1.8;
+  }
+  .section-body .contact-link {
+    color: var(--green-dark); font-weight: 600; text-decoration: underline;
+  }
+  .info-table {
+    width: 100%; border-collapse: collapse; font-size: 13px;
+  }
+  .info-table tr { border-bottom: 1px solid var(--border); }
+  .info-table tr:last-child { border-bottom: none; }
+  .info-table th {
+    text-align: left; color: var(--text-sub); font-weight: 600;
+    padding: 8px 10px 8px 0; width: 90px; vertical-align: top;
+  }
+  .info-table td { padding: 8px 0; color: var(--text-main); }
+
+  /* 戻るボタン */
+  .back-wrap { padding: 0 16px; margin-top: 8px; }
+  .back-btn {
+    width: 100%; height: 48px; border-radius: 24px;
+    border: 1.5px solid var(--border);
+    background: var(--bg-card);
+    font-size: 14px; font-weight: 600; color: var(--text-main);
+    cursor: pointer;
+  }
+  .back-btn:active { background: var(--bg); }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 430px;
+    background: var(--bg-card); border-top: 1px solid var(--border);
+    display: flex; justify-content: space-around; align-items: center;
+    padding: 8px 0 20px; z-index: 100;
+  }
+  .nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; }
+  .nav-icon { width: 22px; height: 22px; stroke: var(--text-sub); fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+  .nav-label { font-size: 10px; color: var(--text-sub); }
+  /* ============ DESKTOP (≥900px) ============ */
+  @media (min-width: 900px) {
+    body { max-width: 720px; padding-bottom: 40px; }
+    .header { padding: 16px 32px; }
+    .bottom-nav { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <a class="header-logo" href="komcho-market-top.html">
+    <svg class="logo-icon" viewBox="0 0 60 48">
+      <path transform="translate(30,24)" d="M -26 7 C -17 -17 5 -24 24 -10 C 12 5 -2 19 -21 24"/>
+    </svg>
+    <span class="logo-text">こむちょマーケット</span>
+  </a>
+  <div class="header-title">プライバシーポリシー</div>
+  <div class="header-spacer"></div>
+</header>
+
+<div class="hero">
+  <div class="hero-label">PRIVACY POLICY</div>
+  <div class="hero-title">プライバシーポリシー</div>
+  <div class="hero-sub">個人情報の取り扱いについて</div>
+  <div class="hero-date">制定日：2026年○月○日　／　最終改定：2026年○月○日</div>
+</div>
+
+<div class="content">
+
+  <div class="draft-banner">
+    ⚠️ このページはドラフト版です。公開前に弁護士による監修を受けることを推奨します。
+  </div>
+
+  <div class="toc-card">
+    <div class="toc-title">目次</div>
+    <div class="toc-list">
+      <div class="toc-item">第1条　事業者情報</div>
+      <div class="toc-item">第2条　取得する情報</div>
+      <div class="toc-item">第3条　利用目的</div>
+      <div class="toc-item">第4条　第三者提供</div>
+      <div class="toc-item">第5条　業務委託</div>
+      <div class="toc-item">第6条　Cookie等の利用</div>
+      <div class="toc-item">第7条　安全管理措置</div>
+      <div class="toc-item">第8条　開示・訂正・利用停止等の請求</div>
+      <div class="toc-item">第9条　お問い合わせ窓口</div>
+      <div class="toc-item">第10条　保有期間</div>
+      <div class="toc-item">第11条　改定について</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">第1条　事業者情報</div>
+    <div class="section-body">
+      <p>こむちょマーケット運営事務局（以下「当社」）は、モール型ECサービス「こむちょマーケット」（以下「本サービス」）をご利用いただくお客様および出店者様の個人情報を、本ポリシーに基づき適切に取り扱います。</p>
+      <table class="info-table">
+        <tr><th>事業者名</th><td>こむちょマーケット運営事務局</td></tr>
+        <tr><th>連絡先</th><td>お問い合わせページよりご連絡ください</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">第2条　取得する情報</div>
+    <div class="section-body">
+      <p>当社は、本サービスの提供にあたり、以下の情報を取得します。</p>
+      <ul>
+        <li>会員情報：氏名、メールアドレス、パスワード（暗号化して保存します）</li>
+        <li>配送情報：郵便番号、住所、電話番号</li>
+        <li>決済情報：クレジットカード情報（決済代行会社Stripe, Inc.を通じて処理し、当社サーバーには保存しません）</li>
+        <li>出店者情報：屋号・会社名、代表者名、事業所所在地、電話番号、メールアドレス、取り扱いカテゴリー、（該当する場合）営業許可書またはOEM委託先の工場情報</li>
+        <li>ご利用状況：注文履歴、お気に入り、閲覧履歴、Cookie等のアクセス情報</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">第3条　利用目的</div>
+    <div class="section-body">
+      <p>取得した情報は、以下の目的で利用します。</p>
+      <ul>
+        <li>商品の受発注・配送手続きのため</li>
+        <li>本人確認およびお問い合わせ対応のため</li>
+        <li>出店審査、出店者との連絡・契約手続きのため</li>
+        <li>ポイントの付与・利用状況の管理のため</li>
+        <li>サービスの維持・改善、新機能の開発のための分析</li>
+        <li>重要なお知らせの送付のため</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">第4条　第三者提供</div>
+    <div class="section-body">
+      <p>当社は、以下の場合を除き、本人の同意なく個人情報を第三者に提供しません。</p>
+      <ul>
+        <li>配送手続きに必要な範囲で、氏名・住所・電話番号を出店者および配送業者に提供する場合</li>
+        <li>決済処理のため、決済に必要な情報を決済代行会社（Stripe, Inc.）に提供する場合</li>
+        <li>法令に基づき開示が求められた場合</li>
+        <li>人の生命・身体・財産の保護のために必要で、本人の同意を得ることが困難な場合</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">第5条　業務委託</div>
+    <div class="section-body">
+      <p>当社は、業務の一部を以下の委託先に委託しています。委託先に対しては、個人情報の適切な取り扱いについて必要な監督を行います。</p>
+      <table class="info-table">
+        <tr><th>決済処理</th><td>Stripe, Inc.</td></tr>
+        <tr><th>サーバー・ホスティング</th><td>Vercel Inc.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">第6条　Cookie等の利用</div>
+    <div class="section-body">
+      <p>本サービスでは、ログイン状態の維持やアクセス状況の分析のため、Cookie等の技術を利用しています。</p>
+      <div class="note">ブラウザの設定によりCookieを無効にすることができますが、その場合、本サービスの一部機能がご利用いただけなくなることがあります。</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">第7条　安全管理措置</div>
+    <div class="section-body">
+      <p>当社は、個人情報の漏えい・滅失・毀損を防止するため、適切なセキュリティ対策を講じます。</p>
+      <p>クレジットカード情報は当社では保持せず、Stripe社のシステム上で安全に処理されます。</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">第8条　開示・訂正・利用停止等の請求</div>
+    <div class="section-body">
+      <p>お客様・出店者様ご自身の個人情報について、開示、訂正、削除、利用停止をご希望の場合は、<a href="komcho-market-contact.html" class="contact-link">お問い合わせページ</a>よりご連絡ください。</p>
+      <p>ご本人であることを確認のうえ、法令に従い速やかに対応いたします。</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">第9条　お問い合わせ窓口</div>
+    <div class="section-body">
+      <p>個人情報の取り扱いに関するお問い合わせは、<a href="komcho-market-contact.html" class="contact-link">お問い合わせページ</a>よりご連絡ください。</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">第10条　保有期間</div>
+    <div class="section-body">
+      <p>当社は、取得した個人情報を、会員登録が有効な期間中、本ポリシーに定める利用目的の達成に必要な範囲で保持します。</p>
+      <ul>
+        <li>最終のご購入またはログインから概ね2〜3年以上ご利用がない場合、当社は事前にメールでお知らせしたうえで、氏名・住所等の個人を特定できる情報を削除します。</li>
+        <li>削除後も、購入回数・売上等の統計データについては、個人を特定できない形に匿名化したうえで、事業分析のために保持する場合があります。</li>
+      </ul>
+      <div class="note">法令により保存が義務付けられている情報（取引に関する帳簿書類等）については、当該法令が定める期間、保持します。</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">第11条　改定について</div>
+    <div class="section-body">
+      <p>当社は、法令の変更やサービス内容の変更に応じて、本ポリシーを改定することがあります。重要な変更がある場合は、本サービス上でお知らせします。</p>
+    </div>
+  </div>
+
+  <div class="back-wrap">
+    <button class="back-btn" onclick="history.back()">前のページに戻る</button>
+  </div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <a class="nav-item" href="komcho-market-top.html">
+    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 0-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <span class="nav-label">ホーム</span>
+  </a>
+  <a class="nav-item" href="komcho-market-top.html">
+    <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <span class="nav-label">さがす</span>
+  </a>
+  <a class="nav-item" href="komcho-market-top.html">
+    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    <span class="nav-label">お気に入り</span>
+  </a>
+  <a class="nav-item" href="komcho-market-top.html">
+    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+    <span class="nav-label">カゴ</span>
+  </a>
+  <a class="nav-item" href="komcho-market-top.html">
+    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <span class="nav-label">マイページ</span>
+  </a>
+</nav>
+
+</body>
+</html>

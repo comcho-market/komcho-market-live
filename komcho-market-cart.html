@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>カゴ - こむちょマーケット</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 48 48%27%3E%3Crect width=%2748%27 height=%2748%27 rx=%2710%27 fill=%27%233D5A3E%27/%3E%3Cg transform=%27translate(24,24) scale(0.55)%27%3E%3Cpath d=%27M -26 7 C -17 -17 5 -24 24 -10 C 12 5 -2 19 -21 24%27 fill=%27none%27 stroke=%27%23F8F5EF%27 stroke-width=%275%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/%3E%3C/g%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg:          #F8F5EF;
+    --bg-card:     #FFFFFF;
+    --green-dark:  #3D5A3E;
+    --green-mid:   #5A7A5B;
+    --green-light: #EAF0E8;
+    --gold:        #B8973A;
+    --text-main:   #2C2C2C;
+    --text-sub:    #6B6B6B;
+    --border:      #E2DDD5;
+    --radius-card: 12px;
+    --shadow-card: 0 2px 12px rgba(0,0,0,0.07);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Yu Gothic', 'Meiryo', sans-serif;
+    background: var(--bg);
+    color: var(--text-main);
+    max-width: 430px;
+    margin: 0 auto;
+    min-height: 100vh;
+    padding-bottom: 80px;
+  }
+  button { cursor: pointer; border: none; background: none; font-family: inherit; }
+
+  /* HEADER */
+  .header {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px;
+  }
+  .header-logo {
+    display: flex; align-items: center; gap: 7px;
+  }
+  .header-logo .logo-icon {
+    width: 24px; height: 19px; flex-shrink: 0;
+  }
+  .header-logo .logo-icon path {
+    fill: none; stroke: var(--green-dark);
+    stroke-width: 3; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .header-logo .logo-text {
+    font-size: 15px; font-weight: 700; letter-spacing: 0.04em;
+    color: var(--text-main);
+  }
+  .header-title { font-size: 15px; font-weight: 700; letter-spacing: 0.04em; }
+  .header-spacer { width: 50px; }
+
+  /* GAP */
+  .gap { height: 8px; background: var(--bg); }
+
+  /* SHOP CART BLOCK */
+  .shop-cart-block {
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 0;
+  }
+
+  /* SHOP HEADER */
+  .shop-cart-header {
+    display: flex; align-items: center; gap: 10px;
+    padding: 14px 16px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .shop-cart-logo {
+    width: 32px; height: 32px; border-radius: 8px;
+    border: 1px dashed var(--border); background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 8px; color: var(--text-sub); text-align: center;
+    line-height: 1.2; flex-shrink: 0;
+  }
+  .shop-cart-name { font-size: 13px; font-weight: 700; flex: 1; }
+  .shop-cart-count { font-size: 11px; color: var(--text-sub); }
+
+  /* CART ITEMS */
+  .cart-items { padding: 0 16px; }
+  .cart-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .cart-item:last-child { border-bottom: none; }
+  .cart-item-img {
+    width: 72px; height: 72px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 32px; flex-shrink: 0;
+  }
+  .cart-item-img.g1 { background: linear-gradient(135deg,#f0e8d0,#d8c8a0); }
+  .cart-item-img.g2 { background: linear-gradient(135deg,#e0e8d0,#b8c890); }
+  .cart-item-img.g3 { background: linear-gradient(135deg,#f4ead8,#d4c0a0); }
+  .cart-item-img.g4 { background: linear-gradient(135deg,#ece8e0,#c8c0b0); }
+  .cart-item-info { flex: 1; }
+  .cart-item-name {
+    font-size: 13px; font-weight: 600;
+    line-height: 1.4; color: var(--text-main);
+    margin-bottom: 4px;
+  }
+  .cart-item-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px; }
+  .cart-item-tag {
+    font-size: 9px; background: var(--green-light);
+    color: var(--green-dark); border-radius: 20px;
+    padding: 2px 7px; font-weight: 500;
+  }
+  .cart-item-price {
+    font-size: 15px; font-weight: 700;
+    color: var(--text-main); margin-bottom: 8px;
+  }
+  .cart-item-controls {
+    display: flex; align-items: center; gap: 0;
+  }
+  .qty-btn {
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; color: var(--green-dark); font-weight: 500;
+    cursor: pointer;
+  }
+  .qty-num {
+    width: 36px; text-align: center;
+    font-size: 15px; font-weight: 700;
+    color: var(--text-main);
+  }
+  .cart-item-delete {
+    margin-left: auto;
+    display: flex; align-items: center; justify-content: center;
+    width: 30px; height: 30px;
+    cursor: pointer;
+  }
+  .cart-item-delete svg {
+    width: 16px; height: 16px;
+    stroke: var(--text-sub); fill: none;
+    stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+  }
+
+  /* SHOP SUMMARY */
+  .shop-summary {
+    padding: 14px 16px;
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+  }
+  .shop-summary-row {
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 13px; color: var(--text-sub);
+    margin-bottom: 6px;
+  }
+  .shop-summary-row:last-child { margin-bottom: 0; }
+  .shop-summary-row.total {
+    font-size: 15px; font-weight: 700;
+    color: var(--text-main); margin-top: 10px;
+    padding-top: 10px; border-top: 1px solid var(--border);
+  }
+  .delivery-type-badge {
+    font-size: 10px; background: var(--bg-card);
+    border: 1px solid var(--border); border-radius: 10px;
+    padding: 2px 8px; color: var(--text-sub);
+  }
+  .free-shipping-note {
+    font-size: 11px; color: var(--green-dark);
+    background: var(--green-light);
+    border-radius: 8px; padding: 8px 12px;
+    margin-top: 10px; line-height: 1.6;
+    display: flex; align-items: center; gap: 6px;
+  }
+
+  /* POINT USE */
+  .point-use-block {
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border);
+    padding: 16px;
+  }
+  .point-use-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .point-use-title {
+    font-size: 14px; font-weight: 700;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .point-use-title svg {
+    width: 16px; height: 16px;
+    stroke: var(--green-dark); fill: none;
+    stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .point-balance {
+    font-size: 12px; color: var(--text-sub);
+  }
+  .point-balance strong { color: var(--green-dark); font-weight: 700; }
+  .point-use-row {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .point-use-toggle {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; color: var(--text-main);
+    cursor: pointer;
+  }
+  .toggle-switch {
+    width: 44px; height: 24px; border-radius: 12px;
+    background: var(--border); position: relative;
+    transition: background 0.2s; flex-shrink: 0;
+    cursor: pointer;
+  }
+  .toggle-switch.on { background: var(--green-dark); }
+  .toggle-knob {
+    width: 20px; height: 20px; border-radius: 50%;
+    background: #fff; position: absolute;
+    top: 2px; left: 2px;
+    transition: left 0.2s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+  }
+  .toggle-switch.on .toggle-knob { left: 22px; }
+  .point-use-amount {
+    font-size: 13px; color: var(--green-dark);
+    font-weight: 700; margin-left: auto;
+  }
+
+  /* CHECKOUT BTN */
+  .checkout-block {
+    background: var(--bg-card);
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .checkout-summary {
+    display: flex; flex-direction: column; gap: 6px;
+    margin-bottom: 14px;
+  }
+  .checkout-row {
+    display: flex; justify-content: space-between;
+    font-size: 13px; color: var(--text-sub);
+  }
+  .checkout-row.grand-total {
+    font-size: 18px; font-weight: 700;
+    color: var(--text-main);
+    padding-top: 10px; margin-top: 4px;
+    border-top: 1px solid var(--border);
+  }
+  .checkout-point-earn {
+    font-size: 11px; color: var(--green-dark);
+    background: var(--green-light);
+    border-radius: 8px; padding: 8px 12px;
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .checkout-btn {
+    width: 100%; height: 52px; border-radius: 26px;
+    background: var(--green-dark); color: #fff;
+    font-size: 16px; font-weight: 700; letter-spacing: 0.04em;
+    cursor: pointer; border: none;
+    transition: opacity 0.15s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .checkout-btn:active { opacity: 0.85; }
+  .checkout-btn svg {
+    width: 18px; height: 18px;
+    stroke: #fff; fill: none;
+    stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .checkout-note {
+    text-align: center;
+    font-size: 11px; color: var(--text-sub);
+    margin-top: 10px; line-height: 1.6;
+  }
+
+  /* GUEST NOTICE */
+  .guest-notice {
+    margin: 0 16px;
+    background: #FFF9EC;
+    border: 1px solid #E8D898;
+    border-radius: var(--radius-card);
+    padding: 14px 16px;
+    margin-bottom: 8px;
+  }
+  .guest-notice-title {
+    font-size: 13px; font-weight: 700;
+    color: var(--text-main); margin-bottom: 6px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .guest-notice-text {
+    font-size: 12px; color: var(--text-sub); line-height: 1.7;
+    margin-bottom: 10px;
+  }
+  .guest-notice-btn {
+    display: inline-block;
+    background: var(--green-dark); color: #fff;
+    font-size: 12px; font-weight: 700;
+    padding: 7px 16px; border-radius: 20px;
+    cursor: pointer;
+  }
+
+  /* CONTINUE SHOPPING */
+  .continue-wrap {
+    padding: 16px;
+    text-align: center;
+  }
+  .continue-link {
+    font-size: 13px; color: var(--green-mid);
+    display: flex; align-items: center; justify-content: center; gap: 4px;
+    cursor: pointer;
+  }
+  .continue-link svg {
+    width: 14px; height: 14px;
+    stroke: var(--green-mid); fill: none;
+    stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+  }
+
+  /* EMPTY STATE */
+  .empty-state {
+    display: none;
+    padding: 80px 24px 40px;
+    text-align: center;
+    flex-direction: column; align-items: center;
+  }
+  .empty-state.visible { display: flex; }
+  .empty-icon { font-size: 52px; margin-bottom: 20px; }
+  .empty-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+  .empty-sub { font-size: 13px; color: var(--text-sub); line-height: 1.8; margin-bottom: 28px; }
+  .empty-btn {
+    height: 48px; border-radius: 24px;
+    background: var(--green-dark); color: #fff;
+    font-size: 14px; font-weight: 700;
+    padding: 0 28px; cursor: pointer; border: none;
+  }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 430px;
+    background: var(--bg-card); border-top: 1px solid var(--border);
+    display: flex; z-index: 200;
+  }
+  .nav-item {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+    padding: 10px 0 14px; color: var(--text-sub);
+    font-size: 10px; letter-spacing: 0.04em; cursor: pointer;
+  }
+  .nav-item.active { color: var(--green-dark); }
+  .nav-item svg {
+    width: 22px; height: 22px;
+    stroke: currentColor; fill: none;
+    stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .cart-wrap { position: relative; }
+  .cart-badge {
+    position: absolute; top: -5px; right: -6px;
+    background: var(--green-dark); color: #fff;
+    font-size: 9px; font-weight: 700;
+    width: 16px; height: 16px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* TOAST */
+  .toast {
+    position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+    background: var(--green-dark); color: #fff;
+    font-size: 13px; font-weight: 600;
+    padding: 10px 24px; border-radius: 20px;
+    z-index: 400; opacity: 0; pointer-events: none;
+    transition: opacity 0.2s; white-space: nowrap;
+  }
+  .toast.show { opacity: 1; }
+
+  /* ============ DESKTOP (≥900px) ============ */
+  @media (min-width: 900px) {
+    body { max-width: 720px; padding-bottom: 40px; }
+    .header { padding: 16px 32px; }
+    .shop-cart-block { border-radius: 16px; margin-bottom: 16px; border-bottom: none; box-shadow: var(--shadow-card); overflow: hidden; }
+    .guest-notice { margin-left: 32px; margin-right: 32px; }
+    .continue-wrap { padding-left: 32px; padding-right: 32px; }
+    .bottom-nav { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <a class="header-logo" href="komcho-market-top.html">
+    <svg class="logo-icon" viewBox="0 0 60 48">
+      <path transform="translate(30,24)" d="M -26 7 C -17 -17 5 -24 24 -10 C 12 5 -2 19 -21 24"/>
+    </svg>
+    <span class="logo-text">こむちょマーケット</span>
+  </a>
+  <div class="header-title">カゴ</div>
+  <div class="header-spacer"></div>
+</header>
+
+<!-- ===== 店舗①：〇〇農園 ===== -->
+<div class="shop-cart-block" id="shop1">
+  <div class="shop-cart-header">
+    <a href="komcho-market-shop.html" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;"><div class="shop-cart-logo">SHOP<br>LOGO</div><div class="shop-cart-name">〇〇農園</div></a>
+    <div class="shop-cart-count" id="shop1Count">2点</div>
+  </div>
+
+  <div class="cart-items" id="shop1Items">
+
+    <div class="cart-item" data-id="s1-1" data-price="1800" data-shop="1">
+      <a href="komcho-market-product.html" class="cart-item-img g1" style="display:flex;align-items:center;justify-content:center;text-decoration:none;">🫙</a>
+      <div class="cart-item-info">
+        <a href="komcho-market-product.html" style="text-decoration:none;color:inherit;display:block;"><div class="cart-item-name">無添加 自家製味噌 500g</div>
+        <div class="cart-item-tags">
+          <span class="cart-item-tag">砂糖不使用</span>
+          <span class="cart-item-tag">国産100%</span>
+        </div>
+        <div class="cart-item-price" id="price-s1-1">¥1,800</div></a>
+        <div class="cart-item-controls">
+          <button class="qty-btn" onclick="changeQty('s1-1', -1)">－</button>
+          <div class="qty-num" id="qty-s1-1">1</div>
+          <button class="qty-btn" onclick="changeQty('s1-1', 1)">＋</button>
+          <button class="cart-item-delete" onclick="deleteItem('s1-1', 1)">
+            <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="cart-item" data-id="s1-2" data-price="3200" data-shop="1">
+      <a href="komcho-market-product.html" class="cart-item-img g2" style="display:flex;align-items:center;justify-content:center;text-decoration:none;">🥕</a>
+      <div class="cart-item-info">
+        <a href="komcho-market-product.html" style="text-decoration:none;color:inherit;display:block;"><div class="cart-item-name">季節の野菜セット（S）</div>
+        <div class="cart-item-tags">
+          <span class="cart-item-tag">無農薬</span>
+        </div>
+        <div class="cart-item-price" id="price-s1-2">¥3,200</div></a>
+        <div class="cart-item-controls">
+          <button class="qty-btn" onclick="changeQty('s1-2', -1)">－</button>
+          <div class="qty-num" id="qty-s1-2">1</div>
+          <button class="qty-btn" onclick="changeQty('s1-2', 1)">＋</button>
+          <button class="cart-item-delete" onclick="deleteItem('s1-2', 1)">
+            <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 店舗①小計 -->
+  <div class="shop-summary">
+    <div class="shop-summary-row">
+      <span>小計</span>
+      <span id="shop1Sub">¥5,000</span>
+    </div>
+    <div class="shop-summary-row">
+      <span>送料 <span class="delivery-type-badge">クール便（冷蔵）</span></span>
+      <span id="shop1Shipping">¥1,000</span>
+    </div>
+    <div class="free-shipping-note" id="shop1FreeNote" style="display:none;">
+      🎁 送料無料が適用されました！
+    </div>
+    <div class="shop-summary-row total">
+      <span>この店舗の合計</span>
+      <span id="shop1Total">¥6,000</span>
+    </div>
+  </div>
+
+  <!-- 店舗①注文ボタン -->
+  <div class="checkout-block">
+    <div class="checkout-point-earn" id="shop1PointEarn">
+      🌿 この注文で <strong>25pt</strong> 獲得予定（200円で1pt）
+    </div>
+    <button class="checkout-btn" onclick="goCheckout(1)">
+      <svg viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+      〇〇農園の注文手続きへ
+    </button>
+    <div class="checkout-note">住所・お支払い方法は次の画面で選択できます</div>
+  </div>
+</div>
+
+<div class="gap"></div>
+
+<!-- ===== 店舗②：京の茶屋 ===== -->
+<div class="shop-cart-block" id="shop2">
+  <div class="shop-cart-header">
+    <a href="komcho-market-shop.html" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;"><div class="shop-cart-logo">SHOP<br>LOGO</div><div class="shop-cart-name">京の茶屋</div></a>
+    <div class="shop-cart-count" id="shop2Count">1点</div>
+  </div>
+
+  <div class="cart-items" id="shop2Items">
+
+    <div class="cart-item" data-id="s2-1" data-price="1080" data-shop="2">
+      <a href="komcho-market-product.html" class="cart-item-img g3" style="display:flex;align-items:center;justify-content:center;text-decoration:none;">🍵</a>
+      <div class="cart-item-info">
+        <a href="komcho-market-product.html" style="text-decoration:none;color:inherit;display:block;"><div class="cart-item-name">無農薬ほうじ茶 100g</div>
+        <div class="cart-item-tags">
+          <span class="cart-item-tag">無農薬</span>
+        </div>
+        <div class="cart-item-price" id="price-s2-1">¥1,080</div></a>
+        <div class="cart-item-controls">
+          <button class="qty-btn" onclick="changeQty('s2-1', -1)">－</button>
+          <div class="qty-num" id="qty-s2-1">1</div>
+          <button class="qty-btn" onclick="changeQty('s2-1', 1)">＋</button>
+          <button class="cart-item-delete" onclick="deleteItem('s2-1', 2)">
+            <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 店舗②小計 -->
+  <div class="shop-summary">
+    <div class="shop-summary-row">
+      <span>小計</span>
+      <span id="shop2Sub">¥1,080</span>
+    </div>
+    <div class="shop-summary-row">
+      <span>送料 <span class="delivery-type-badge">通常便</span></span>
+      <span id="shop2Shipping">¥800</span>
+    </div>
+    <div class="free-shipping-note" id="shop2FreeNote" style="display:none;">
+      🎁 送料無料が適用されました！
+    </div>
+    <div class="shop-summary-row total">
+      <span>この店舗の合計</span>
+      <span id="shop2Total">¥1,880</span>
+    </div>
+  </div>
+
+  <!-- 店舗②注文ボタン -->
+  <div class="checkout-block">
+    <div class="checkout-point-earn" id="shop2PointEarn">
+      🌿 この注文で <strong>5pt</strong> 獲得予定（200円で1pt）
+    </div>
+    <button class="checkout-btn" onclick="goCheckout(2)">
+      <svg viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+      京の茶屋の注文手続きへ
+    </button>
+    <div class="checkout-note">住所・お支払い方法は次の画面で選択できます</div>
+  </div>
+</div>
+
+<div class="gap"></div>
+
+<!-- ゲスト向け登録促進 -->
+<div class="guest-notice">
+  <div class="guest-notice-title">🌿 会員登録でポイントが貯まります</div>
+  <div class="guest-notice-text">
+    今回の購入でポイントを貯めるには会員登録が必要です。登録は無料・1分で完了します。
+  </div>
+  <a class="guest-notice-btn" href="komcho-market-terms.html" style="text-decoration:none;">無料で会員登録する</a>
+</div>
+
+<!-- 買い物を続ける -->
+<div class="continue-wrap">
+  <a class="continue-link" href="komcho-market-search.html" onclick="if(document.referrer && document.referrer.includes('komcho-market')){history.back(); return false;}" style="text-decoration:none;">
+    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+    買い物を続ける
+  </a>
+</div>
+
+<!-- カラの状態（初期は非表示） -->
+<div class="empty-state" id="emptyState">
+  <div class="empty-icon">🛒</div>
+  <div class="empty-title">カゴに商品がありません</div>
+  <div class="empty-sub">気になる商品を見つけて<br>カゴに入れてみましょう</div>
+  <button class="empty-btn" onclick="window.location.href='komcho-market-search.html'">商品を探す</button>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <a class="nav-item" href="komcho-market-top.html">
+    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <span>ホーム</span>
+  </a>
+  <a class="nav-item" href="komcho-market-search.html">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <span>探す</span>
+  </a>
+  <a class="nav-item" href="komcho-market-mypage.html">
+    <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    <span>お気に入り</span>
+  </a>
+  <a class="nav-item active" href="komcho-market-top.html">
+    <div class="cart-wrap">
+      <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      <div class="cart-badge" id="cartBadge">3</a>
+    </div>
+    <span>カゴ</span>
+  </div>
+  <a class="nav-item" href="komcho-market-top.html">
+    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <span>マイページ</span>
+  </a>
+</nav>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+  // 商品データ
+  const items = {
+    's1-1': { price: 1800, qty: 1, shop: 1 },
+    's1-2': { price: 3200, qty: 1, shop: 1 },
+    's2-1': { price: 1080, qty: 1, shop: 2 },
+  };
+
+  // 店舗設定
+  const shopConfig = {
+    1: { shipping: 1000, freeThreshold: 10000, name: '〇〇農園' },
+    2: { shipping: 800,  freeThreshold: 5000,  name: '京の茶屋' },
+  };
+
+  function changeQty(id, delta) {
+    const item = items[id];
+    const newQty = item.qty + delta;
+    if (newQty < 1) { deleteItem(id, item.shop); return; }
+    if (newQty > 99) return;
+    item.qty = newQty;
+    document.getElementById('qty-' + id).textContent = newQty;
+    document.getElementById('price-' + id).textContent =
+      '¥' + (item.price * newQty).toLocaleString();
+    updateShop(item.shop);
+  }
+
+  function deleteItem(id, shopNum) {
+    if (!confirm('この商品をカゴから削除しますか？')) return;
+    delete items[id];
+    const el = document.querySelector(`[data-id="${id}"]`);
+    if (el) el.remove();
+    updateShop(shopNum);
+    updateCartBadge();
+    showToast('商品を削除しました');
+
+    // 店舗内商品が0になったら店舗ブロックを非表示
+    const remaining = Object.values(items).filter(i => i.shop === shopNum);
+    if (remaining.length === 0) {
+      document.getElementById('shop' + shopNum).style.display = 'none';
+    }
+
+    // 全商品が0になったら空状態
+    if (Object.keys(items).length === 0) {
+      document.getElementById('emptyState').classList.add('visible');
+      document.getElementById('cartBadge').style.display = 'none';
+    }
+  }
+
+  function updateShop(shopNum) {
+    const shopItems = Object.values(items).filter(i => i.shop === shopNum);
+    const subtotal = shopItems.reduce((s, i) => s + i.price * i.qty, 0);
+    const config = shopConfig[shopNum];
+    const isFree = subtotal >= config.freeThreshold;
+    const shipping = isFree ? 0 : config.shipping;
+    const total = subtotal + shipping;
+    const earnPt = Math.floor(total / 200);
+
+    document.getElementById('shop' + shopNum + 'Sub').textContent =
+      '¥' + subtotal.toLocaleString();
+    document.getElementById('shop' + shopNum + 'Shipping').textContent =
+      isFree ? '無料' : '¥' + shipping.toLocaleString();
+    document.getElementById('shop' + shopNum + 'Total').textContent =
+      '¥' + total.toLocaleString();
+    document.getElementById('shop' + shopNum + 'Count').textContent =
+      shopItems.reduce((s, i) => s + i.qty, 0) + '点';
+    document.getElementById('shop' + shopNum + 'FreeNote').style.display =
+      isFree ? 'flex' : 'none';
+    document.getElementById('shop' + shopNum + 'PointEarn').innerHTML =
+      `🌿 この注文で <strong>${earnPt}pt</strong> 獲得予定（200円で1pt）`;
+
+    updateCartBadge();
+  }
+
+  function updateCartBadge() {
+    const total = Object.values(items).reduce((s, i) => s + i.qty, 0);
+    document.getElementById('cartBadge').textContent = total;
+  }
+
+  function goCheckout(shopNum) {
+    window.location.href = 'komcho-market-checkout.html';
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+</script>
+</body>
+</html>

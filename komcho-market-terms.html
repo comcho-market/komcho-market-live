@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>利用規約（お客様向け） - こむちょマーケット</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 48 48%27%3E%3Crect width=%2748%27 height=%2748%27 rx=%2710%27 fill=%27%233D5A3E%27/%3E%3Cg transform=%27translate(24,24) scale(0.55)%27%3E%3Cpath d=%27M -26 7 C -17 -17 5 -24 24 -10 C 12 5 -2 19 -21 24%27 fill=%27none%27 stroke=%27%23F8F5EF%27 stroke-width=%275%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/%3E%3C/g%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg:#F8F5EF; --bg-card:#FFFFFF; --green-dark:#3D5A3E; --green-mid:#5A7A5B;
+    --green-light:#EAF0E8; --gold:#B8973A; --text-main:#2C2C2C; --text-sub:#6B6B6B;
+    --border:#E2DDD5; --radius-card:12px; --shadow-card:0 2px 12px rgba(0,0,0,0.07);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Hiragino Kaku Gothic ProN','Hiragino Sans','Yu Gothic','Meiryo',sans-serif;
+    background: var(--bg); color: var(--text-main);
+    max-width: 430px; margin: 0 auto; min-height: 100vh; padding-bottom: 100px;
+  }
+  a { text-decoration: none; color: inherit; }
+  button { cursor: pointer; border: none; background: none; font-family: inherit; }
+
+  .header {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--bg); border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px;
+  }
+  .header-logo {
+    display: flex; align-items: center; gap: 7px;
+  }
+  .header-logo .logo-icon {
+    width: 24px; height: 19px; flex-shrink: 0;
+  }
+  .header-logo .logo-icon path {
+    fill: none; stroke: var(--green-dark);
+    stroke-width: 3; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .header-logo .logo-text {
+    font-size: 15px; font-weight: 700; letter-spacing: 0.04em;
+    color: var(--text-main);
+  }
+  .header-title { font-size: 15px; font-weight: 700; }
+  .header-spacer { width: 50px; }
+
+  .hero {
+    background: var(--green-dark); padding: 28px 20px 24px;
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: ''; position: absolute; top: -40px; right: -40px;
+    width: 180px; height: 180px; border-radius: 50%;
+    background: rgba(255,255,255,0.05);
+  }
+  .hero-label { font-size: 10px; color: rgba(255,255,255,0.6); letter-spacing: 0.15em; margin-bottom: 8px; }
+  .hero-title { font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+  .hero-sub { font-size: 12px; color: rgba(255,255,255,0.7); margin-bottom: 8px; }
+  .hero-date { font-size: 11px; color: rgba(255,255,255,0.5); }
+
+  .content { padding: 20px 16px; }
+
+  .draft-banner {
+    background: #FFF9EC; border: 1px solid #E8D898;
+    border-radius: 8px; padding: 12px 14px; margin-bottom: 20px;
+    font-size: 12px; color: #8A7000; line-height: 1.8;
+  }
+
+  .toc-card {
+    background: var(--bg-card); border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card); padding: 16px; margin-bottom: 24px;
+  }
+  .toc-title { font-size: 12px; font-weight: 700; color: var(--text-sub); margin-bottom: 10px; letter-spacing: 0.08em; }
+  .toc-list { display: flex; flex-direction: column; gap: 6px; }
+  .toc-item { font-size: 12px; color: var(--green-dark); display: flex; align-items: center; gap: 8px; }
+  .toc-item::before { content: '▸'; font-size: 10px; }
+
+  .section { margin-bottom: 24px; }
+  .section-title {
+    font-size: 14px; font-weight: 700; color: var(--green-dark);
+    padding: 10px 14px; background: var(--green-light);
+    border-radius: 8px; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-title::before { content: ''; width: 3px; height: 16px; background: var(--green-dark); border-radius: 2px; flex-shrink: 0; }
+  .section-body {
+    background: var(--bg-card); border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card); padding: 16px;
+    font-size: 13px; line-height: 1.9; color: var(--text-main);
+  }
+  .section-body p { margin-bottom: 10px; }
+  .section-body p:last-child { margin-bottom: 0; }
+  .section-body ul { padding-left: 18px; margin: 8px 0; }
+  .section-body ul li { margin-bottom: 6px; }
+  .section-body .note {
+    font-size: 11px; color: var(--text-sub); background: var(--bg);
+    border-radius: 6px; padding: 10px 12px; margin-top: 10px; line-height: 1.8;
+  }
+
+  /* 同意ボタンエリア */
+  .agree-wrap {
+    background: var(--bg-card); border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card); padding: 20px 16px;
+    margin-top: 8px;
+  }
+  .agree-check-row {
+    display: flex; align-items: flex-start; gap: 12px; margin-bottom: 16px;
+  }
+  .agree-checkbox {
+    width: 22px; height: 22px; border: 2px solid var(--border);
+    border-radius: 6px; appearance: none; -webkit-appearance: none;
+    cursor: pointer; flex-shrink: 0; margin-top: 1px;
+    transition: background 0.15s, border-color 0.15s;
+    position: relative;
+  }
+  .agree-checkbox:checked { background: var(--green-dark); border-color: var(--green-dark); }
+  .agree-checkbox:checked::after {
+    content: ''; position: absolute;
+    left: 5px; top: 2px; width: 8px; height: 12px;
+    border: 2px solid #fff; border-top: none; border-left: none;
+    transform: rotate(45deg);
+  }
+  .agree-label { font-size: 13px; line-height: 1.8; color: var(--text-main); }
+  .agree-label span { color: var(--green-dark); font-weight: 600; }
+  .agree-btn {
+    width: 100%; height: 52px; border-radius: 26px;
+    background: var(--border); color: #fff;
+    font-size: 16px; font-weight: 700; letter-spacing: 0.04em;
+    border: none; cursor: not-allowed;
+    transition: background 0.2s;
+  }
+  .agree-btn.active { background: var(--green-dark); cursor: pointer; }
+  .agree-btn.active:active { opacity: 0.85; }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 430px;
+    background: var(--bg-card); border-top: 1px solid var(--border);
+    display: flex; justify-content: space-around; align-items: center;
+    padding: 8px 0 20px; z-index: 100;
+  }
+  .nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; }
+  .nav-icon { width: 22px; height: 22px; stroke: var(--text-sub); fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+  .nav-label { font-size: 10px; color: var(--text-sub); }
+  /* ============ DESKTOP (≥900px) ============ */
+  @media (min-width: 900px) {
+    body { max-width: 720px; padding-bottom: 40px; }
+    .header { padding: 16px 32px; }
+    .bottom-nav { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <a class="header-logo" href="komcho-market-top.html">
+    <svg class="logo-icon" viewBox="0 0 60 48">
+      <path transform="translate(30,24)" d="M -26 7 C -17 -17 5 -24 24 -10 C 12 5 -2 19 -21 24"/>
+    </svg>
+    <span class="logo-text">こむちょマーケット</span>
+  </a>
+  <div class="header-title">利用規約</div>
+  <div class="header-spacer"></div>
+</header>
+
+<div class="hero">
+  <div class="hero-label">TERMS OF SERVICE</div>
+  <div class="hero-title">利用規約</div>
+  <div class="hero-sub">お客様向け</div>
+  <div class="hero-date">制定日：2026年○月○日　／　最終改定：2026年○月○日</div>
+</div>
+
+<div class="content">
+
+  <div class="draft-banner">
+    ⚠️ このページはドラフト版です。公開前に弁護士による監修を受けることを推奨します。
+  </div>
+
+  <div class="toc-card">
+    <div class="toc-title">目次</div>
+    <div class="toc-list">
+      <div class="toc-item">第1条　適用範囲</div>
+      <div class="toc-item">第2条　会員登録</div>
+      <div class="toc-item">第3条　禁止事項</div>
+      <div class="toc-item">第4条　商品の購入</div>
+      <div class="toc-item">第5条　ポイントサービス</div>
+      <div class="toc-item">第6条　知的財産権</div>
+      <div class="toc-item">第7条　免責事項</div>
+      <div class="toc-item">第8条　サービスの変更・停止</div>
+      <div class="toc-item">第9条　規約の変更</div>
+      <div class="toc-item">第10条　準拠法・管轄裁判所</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">第1条　適用範囲</div>
+    <div class="section-body">
+      <p>本規約は、○○（以下「当社」）が運営するモール型ECサービス「こむちょマーケット」（以下「本サービス」）を利用するお客様に適用されます。</p>
+      <p>本サービスを利用した時点で、本規約に同意したものとみなします。</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">第2条　会員登録</div>
+    <div class="section-body">
+      <p>本サービスの一部機能（購入・お気に入り・注文履歴・ポイント管理など）は会員登録が必要です。</p>
+      <ul>
+        <li>登録情報は正確・最新の情報を入力してください。</li>
+        <li>アカウントの管理はご自身の責任で行ってください。</li>
+        <li>第三者へのアカウントの貸与・譲渡は禁止します。</li>
+        <li>退会を希望する場合は、マイページより手続きを行ってください。</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">第3条　禁止事項</div>
+    <div class="section-body">
+      <p>お客様は以下の行為を行ってはなりません。</p>
+      <ul>
+        <li>法令・公序良俗に違反する行為</li>
+        <li>虚偽の情報を登録する行為</li>
+        <li>本サービスの運営を妨害する行為</li>
+        <li>出店者・他のお客様への迷惑行為・嫌がらせ</li>
+        <li>不正な方法によるポイントの取得・利用</li>
+        <li>転売目的での大量購入（当社が不適切と判断した場合）</li>
+        <li>当社の書面による許可なく、本サービスのコンテンツを複製・転用する行為</li>
+      </ul>
+      <div class="note">違反が確認された場合、アカウントの停止・法的手続きを行う場合があります。</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">第4条　商品の購入</div>
+    <div class="section-body">
+      <p>本サービスでの購入に関して、以下のとおりです。</p>
+      <ul>
+        <li>注文確定をもって売買契約が成立します。</li>
+        <li>商品の販売者は各出店者です。当社は取引の仲介を行います。</li>
+        <li>商品の品質・内容・発送に関するトラブルは、原則として出店者と直接解決してください。当社は必要に応じて仲介いたします。</li>
+        <li>食品の性質上、注文確定後のキャンセルは原則お受けできません。</li>
+        <li>商品に破損・品質不良・誤配送があった場合は、到着後7日以内にお問い合わせください。</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">第5条　ポイントサービス</div>
+    <div class="section-body">
+      <p>本サービスでは、購入に応じてポイントを付与するサービスを提供します。詳細はサービス内のお知らせをご確認ください。</p>
+      <ul>
+        <li>ポイントは現金・その他への換金はできません。</li>
+        <li>ポイントの有効期限は最終ご利用日から1年間です。</li>
+        <li>退会した場合、ポイントは失効します。</li>
+        <li>当社はポイントの内容・還元率を予告なく変更する場合があります。</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">第6条　知的財産権</div>
+    <div class="section-body">
+      <p>本サービスに掲載されているコンテンツ（テキスト・画像・デザイン・ロゴ等）の著作権は当社または各権利者に帰属します。無断転載・複製・改変を禁じます。</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">第7条　免責事項</div>
+    <div class="section-body">
+      <p>当社は以下について責任を負いません。</p>
+      <ul>
+        <li>出店者が販売する商品の品質・安全性・効果</li>
+        <li>システム障害・メンテナンスによるサービス停止</li>
+        <li>天災・不可抗力による損害</li>
+        <li>お客様間・お客様と出店者間のトラブル（当社は仲介に努めますが、解決を保証するものではありません）</li>
+      </ul>
+      <div class="note">ただし、当社の故意・重大な過失による損害についてはこの限りではありません。</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">第8条　サービスの変更・停止</div>
+    <div class="section-body">
+      <p>当社は、システムメンテナンス・法令改正・事業上の都合により、サービスの一部または全部を変更・停止することができます。重要な変更がある場合は、事前にサービス上でお知らせします。</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">第9条　規約の変更</div>
+    <div class="section-body">
+      <p>当社は、必要に応じて本規約を変更することができます。変更後も引き続き本サービスをご利用いただいた場合、変更後の規約に同意したものとみなします。重要な変更については、サービス上またはメールにてお知らせします。</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">第10条　準拠法・管轄裁判所</div>
+    <div class="section-body">
+      <p>本規約は日本法に準拠します。本サービスに関する紛争については、京都地方裁判所を第一審の専属的合意管轄裁判所とします。</p>
+    </div>
+  </div>
+
+  <!-- 同意ボタン -->
+  <div class="agree-wrap">
+    <div class="agree-check-row">
+      <input type="checkbox" class="agree-checkbox" id="agreeCheck" onchange="toggleBtn()">
+      <label class="agree-label" for="agreeCheck">
+        <span>利用規約</span>および<span>プライバシーポリシー</span>の内容を読み、同意します
+      </label>
+    </div>
+    <button class="agree-btn" id="agreeBtn" disabled onclick="handleAgree()">同意してアカウントを作成する</button>
+  </div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <a class="nav-item" href="komcho-market-top.html">
+    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 0-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <span class="nav-label">ホーム</span>
+  </a>
+  <a class="nav-item" href="komcho-market-top.html">
+    <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <span class="nav-label">さがす</span>
+  </a>
+  <a class="nav-item" href="komcho-market-top.html">
+    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    <span class="nav-label">お気に入り</span>
+  </a>
+  <a class="nav-item" href="komcho-market-top.html">
+    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+    <span class="nav-label">カゴ</span>
+  </a>
+  <a class="nav-item" href="komcho-market-top.html">
+    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <span class="nav-label">マイページ</span>
+  </a>
+</nav>
+
+<script>
+function toggleBtn() {
+  const checked = document.getElementById('agreeCheck').checked;
+  const btn = document.getElementById('agreeBtn');
+  btn.classList.toggle('active', checked);
+  btn.disabled = !checked;
+}
+function handleAgree() {
+  window.location.href = 'komcho-market-register.html';
+}
+</script>
+</body>
+</html>

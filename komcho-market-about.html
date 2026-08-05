@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>わたしたちについて - こむちょマーケット</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 48 48%27%3E%3Crect width=%2748%27 height=%2748%27 rx=%2710%27 fill=%27%233D5A3E%27/%3E%3Cg transform=%27translate(24,24) scale(0.55)%27%3E%3Cpath d=%27M -26 7 C -17 -17 5 -24 24 -10 C 12 5 -2 19 -21 24%27 fill=%27none%27 stroke=%27%23F8F5EF%27 stroke-width=%275%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/%3E%3C/g%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg:#F8F5EF; --bg-card:#FFFFFF; --green-dark:#3D5A3E; --green-mid:#5A7A5B;
+    --green-light:#EAF0E8; --gold:#B8973A; --text-main:#2C2C2C; --text-sub:#6B6B6B;
+    --border:#E2DDD5; --radius-card:12px; --shadow-card:0 2px 12px rgba(0,0,0,0.07);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Hiragino Kaku Gothic ProN','Hiragino Sans','Yu Gothic','Meiryo',sans-serif;
+    background: var(--bg); color: var(--text-main);
+    max-width: 430px; margin: 0 auto; min-height: 100vh; padding-bottom: 100px;
+  }
+  a { text-decoration: none; color: inherit; }
+  button { cursor: pointer; border: none; background: none; font-family: inherit; }
+
+  .header {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--bg); border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px;
+  }
+  .header-back {
+    width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+  }
+  .header-back svg { width: 22px; height: 22px; stroke: var(--text-main); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .header-title { font-size: 15px; font-weight: 700; }
+  .header-spacer { width: 32px; }
+
+  .hero {
+    background: var(--green-dark); padding: 32px 24px 28px;
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: ''; position: absolute; top: -40px; right: -40px;
+    width: 180px; height: 180px; border-radius: 50%;
+    background: rgba(255,255,255,0.05);
+  }
+  .hero-label { font-size: 10px; color: rgba(255,255,255,0.6); letter-spacing: 0.15em; margin-bottom: 8px; }
+  .hero-title { font-size: 22px; font-weight: 700; color: #fff; line-height: 1.5; }
+
+  .about-section {
+    margin: 20px 16px 24px;
+    background: var(--bg-card);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
+    padding: 28px 24px;
+  }
+  .about-body {
+    font-size: 13px;
+    line-height: 2;
+    color: var(--text-main);
+  }
+  .about-body strong { color: var(--green-dark); font-weight: 700; }
+
+  .about-block {
+    border-top: 1px solid var(--border);
+    padding-top: 20px;
+    margin-top: 20px;
+  }
+  .about-block:first-child { border-top: none; padding-top: 0; margin-top: 0; }
+  .about-block-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .about-block p {
+    font-size: 13px;
+    line-height: 1.9;
+    color: var(--text-main);
+  }
+  .about-block p strong { color: var(--green-dark); font-weight: 700; }
+  .about-block p em {
+    font-style: normal;
+    background: var(--green-light);
+    color: var(--green-dark);
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+
+  .ng-list {
+    list-style: none;
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .ng-list li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-main);
+  }
+  .ng-list li::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--green-dark);
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .cta-wrap { margin: 4px 16px 0; }
+  .cta-btn {
+    display: block; text-align: center;
+    background: var(--green-dark); color: #fff;
+    font-size: 14px; font-weight: 700;
+    padding: 14px; border-radius: 24px;
+  }
+
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 430px;
+    background: var(--bg-card); border-top: 1px solid var(--border);
+    display: flex; z-index: 200;
+  }
+  .nav-item {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+    padding: 10px 0 14px; color: var(--text-sub);
+    font-size: 10px; letter-spacing: 0.04em; cursor: pointer;
+  }
+  .nav-item.active { color: var(--green-dark); }
+  .nav-item svg {
+    width: 22px; height: 22px;
+    stroke: currentColor; fill: none;
+    stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
+  }
+  /* ============ DESKTOP (≥900px) ============ */
+  @media (min-width: 900px) {
+    body { max-width: 720px; padding-bottom: 40px; }
+    .header { padding: 16px 32px; }
+    .bottom-nav { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <button class="header-back" onclick="history.back()">
+    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
+  <div class="header-title">わたしたちについて</div>
+  <div class="header-spacer"></div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-label">ABOUT US</div>
+  <div class="hero-title">なぜ、こむちょマーケットを<br>つくったのか。</div>
+</div>
+
+<div class="about-section">
+
+  <div class="about-block">
+    <p>
+      スーパーの棚には、たくさんの商品が並んでいます。でも「本当に自分に合うもの」を探そうとすると、原材料を調べて、産地を確認して、気づけば何十分も経っている。<br><br>
+      そんな経験、ありませんか？<br><br>
+      「こむちょ」という名前には、<strong>こ</strong>だわりたい人が、<strong>む</strong>添加やオーガニックといった基準の中から、自分にとって<strong>ちょ</strong>うどいいものを見つけられるように、という想いを込めました。<br><br>
+      こむちょマーケットは、こだわりたい人が、迷わず選べる場所です。
+    </p>
+  </div>
+
+  <div class="about-block">
+    <div class="about-block-title">🌿 絶対に扱わないもの</div>
+    <p>どんな商品であっても、以下は出店をお断りしています。</p>
+    <ul class="ng-list">
+      <li>タール色素・合成着色料</li>
+      <li>アスパルテームなどの人工甘味料</li>
+      <li>亜硝酸ナトリウム・硝酸塩</li>
+      <li>ポストハーベスト農薬</li>
+    </ul>
+  </div>
+
+  <div class="about-block">
+    <div class="about-block-title">🏷️ あなたの「ちょうどいい」が見つかる</div>
+    <p>
+      こだわりに、正解はありません。<br><br>
+      「添加物は気になるけど、全部は無理」「オーガニックにしたいけど、予算もある」——自分の中にある<strong>ちょうどいいライン</strong>は、人それぞれ違う。<br><br>
+      こむちょマーケットは、そのラインに合う商品がサッと見つかるように、詳細なタグとフィルターを用意しています。<br><em>無農薬</em>・<em>オーガニック</em>・<em>グルテンフリー</em>・<em>砂糖不使用</em>など。アレルギー8品目の除外フィルターも使えます。<br><br>
+      何が正しいかより、<strong>あなたに合うかどうか。</strong> それだけを基準に選べる場所でありたいと思っています。
+    </p>
+  </div>
+
+  <div class="about-block">
+    <div class="about-block-title">🏪 小さなお店が、集まる場所</div>
+    <p>
+      モール系のECサイトは手数料が高く、小さなお店にとって出店のハードルが高いのが現実です。<br><br>
+      こむちょマーケットは、AIを活用してコストを抑えることで、個人店や小さなこだわりのお店が出店しやすい場所を目指しています。<br><br>
+      今まではなかなか出会えなかった、<strong>こだわりの強い小さなお店</strong>が集まる場所を目指しています。
+    </p>
+  </div>
+
+  <div class="about-block">
+    <div class="about-block-title">📋 全商品に開示を求めています</div>
+    <p>
+      他のショッピングサイトで商品を探していると、「原材料、どこに書いてあるの？」と思うことはありませんか？<br><br>
+      こむちょマーケットでは、全商品の商品ページに<strong>バックラベルと同じ情報</strong>（原材料・アレルギー情報・製造者情報など）を必ず掲載しています。小さな文字でまとめてあるのではなく、すぐ目につく場所に。<br><br>
+      買う前に、ちゃんと確認できる。それがわたしたちの約束です。
+    </p>
+  </div>
+
+</div>
+
+<div class="cta-wrap">
+  <a class="cta-btn" href="komcho-market-search.html">商品をさがす</a>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <a class="nav-item" href="komcho-market-top.html">
+    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <span>ホーム</span>
+  </a>
+  <a class="nav-item" href="komcho-market-search.html">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <span>探す</span>
+  </a>
+  <a class="nav-item" href="komcho-market-mypage.html">
+    <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    <span>お気に入り</span>
+  </a>
+  <a class="nav-item" href="komcho-market-cart.html">
+    <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+    <span>カゴ</span>
+  </a>
+  <a class="nav-item" href="komcho-market-orders.html">
+    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    <span>履歴</span>
+  </a>
+</nav>
+
+</body>
+</html>

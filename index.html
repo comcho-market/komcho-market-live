@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>こむちょマーケット - こだわるあなたに、ちょうどいい。</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 48 48%27%3E%3Crect width=%2748%27 height=%2748%27 rx=%2710%27 fill=%27%233D5A3E%27/%3E%3Cg transform=%27translate(24,24) scale(0.55)%27%3E%3Cpath d=%27M -26 7 C -17 -17 5 -24 24 -10 C 12 5 -2 19 -21 24%27 fill=%27none%27 stroke=%27%23F8F5EF%27 stroke-width=%275%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/%3E%3C/g%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg:          #F8F5EF;
+    --bg-card:     #FFFFFF;
+    --green-dark:  #3D5A3E;
+    --green-mid:   #5A7A5B;
+    --green-light: #EAF0E8;
+    --gold:        #B8973A;
+    --text-main:   #2C2C2C;
+    --text-sub:    #6B6B6B;
+    --border:      #E2DDD5;
+    --radius-card: 12px;
+    --shadow-card: 0 2px 12px rgba(0,0,0,0.07);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Yu Gothic', 'Meiryo', sans-serif;
+    background: var(--bg);
+    color: var(--text-main);
+    max-width: 430px;
+    margin: 0 auto;
+    min-height: 100vh;
+    padding-bottom: 80px;
+  }
+  a { text-decoration: none; color: inherit; }
+  button { cursor: pointer; border: none; background: none; font-family: inherit; }
+
+  /* HEADER */
+  .header {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px;
+  }
+  .header-logo {
+    display: flex; align-items: center; gap: 7px;
+  }
+  .header-logo .logo-icon {
+    width: 24px; height: 19px; flex-shrink: 0;
+  }
+  .header-logo .logo-icon path {
+    fill: none; stroke: var(--green-dark);
+    stroke-width: 3; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .header-logo .logo-text {
+    font-size: 15px; font-weight: 700; letter-spacing: 0.04em;
+    color: var(--text-main);
+  }
+
+  /* TAGLINE */
+  .tagline {
+    text-align: center;
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    color: var(--green-mid);
+    font-weight: 500;
+    margin: 14px 16px 0;
+  }
+  .header-icons { display: flex; align-items: center; gap: 18px; }
+  .header-icons svg {
+    width: 22px; height: 22px;
+    stroke: var(--text-main); fill: none;
+    stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .cart-wrap { position: relative; }
+  .cart-badge {
+    position: absolute; top: -5px; right: -6px;
+    background: var(--green-dark); color: #fff;
+    font-size: 9px; font-weight: 700;
+    width: 16px; height: 16px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* HERO */
+  .hero-wrap {
+    margin: 12px 16px 0;
+    border-radius: 16px;
+    overflow: hidden;
+    position: relative;
+    aspect-ratio: 4/3;
+    background: #E8E0D0;
+  }
+  .hero-photo-placeholder {
+    width: 100%; height: 100%;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 8px;
+    color: #A89878;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    border: 2px dashed #C8B898;
+  }
+  .hero-photo-placeholder svg {
+    width: 40px; height: 40px;
+    stroke: #C8B898; fill: none;
+    stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round;
+  }
+
+  /* CATEGORIES */
+  .section { margin: 24px 0; }
+  .categories-scroll {
+    display: flex;
+    overflow-x: auto;
+    padding: 4px 16px;
+    scrollbar-width: none;
+  }
+  .categories-scroll::-webkit-scrollbar { display: none; }
+  .cat-item {
+    flex: 0 0 auto;
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    width: 70px; padding: 8px 4px;
+    cursor: pointer;
+  }
+  .cat-icon {
+    width: 52px; height: 52px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .cat-icon svg {
+    width: 38px; height: 38px;
+    stroke: var(--green-dark); fill: none;
+    stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .cat-label { font-size: 11px; text-align: center; line-height: 1.3; color: var(--text-main); }
+
+  /* SECTION TITLE */
+  .section-title { text-align: center; margin-bottom: 16px; padding: 0 16px; }
+  .section-title .eyebrow {
+    font-size: 11px; color: var(--green-mid);
+    letter-spacing: 0.15em; font-weight: 500; margin-bottom: 4px;
+  }
+  .section-title h2 { font-size: 20px; font-weight: 700; letter-spacing: 0.05em; }
+
+  /* ABOUT SECTION */
+  .about-section {
+    margin: 8px 16px 24px;
+    background: var(--bg-card);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
+    padding: 28px 24px;
+  }
+  .about-lead {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--green-dark);
+    margin-bottom: 18px;
+    line-height: 1.5;
+  }
+  .about-body {
+    font-size: 13px;
+    line-height: 2;
+    color: var(--text-main);
+    margin-bottom: 24px;
+  }
+  .about-body strong { color: var(--green-dark); font-weight: 700; }
+
+  .about-block {
+    border-top: 1px solid var(--border);
+    padding-top: 20px;
+    margin-top: 4px;
+    margin-bottom: 20px;
+  }
+  .about-block-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .about-block p {
+    font-size: 13px;
+    line-height: 1.9;
+    color: var(--text-main);
+  }
+  .about-block p strong { color: var(--green-dark); font-weight: 700; }
+  .about-block p em {
+    font-style: normal;
+    background: var(--green-light);
+    color: var(--green-dark);
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+
+  .ng-list {
+    list-style: none;
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .ng-list li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-main);
+  }
+  .ng-list li::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--green-dark);
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* NEW ARRIVALS GRID */
+  .products-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 12px; padding: 4px 16px 12px;
+  }
+  .product-card-grid {
+    background: var(--bg-card); border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card); overflow: hidden; position: relative;
+  }
+  .new-badge {
+    position: absolute; top: 8px; left: 8px; z-index: 1;
+    background: var(--gold); color: #fff;
+    font-size: 10px; font-weight: 700;
+    padding: 3px 7px; border-radius: 4px; letter-spacing: 0.05em;
+  }
+  .product-img-grid {
+    width: 100%; aspect-ratio: 1;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 38px; position: relative;
+  }
+  .product-img-grid.g1 { background: linear-gradient(135deg,#f0e8d8,#d4c4a8); }
+  .product-img-grid.g2 { background: linear-gradient(135deg,#e0e8d0,#b8c890); }
+  .product-img-grid.g3 { background: linear-gradient(135deg,#e8e8e8,#c0c0b8); }
+  .product-img-grid.g4 { background: linear-gradient(135deg,#f4e8d0,#d4b880); }
+  .wish-btn {
+    position: absolute; bottom: 8px; right: 8px;
+    width: 26px; height: 26px;
+    background: rgba(255,255,255,0.85); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+    cursor: pointer; border: none;
+  }
+  .wish-btn svg { width: 13px; height: 13px; stroke: #999; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .product-info-grid { padding: 8px 10px 10px; }
+  .product-shop-grid { font-size: 10px; color: var(--text-sub); margin-bottom: 2px; }
+  .product-name-grid { font-size: 12px; font-weight: 600; line-height: 1.4; color: var(--text-main); }
+  .tag-pills { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+  .tag-pill {
+    font-size: 9px; background: var(--green-light); color: var(--green-dark);
+    border-radius: 20px; padding: 2px 7px; font-weight: 500;
+  }
+  .product-price { font-size: 13px; font-weight: 700; margin-top: 5px; color: var(--text-main); }
+
+  /* BANNER */
+  .banner {
+    margin: 8px 16px 0;
+    background: var(--green-light);
+    border-radius: var(--radius-card);
+    padding: 16px 20px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  }
+  .banner-text h3 { font-size: 13px; font-weight: 700; color: var(--green-dark); margin-bottom: 4px; }
+  .banner-text p { font-size: 11px; color: var(--green-mid); line-height: 1.5; }
+  .banner-btn {
+    flex-shrink: 0;
+    background: var(--green-dark); color: #fff;
+    font-size: 11px; font-weight: 600;
+    padding: 8px 14px; border-radius: 20px; white-space: nowrap;
+    cursor: pointer;
+  }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 430px;
+    background: var(--bg-card); border-top: 1px solid var(--border);
+    display: flex; z-index: 200;
+  }
+  .nav-item {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+    padding: 10px 0 14px; color: var(--text-sub);
+    font-size: 10px; letter-spacing: 0.04em; cursor: pointer;
+  }
+  .nav-item.active { color: var(--green-dark); }
+  .nav-item svg {
+    width: 22px; height: 22px;
+    stroke: currentColor; fill: none;
+    stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
+  }
+
+  /* ============ DESKTOP (≥900px) ============ */
+  @media (min-width: 900px) {
+    body { max-width: 1160px; padding-bottom: 60px; }
+
+    .header { padding: 20px 40px; }
+    .header-logo .logo-icon { width: 30px; height: 24px; }
+    .header-logo .logo-text { font-size: 18px; }
+    .header-icons { gap: 28px; }
+    .header-icons svg { width: 23px; height: 23px; }
+
+    .hero-wrap { margin: 24px 40px 0; aspect-ratio: 21 / 6; border-radius: 20px; }
+    .hero-photo-placeholder svg { width: 52px; height: 52px; }
+    .hero-photo-placeholder span { font-size: 14px; }
+    .hero-photo-placeholder span + span { font-size: 12px; }
+
+    .tagline { margin: 22px 40px 0; font-size: 13px; }
+
+    .section { margin: 40px 0; }
+    .categories-scroll {
+      padding: 4px 40px; overflow: visible;
+      justify-content: center; gap: 18px;
+    }
+    .cat-item { width: 96px; padding: 8px; }
+    .cat-icon { width: 66px; height: 66px; }
+    .cat-icon svg { width: 48px; height: 48px; }
+    .cat-label { font-size: 13px; }
+
+    .section-title h2 { font-size: 27px; }
+    .section-title .eyebrow { font-size: 12px; }
+
+    .products-grid {
+      grid-template-columns: repeat(4, 1fr);
+      gap: 22px; padding: 4px 40px 16px;
+    }
+    .product-img-grid { font-size: 52px; }
+    .product-name-grid { font-size: 13.5px; }
+    .product-price { font-size: 14.5px; }
+
+    .about-section { max-width: 760px; margin: 8px auto 36px; padding: 48px 60px; }
+    .about-lead { font-size: 21px; }
+
+    .banner { margin: 8px 40px 0; padding: 30px 44px; }
+    .banner-text h3 { font-size: 16px; }
+    .banner-text p { font-size: 13px; }
+    .banner-btn { font-size: 13px; padding: 11px 22px; }
+
+    .bottom-nav { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <a class="header-logo" href="komcho-market-top.html">
+    <svg class="logo-icon" viewBox="0 0 60 48">
+      <path transform="translate(30,24)" d="M -26 7 C -17 -17 5 -24 24 -10 C 12 5 -2 19 -21 24"/>
+    </svg>
+    <span class="logo-text">こむちょマーケット</span>
+  </a>
+  <div class="header-icons">
+    <a href="komcho-market-search.html" style="display:flex;"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></a>
+    <a href="komcho-market-mypage.html" style="display:flex;"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></a>
+    <a href="komcho-market-cart.html" style="display:flex;"><div class="cart-wrap">
+      <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      <div class="cart-badge">1</div>
+    </div></a>
+    <a href="komcho-market-mypage.html" style="display:flex;"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></a>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero-wrap">
+  <img src="images/hero.jpg" alt="こむちょマーケット" style="width:100%;height:100%;object-fit:cover;object-position:center 75%;display:block;">
+</div>
+
+<div class="tagline">こだわり・無添加・ちょいす</div>
+
+<!-- CATEGORIES -->
+<div class="section" style="margin-top:20px;">
+  <div class="categories-scroll">
+
+    <a class="cat-item" href="komcho-market-search.html?category=生鮮食品" style="text-decoration:none;">
+      <div class="cat-icon">
+        <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#EAF0E8"/><g transform="translate(50,50)" fill="none" stroke="#3D5A3E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M -13 -16 C -13 -21 13 -21 13 -16 L 4 22 L 0 30 L -4 22 Z"/><path d="M 0 -21 L -4 -35"/><path d="M 0 -21 L 4 -37"/><path d="M 0 -21 L -9 -32"/></g></svg>
+      </div>
+      <span class="cat-label">生鮮食品</span>
+    </a>
+
+    <a class="cat-item" href="komcho-market-search.html?category=惣菜" style="text-decoration:none;">
+      <div class="cat-icon">
+        <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#EAF0E8"/><g transform="translate(50,50)" fill="none" stroke="#3D5A3E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M -22 10 C -22 -12 22 -12 22 10 L 18 18 L -18 18 Z"/><path d="M -6 -18 C -6 -24 -10 -28 -8 -34"/><path d="M 6 -18 C 6 -24 10 -28 8 -34"/></g></svg>
+      </div>
+      <span class="cat-label">惣菜</span>
+    </a>
+
+    <a class="cat-item" href="komcho-market-search.html?category=調味料" style="text-decoration:none;">
+      <div class="cat-icon">
+        <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#EAF0E8"/><g transform="translate(50,50)" fill="none" stroke="#3D5A3E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M -8 -28 L -8 -20 L -16 -8 L -16 28 L 16 28 L 16 -8 L 8 -20 L 8 -28 Z"/><path d="M -8 -28 L 8 -28"/></g></svg>
+      </div>
+      <span class="cat-label">調味料</span>
+    </a>
+
+    <a class="cat-item" href="komcho-market-search.html?category=お菓子" style="text-decoration:none;">
+      <div class="cat-icon">
+        <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#EAF0E8"/><g transform="translate(50,50)" fill="none" stroke="#3D5A3E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="0" cy="0" r="28"/><path d="M 0 0 L 0 -20"/><path d="M 0 0 L 16 0"/></g></svg>
+      </div>
+      <span class="cat-label">お菓子</span>
+    </a>
+
+    <a class="cat-item" href="komcho-market-search.html?category=飲み物" style="text-decoration:none;">
+      <div class="cat-icon">
+        <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#EAF0E8"/><g transform="translate(50,50)" fill="none" stroke="#3D5A3E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M -12 -22 L 12 -22 L 10 20 C 10 26 -10 26 -10 20 Z"/><path d="M 0 -22 L 0 -35"/><path d="M -8 -35 C -4 -42 4 -42 8 -35"/></g></svg>
+      </div>
+      <span class="cat-label">飲み物</span>
+    </a>
+
+    <a class="cat-item" href="komcho-market-search.html?category=日用品" style="text-decoration:none;">
+      <div class="cat-icon">
+        <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#EAF0E8"/><g transform="translate(50,50)" fill="none" stroke="#3D5A3E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M -22 -18 L 22 -18 L 18 22 L -18 22 Z"/><path d="M -22 -18 L 0 -30 L 22 -18"/></g></svg>
+      </div>
+      <span class="cat-label">日用品</span>
+    </a>
+
+    <a class="cat-item" href="komcho-market-search.html?category=ギフト" style="text-decoration:none;">
+      <div class="cat-icon">
+        <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#EAF0E8"/><g transform="translate(50,50)" fill="none" stroke="#3D5A3E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M -22 -8 L -22 22 L 22 22 L 22 -8 Z"/><path d="M -26 -14 L 26 -14 L 22 -8 L -22 -8 Z"/><path d="M 0 -14 L 0 22"/><path d="M 0 -14 C 0 -14 -6 -26 -12 -22 C -16 -19 -16 -14 -12 -14 C -6 -14 -2 -18 0 -14"/><path d="M 0 -14 C 0 -14 6 -26 12 -22 C 16 -19 16 -14 12 -14 C 6 -14 2 -18 0 -14"/></g></svg>
+      </div>
+      <span class="cat-label">ギフト</span>
+    </a>
+
+  </div>
+</div>
+
+<!-- NEW ARRIVALS -->
+<div class="section">
+  <div class="section-title">
+    <div class="eyebrow">New Arrivals</div>
+    <h2>新着商品</h2>
+  </div>
+  <div class="products-grid">
+
+    <a class="product-card-grid" href="komcho-market-product.html" style="text-decoration:none;color:inherit;display:block;">
+      <div class="new-badge">NEW</div>
+      <div class="product-img-grid g1">🧼
+        <button class="wish-btn">
+          <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </button>
+      </div>
+      <div class="product-info-grid">
+        <div class="product-shop-grid">草木屋</div>
+        <div class="product-name-grid">無添加石鹸 ひのき</div>
+        <div class="tag-pills"><span class="tag-pill">天然素材100%</span></div>
+        <div class="product-price">¥680</div></div></a>
+
+    <a class="product-card-grid" href="komcho-market-product.html" style="text-decoration:none;color:inherit;display:block;">
+      <div class="new-badge">NEW</div>
+      <div class="product-img-grid g2">🍵
+        <button class="wish-btn">
+          <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </button>
+      </div>
+      <div class="product-info-grid">
+        <div class="product-shop-grid">京の茶屋</div>
+        <div class="product-name-grid">無農薬ほうじ茶 100g</div>
+        <div class="tag-pills"><span class="tag-pill">無農薬</span></div>
+        <div class="product-price">¥1,080</div></div></a>
+
+    <a class="product-card-grid" href="komcho-market-product.html" style="text-decoration:none;color:inherit;display:block;">
+      <div class="new-badge">NEW</div>
+      <div class="product-img-grid g3">💧
+        <button class="wish-btn">
+          <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </button>
+      </div>
+      <div class="product-info-grid">
+        <div class="product-shop-grid">ナチュラルケア</div>
+        <div class="product-name-grid">有機オリーブオイル</div>
+        <div class="tag-pills"><span class="tag-pill">有機・オーガニック</span></div>
+        <div class="product-price">¥1,480</div></div></a>
+
+    <a class="product-card-grid" href="komcho-market-product.html" style="text-decoration:none;color:inherit;display:block;">
+      <div class="new-badge">NEW</div>
+      <div class="product-img-grid g4">🍪
+        <button class="wish-btn">
+          <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </button>
+      </div>
+      <div class="product-info-grid">
+        <div class="product-shop-grid">てとてベーカリー</div>
+        <div class="product-name-grid">グルテンフリー クッキー</div>
+        <div class="tag-pills"><span class="tag-pill">グルテンフリー</span></div>
+        <div class="product-price">¥840</div></div></a>
+
+  </div>
+</div>
+
+<!-- わたしたちについて -->
+<div class="section" style="margin-top:4px;">
+  <div class="section-title">
+    <div class="eyebrow">About Us</div>
+    <h2>わたしたちについて</h2>
+  </div>
+
+  <div class="about-section">
+
+    <div class="about-lead">なぜ、こむちょマーケットを<br>つくったのか。</div>
+
+    <div class="about-body" style="margin-bottom:0;">
+      スーパーの棚には、たくさんの商品が並んでいます。でも「本当に自分に合うもの」を探そうとすると、原材料を調べて、産地を確認して、気づけば何十分も経っている。<br><br>
+      そんな経験、ありませんか？<br><br>
+      「こむちょ」という名前には、<strong>こ</strong>だわりたい人が、<strong>む</strong>添加やオーガニックといった基準の中から、自分にとって<strong>ちょ</strong>うどいいものを見つけられるように、という想いを込めました。<br><br>
+      こむちょマーケットは、こだわりたい人が、迷わず選べる場所です。
+    </div>
+
+    <a href="komcho-market-about.html" style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:20px;padding-top:20px;border-top:1px solid var(--border);font-size:13px;font-weight:700;color:var(--green-dark);">
+      わたしたちのこだわりをもっと見る
+      <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:var(--green-dark);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><polyline points="9 18 15 12 9 6"/></svg>
+    </a>
+
+  </div>
+</div>
+
+<!-- BANNER -->
+<a href="komcho-market-seller-apply.html" class="banner" style="text-decoration:none;">
+  <div class="banner-text">
+    <h3>🌿 出店をご検討の方へ</h3>
+    <p>こだわりの食品・日用品を<br>販売しませんか？</p>
+  </div>
+  <div class="banner-btn">詳しく見る</div>
+</a>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <a class="nav-item active" href="komcho-market-top.html">
+    <svg viewBox="0 0 24 24" style="fill:var(--green-dark);stroke:var(--green-dark);stroke-width:1.6;">
+      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+      <polyline points="9 22 9 12 15 12 15 22" style="stroke:#fff;fill:none;stroke-width:1.6;"/>
+    </svg>
+    <span>ホーム</span>
+  </a>
+  <a class="nav-item" href="komcho-market-search.html">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <span>探す</span>
+  </a>
+  <a class="nav-item" href="komcho-market-mypage.html">
+    <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    <span>お気に入り</span>
+  </a>
+  <a class="nav-item" href="komcho-market-cart.html">
+    <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+    <span>カゴ</span>
+  </a>
+  <a class="nav-item" href="komcho-market-orders.html">
+    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    <span>履歴</span>
+  </a>
+</nav>
+
+</body>
+</html>

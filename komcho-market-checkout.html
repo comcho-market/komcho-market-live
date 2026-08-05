@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>注文手続き - こむちょマーケット</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 48 48%27%3E%3Crect width=%2748%27 height=%2748%27 rx=%2710%27 fill=%27%233D5A3E%27/%3E%3Cg transform=%27translate(24,24) scale(0.55)%27%3E%3Cpath d=%27M -26 7 C -17 -17 5 -24 24 -10 C 12 5 -2 19 -21 24%27 fill=%27none%27 stroke=%27%23F8F5EF%27 stroke-width=%275%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/%3E%3C/g%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg:          #F8F5EF;
+    --bg-card:     #FFFFFF;
+    --green-dark:  #3D5A3E;
+    --green-mid:   #5A7A5B;
+    --green-light: #EAF0E8;
+    --gold:        #B8973A;
+    --text-main:   #2C2C2C;
+    --text-sub:    #6B6B6B;
+    --border:      #E2DDD5;
+    --radius-card: 12px;
+    --shadow-card: 0 2px 12px rgba(0,0,0,0.07);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Yu Gothic', 'Meiryo', sans-serif;
+    background: var(--bg);
+    color: var(--text-main);
+    max-width: 430px;
+    margin: 0 auto;
+    min-height: 100vh;
+    padding-bottom: 120px;
+  }
+  button { cursor: pointer; border: none; background: none; font-family: inherit; }
+  input, textarea { font-family: inherit; }
+
+  /* HEADER */
+  .header {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px;
+  }
+  .header-back svg {
+    width: 22px; height: 22px;
+    stroke: var(--text-main); fill: none;
+    stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .header-logo {
+    display: flex; align-items: center; gap: 7px;
+  }
+  .header-logo .logo-icon {
+    width: 24px; height: 19px; flex-shrink: 0;
+  }
+  .header-logo .logo-icon path {
+    fill: none; stroke: var(--green-dark);
+    stroke-width: 3; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .header-logo .logo-text {
+    font-size: 15px; font-weight: 700; letter-spacing: 0.04em;
+    color: var(--text-main);
+  }
+  .header-step {
+    font-size: 12px; color: var(--text-sub); font-weight: 500;
+  }
+
+  /* STEP BAR */
+  .step-bar {
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 16px;
+    display: flex; align-items: center; justify-content: center; gap: 0;
+  }
+  .step-item {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    flex: 1;
+  }
+  .step-circle {
+    width: 24px; height: 24px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700;
+    background: var(--border); color: var(--text-sub);
+  }
+  .step-circle.active { background: var(--green-dark); color: #fff; }
+  .step-circle.done { background: var(--green-mid); color: #fff; }
+  .step-label { font-size: 10px; color: var(--text-sub); }
+  .step-label.active { color: var(--green-dark); font-weight: 700; }
+  .step-line {
+    flex: 0 0 24px; height: 1px;
+    background: var(--border);
+    margin-bottom: 14px;
+  }
+  .step-line.done { background: var(--green-mid); }
+
+  /* GAP */
+  .gap { height: 8px; background: var(--bg); }
+
+  /* SECTION BLOCK */
+  .section-block {
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 16px;
+  }
+  .block-title {
+    font-size: 14px; font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .block-title svg {
+    width: 16px; height: 16px;
+    stroke: var(--green-dark); fill: none;
+    stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .block-title::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+
+  /* ADDRESS OPTIONS */
+  .address-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+  .address-option {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 12px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-card);
+    background: var(--bg); cursor: pointer;
+    transition: all 0.15s;
+  }
+  .address-option.selected {
+    border-color: var(--green-dark);
+    background: var(--green-light);
+  }
+  .radio-circle {
+    width: 18px; height: 18px; border-radius: 50%;
+    border: 1.5px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 2px; transition: all 0.15s;
+  }
+  .address-option.selected .radio-circle {
+    border-color: var(--green-dark); background: var(--green-dark);
+  }
+  .address-option.selected .radio-circle::after {
+    content: ''; width: 6px; height: 6px;
+    border-radius: 50%; background: #fff;
+  }
+  .address-option-body { flex: 1; }
+  .address-option-name { font-size: 13px; font-weight: 700; margin-bottom: 3px; }
+  .address-option-text { font-size: 12px; color: var(--text-main); line-height: 1.6; }
+  .address-default-badge {
+    font-size: 9px; font-weight: 700;
+    background: var(--green-dark); color: #fff;
+    border-radius: 10px; padding: 2px 7px;
+    margin-left: 6px; vertical-align: middle;
+  }
+
+  /* ADD ADDRESS */
+  .add-address-toggle {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; color: var(--green-dark); font-weight: 600;
+    cursor: pointer; padding: 4px 0;
+  }
+  .add-address-toggle svg {
+    width: 18px; height: 18px;
+    stroke: var(--green-dark); fill: none;
+    stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .new-address-form {
+    margin-top: 14px;
+    display: none;
+    flex-direction: column; gap: 12px;
+  }
+  .new-address-form.open { display: flex; }
+
+  /* FORM FIELDS */
+  .form-field { display: flex; flex-direction: column; gap: 5px; }
+  .form-label {
+    font-size: 12px; font-weight: 600; color: var(--text-sub);
+  }
+  .form-label-req::after {
+    content: '必須';
+    font-size: 10px; color: #fff; background: var(--green-dark);
+    border-radius: 4px; padding: 1px 5px; margin-left: 6px;
+    font-weight: 600; vertical-align: middle;
+  }
+  .form-input {
+    width: 100%;
+    border: 1.5px solid var(--border); border-radius: 8px;
+    padding: 11px 12px; font-size: 14px; color: var(--text-main);
+    background: var(--bg); outline: none; -webkit-appearance: none;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .form-input:focus { border-color: var(--green-dark); background: #fff; }
+  .form-row { display: flex; gap: 10px; }
+  .form-row .form-field { flex: 1; }
+
+  /* SAVE CHECKBOX */
+  .save-check-wrap {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 14px;
+    background: var(--green-light);
+    border-radius: 8px; margin-top: 4px;
+    cursor: pointer;
+  }
+  .save-check-wrap input[type="checkbox"] {
+    width: 16px; height: 16px;
+    accent-color: var(--green-dark); cursor: pointer;
+  }
+  .save-check-label { font-size: 13px; color: var(--green-dark); font-weight: 600; cursor: pointer; }
+
+  /* PAYMENT OPTIONS */
+  .payment-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+  .payment-option {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-card);
+    background: var(--bg); cursor: pointer; transition: all 0.15s;
+  }
+  .payment-option.selected {
+    border-color: var(--green-dark); background: var(--green-light);
+  }
+  .payment-option .radio-circle { margin-top: 0; }
+  .card-icon {
+    width: 38px; height: 24px; border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700; flex-shrink: 0;
+  }
+  .card-icon.visa   { background: #1A1F71; color: #fff; }
+  .card-icon.master { background: #EB001B; color: #fff; }
+  .card-icon.new    { background: var(--border); color: var(--text-sub); font-size: 9px; }
+  .payment-option-info { flex: 1; }
+  .payment-brand { font-size: 13px; font-weight: 600; }
+  .payment-number { font-size: 11px; color: var(--text-sub); margin-top: 1px; }
+  .payment-default-badge {
+    font-size: 9px; font-weight: 700;
+    background: var(--green-light); color: var(--green-dark);
+    border-radius: 10px; padding: 2px 8px;
+  }
+  .payment-option.selected .payment-default-badge {
+    background: rgba(255,255,255,0.6);
+  }
+
+  /* NEW CARD FORM */
+  .new-card-form {
+    display: none; flex-direction: column; gap: 12px;
+    margin-top: 14px; padding-top: 14px;
+    border-top: 1px solid var(--border);
+  }
+  .new-card-form.open { display: flex; }
+  .card-number-wrap { position: relative; }
+  .card-type-icon {
+    position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+    font-size: 11px; font-weight: 700; color: var(--text-sub);
+  }
+  .pw-toggle {
+    position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+    cursor: pointer; padding: 4px;
+  }
+  .pw-toggle svg {
+    width: 16px; height: 16px; stroke: var(--text-sub); fill: none;
+    stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .stripe-note {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 11px; color: var(--text-sub);
+    background: var(--bg); border-radius: 8px; padding: 9px 12px;
+  }
+  .stripe-note svg {
+    width: 13px; height: 13px; stroke: var(--text-sub); fill: none;
+    stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0;
+  }
+
+  /* POINT USE */
+  .point-use-block {
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-card);
+    background: var(--bg);
+    overflow: hidden;
+  }
+  .point-use-top {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px;
+  }
+  .point-use-left { display: flex; flex-direction: column; gap: 3px; }
+  .point-use-title-sm { font-size: 13px; font-weight: 700; color: var(--text-main); }
+  .point-use-balance { font-size: 11px; color: var(--text-sub); }
+  .point-use-balance strong { color: var(--green-dark); }
+  .point-all-btn {
+    font-size: 11px; font-weight: 700;
+    color: var(--green-dark);
+    border: 1px solid var(--green-dark);
+    border-radius: 20px; padding: 5px 12px;
+    background: var(--bg-card); cursor: pointer;
+    white-space: nowrap;
+  }
+  .point-input-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 0 14px 14px;
+  }
+  .point-input-wrap { flex: 1; position: relative; }
+  .point-input {
+    width: 100%;
+    border: 1.5px solid var(--border); border-radius: 8px;
+    padding: 10px 36px 10px 12px;
+    font-size: 16px; font-weight: 700; color: var(--text-main);
+    background: #fff; outline: none; -webkit-appearance: none;
+    font-family: inherit; transition: border-color 0.15s;
+  }
+  .point-input:focus { border-color: var(--green-dark); }
+  .point-input-unit {
+    position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+    font-size: 12px; font-weight: 600; color: var(--text-sub);
+  }
+  .point-input-note { font-size: 11px; color: var(--text-sub); white-space: nowrap; }
+  .point-discount-preview {
+    background: var(--green-light);
+    padding: 8px 14px;
+    font-size: 12px; color: var(--green-dark); font-weight: 600;
+    display: none;
+  }
+  .point-discount-preview.visible { display: block; }
+
+  /* ORDER SUMMARY */
+  .order-items { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+  .order-item-row {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .order-item-thumb {
+    width: 48px; height: 48px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; flex-shrink: 0;
+  }
+  .order-item-thumb.g1 { background: linear-gradient(135deg,#f0e8d0,#d8c8a0); }
+  .order-item-thumb.g2 { background: linear-gradient(135deg,#e0e8d0,#b8c890); }
+  .order-item-thumb.g3 { background: linear-gradient(135deg,#f4ead8,#d4c0a0); }
+  .order-item-info { flex: 1; }
+  .order-item-name { font-size: 12px; font-weight: 600; line-height: 1.4; }
+  .order-item-meta { font-size: 11px; color: var(--text-sub); margin-top: 2px; }
+  .order-item-price { font-size: 13px; font-weight: 700; white-space: nowrap; }
+
+  .summary-rows { display: flex; flex-direction: column; gap: 8px; }
+  .summary-row {
+    display: flex; justify-content: space-between;
+    font-size: 13px; color: var(--text-sub);
+  }
+  .summary-row.discount { color: #CC4444; }
+  .summary-row.total {
+    font-size: 18px; font-weight: 700; color: var(--text-main);
+    padding-top: 12px; margin-top: 4px;
+    border-top: 1.5px solid var(--border);
+  }
+  .summary-row.point-earn {
+    font-size: 11px; color: var(--green-dark);
+    background: var(--green-light); border-radius: 8px;
+    padding: 8px 12px; margin-top: 6px;
+  }
+
+  /* BOTTOM CTA */
+  .bottom-cta {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 430px;
+    background: var(--bg-card); border-top: 1px solid var(--border);
+    padding: 12px 16px 24px; z-index: 150;
+  }
+  .cta-total-row {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 10px;
+  }
+  .cta-total-label { font-size: 13px; color: var(--text-sub); }
+  .cta-total-amount { font-size: 20px; font-weight: 700; color: var(--text-main); }
+  .cta-total-sub { font-size: 11px; color: var(--green-dark); font-weight: 600; }
+  .order-btn {
+    width: 100%; height: 52px; border-radius: 26px;
+    background: var(--green-dark); color: #fff;
+    font-size: 16px; font-weight: 700; letter-spacing: 0.04em;
+    cursor: pointer; border: none; transition: opacity 0.15s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .order-btn:active { opacity: 0.85; }
+  .order-btn svg {
+    width: 18px; height: 18px; stroke: #fff; fill: none;
+    stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .order-note {
+    text-align: center; font-size: 10px; color: var(--text-sub);
+    margin-top: 8px; line-height: 1.5;
+  }
+
+  /* COMPLETE SCREEN */
+  .complete-screen {
+    display: none; padding: 48px 24px 40px;
+    flex-direction: column; align-items: center;
+    text-align: center; min-height: 80vh; justify-content: center;
+  }
+  .complete-screen.visible { display: flex; }
+  .complete-icon {
+    width: 80px; height: 80px; border-radius: 50%;
+    background: var(--green-light);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 24px;
+  }
+  .complete-icon svg {
+    width: 36px; height: 36px; stroke: var(--green-dark); fill: none;
+    stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .complete-title { font-size: 22px; font-weight: 700; margin-bottom: 10px; }
+  .complete-sub {
+    font-size: 13px; color: var(--text-sub);
+    line-height: 1.9; margin-bottom: 28px;
+  }
+  .complete-order-card {
+    width: 100%; background: var(--bg);
+    border: 1px solid var(--border); border-radius: var(--radius-card);
+    padding: 16px; margin-bottom: 28px; text-align: left;
+  }
+  .complete-order-row {
+    display: flex; justify-content: space-between;
+    font-size: 13px; padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .complete-order-row:last-child { border-bottom: none; }
+  .complete-order-row .label { color: var(--text-sub); }
+  .complete-order-row .value { font-weight: 600; }
+  .complete-point-card {
+    width: 100%; background: var(--green-dark);
+    border-radius: var(--radius-card); padding: 16px 18px;
+    color: #fff; margin-bottom: 28px; text-align: left;
+  }
+  .complete-point-label { font-size: 11px; color: rgba(255,255,255,0.7); margin-bottom: 4px; }
+  .complete-point-value { font-size: 24px; font-weight: 700; margin-bottom: 2px; }
+  .complete-point-note { font-size: 11px; color: rgba(255,255,255,0.6); }
+  .complete-btn {
+    width: 100%; height: 50px; border-radius: 25px;
+    background: var(--green-dark); color: #fff;
+    font-size: 15px; font-weight: 700; cursor: pointer; border: none;
+    margin-bottom: 12px;
+  }
+  .complete-btn-sub {
+    font-size: 13px; color: var(--green-mid); cursor: pointer;
+    text-decoration: underline;
+  }
+
+  /* GUEST REGISTER PROMPT */
+  .guest-prompt {
+    width: 100%; background: #FFF9EC;
+    border: 1px solid #E8D898; border-radius: var(--radius-card);
+    padding: 16px 18px; margin-bottom: 24px; text-align: left;
+  }
+  .guest-prompt-title {
+    font-size: 13px; font-weight: 700; margin-bottom: 6px;
+  }
+  .guest-prompt-text {
+    font-size: 12px; color: var(--text-sub); line-height: 1.7; margin-bottom: 12px;
+  }
+  .guest-prompt-btn {
+    display: block; width: 100%; height: 44px; border-radius: 22px;
+    background: var(--green-dark); color: #fff;
+    font-size: 13px; font-weight: 700; cursor: pointer; border: none;
+  }
+  /* ============ DESKTOP (≥900px) ============ */
+  @media (min-width: 900px) {
+    body { max-width: 720px; padding-bottom: 40px; }
+    .header { padding: 16px 32px; }
+
+    .bottom-cta {
+      left: auto; right: 32px; transform: none;
+      width: 300px; max-width: 300px;
+      border-top: none; border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.14);
+      bottom: 24px; padding: 18px 20px 20px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <button class="header-back" onclick="history.back()">
+    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
+  <a class="header-logo" href="komcho-market-top.html">
+    <svg class="logo-icon" viewBox="0 0 60 48">
+      <path transform="translate(30,24)" d="M -26 7 C -17 -17 5 -24 24 -10 C 12 5 -2 19 -21 24"/>
+    </svg>
+    <span class="logo-text">こむちょマーケット</span>
+  </a>
+  <div class="header-step">〇〇農園</div>
+</header>
+
+<!-- STEP BAR -->
+<div class="step-bar">
+  <div class="step-item">
+    <div class="step-circle active">1</div>
+    <div class="step-label active">注文内容</div>
+  </div>
+  <div class="step-line"></div>
+  <div class="step-item">
+    <div class="step-circle">2</div>
+    <div class="step-label">確認</div>
+  </div>
+  <div class="step-line"></div>
+  <div class="step-item">
+    <div class="step-circle">3</div>
+    <div class="step-label">完了</div>
+  </div>
+</div>
+
+<!-- ===== 注文フォーム ===== -->
+<div id="checkoutForm">
+
+  <div class="gap"></div>
+
+  <!-- ① 配送先住所 -->
+  <div class="section-block">
+    <div class="block-title">
+      <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      配送先住所
+    </div>
+
+    <!-- 登録済み住所（会員のみ表示） -->
+    <div class="address-options" id="addressOptions">
+      <div class="address-option selected" onclick="selectAddress(this)">
+        <div class="radio-circle"></div>
+        <div class="address-option-body">
+          <div class="address-option-name">山田 花子 <span class="address-default-badge">デフォルト</span></div>
+          <div class="address-option-text">〒604-0000<br>京都府京都市中京区○○町1-2-3<br>090-0000-0000</div>
+        </div>
+      </div>
+      <div class="address-option" onclick="selectAddress(this)">
+        <div class="radio-circle"></div>
+        <div class="address-option-body">
+          <div class="address-option-name">山田 太郎（実家）</div>
+          <div class="address-option-text">〒615-0000<br>京都府京都市西京区△△町4-5<br>075-000-0000</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 新しい住所を追加 -->
+    <div class="add-address-toggle" onclick="toggleNewAddress()">
+      <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      別の住所に届ける
+    </div>
+
+    <div class="new-address-form" id="newAddressForm">
+      <div class="form-row">
+        <div class="form-field">
+          <label class="form-label form-label-req">姓</label>
+          <input class="form-input" type="text" placeholder="山田">
+        </div>
+        <div class="form-field">
+          <label class="form-label form-label-req">名</label>
+          <input class="form-input" type="text" placeholder="花子">
+        </div>
+      </div>
+      <div class="form-field">
+        <label class="form-label form-label-req">郵便番号</label>
+        <input class="form-input" type="text" placeholder="000-0000" inputmode="numeric" maxlength="8">
+      </div>
+      <div class="form-field">
+        <label class="form-label form-label-req">都道府県</label>
+        <input class="form-input" type="text" placeholder="京都府">
+      </div>
+      <div class="form-field">
+        <label class="form-label form-label-req">市区町村・番地</label>
+        <input class="form-input" type="text" placeholder="京都市中京区○○町1-2-3">
+      </div>
+      <div class="form-field">
+        <label class="form-label">建物名・部屋番号（任意）</label>
+        <input class="form-input" type="text" placeholder="○○マンション 101号室">
+      </div>
+      <div class="form-field">
+        <label class="form-label form-label-req">電話番号</label>
+        <input class="form-input" type="tel" placeholder="090-0000-0000" inputmode="tel">
+      </div>
+      <!-- 住所保存チェック -->
+      <label class="save-check-wrap">
+        <input type="checkbox" id="saveAddress" checked>
+        <span class="save-check-label">🏠 この住所を保存して次回から使う</span>
+      </label>
+    </div>
+  </div>
+
+  <div class="gap"></div>
+
+  <!-- ② お支払い方法 -->
+  <div class="section-block">
+    <div class="block-title">
+      <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+      お支払い方法
+    </div>
+
+    <div class="payment-options" id="paymentOptions">
+      <div class="payment-option selected" onclick="selectPayment(this, false)">
+        <div class="radio-circle"></div>
+        <div class="card-icon visa">VISA</div>
+        <div class="payment-option-info">
+          <div class="payment-brand">Visa <span class="payment-default-badge">メイン</span></div>
+          <div class="payment-number">**** **** **** 4242</div>
+        </div>
+      </div>
+      <div class="payment-option" onclick="selectPayment(this, false)">
+        <div class="radio-circle"></div>
+        <div class="card-icon master">MC</div>
+        <div class="payment-option-info">
+          <div class="payment-brand">Mastercard</div>
+          <div class="payment-number">**** **** **** 8765</div>
+        </div>
+      </div>
+      <div class="payment-option" id="newCardOption" onclick="selectPayment(this, true)">
+        <div class="radio-circle"></div>
+        <div class="card-icon new">NEW</div>
+        <div class="payment-option-info">
+          <div class="payment-brand">新しいカードで支払う</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 新しいカード入力フォーム -->
+    <div class="new-card-form" id="newCardForm">
+      <div class="form-field">
+        <label class="form-label form-label-req">カード番号</label>
+        <div class="card-number-wrap">
+          <input class="form-input" type="text" placeholder="0000 0000 0000 0000"
+            inputmode="numeric" maxlength="19" oninput="formatCardNumber(this)">
+          <span class="card-type-icon" id="cardTypeIcon"></span>
+        </div>
+      </div>
+      <div class="form-field">
+        <label class="form-label form-label-req">カード名義（半角）</label>
+        <input class="form-input" type="text" placeholder="HANAKO YAMADA" style="text-transform:uppercase;">
+      </div>
+      <div class="form-row">
+        <div class="form-field">
+          <label class="form-label form-label-req">有効期限</label>
+          <input class="form-input" type="text" placeholder="MM / YY"
+            inputmode="numeric" maxlength="7" oninput="formatExpiry(this)">
+        </div>
+        <div class="form-field">
+          <label class="form-label form-label-req">セキュリティコード</label>
+          <div class="card-number-wrap">
+            <input class="form-input" type="password" placeholder="000" inputmode="numeric" maxlength="4" id="cvvInput">
+            <button class="pw-toggle" onclick="toggleCvv()" type="button">
+              <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="stripe-note">
+        <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        カード情報はStripeが暗号化して管理します。
+      </div>
+      <!-- カード保存チェック -->
+      <label class="save-check-wrap">
+        <input type="checkbox" id="saveCard" checked>
+        <span class="save-check-label">💳 このカードを保存して次回から使う</span>
+      </label>
+    </div>
+  </div>
+
+  <div class="gap"></div>
+
+  <!-- ③ ポイント利用 -->
+  <div class="section-block">
+    <div class="block-title">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      ポイント利用
+    </div>
+    <div class="point-use-block">
+      <div class="point-use-top">
+        <div class="point-use-left">
+          <div class="point-use-title-sm">🌿 使用するポイントを入力</div>
+          <div class="point-use-balance">残高：<strong>1,240pt</strong>（1pt＝1円）</div>
+        </div>
+        <button class="point-all-btn" onclick="useAllPoint()">全部使う</button>
+      </div>
+      <div class="point-input-row">
+        <div class="point-input-wrap">
+          <input class="point-input" type="number" id="pointInput"
+            placeholder="0" min="0" max="1240" inputmode="numeric"
+            oninput="onPointInput()">
+          <span class="point-input-unit">pt</span>
+        </div>
+        <div class="point-input-note">上限：1,240pt</div>
+      </div>
+      <div class="point-discount-preview" id="pointDiscountPreview">
+        ✓ 1,240円分のポイントを使用します
+      </div>
+    </div>
+  </div>
+
+  <div class="gap"></div>
+
+  <!-- ④ 注文内容確認 -->
+  <div class="section-block">
+    <div class="block-title">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      注文内容
+    </div>
+
+    <div class="order-items">
+      <div class="order-item-row">
+        <div class="order-item-thumb g1">🫙</div>
+        <div class="order-item-info">
+          <div class="order-item-name">無添加 自家製味噌 500g</div>
+          <div class="order-item-meta">数量：1</div>
+        </div>
+        <div class="order-item-price">¥1,800</div>
+      </div>
+      <div class="order-item-row">
+        <div class="order-item-thumb g2">🥕</div>
+        <div class="order-item-info">
+          <div class="order-item-name">季節の野菜セット（S）</div>
+          <div class="order-item-meta">数量：1</div>
+        </div>
+        <div class="order-item-price">¥3,200</div>
+      </div>
+    </div>
+
+    <div class="summary-rows">
+      <div class="summary-row">
+        <span>商品合計</span>
+        <span>¥5,000</span>
+      </div>
+      <div class="summary-row">
+        <span>送料（クール便・冷蔵）</span>
+        <span>¥1,000</span>
+      </div>
+      <div class="summary-row discount" id="pointDiscountRow" style="display:none;">
+        <span>ポイント利用</span>
+        <span id="pointDiscountAmount">−¥1,240</span>
+      </div>
+      <div class="summary-row total">
+        <span>お支払い合計</span>
+        <span id="grandTotal">¥6,000</span>
+      </div>
+      <div class="summary-row point-earn" id="pointEarnRow">
+        🌿 この注文で <strong id="earnPt">30pt</strong> 獲得予定
+      </div>
+    </div>
+  </div>
+
+  <div class="gap"></div>
+
+</div>
+
+<!-- ===== 注文完了画面 ===== -->
+<div class="complete-screen" id="completeScreen">
+  <div class="complete-icon">
+    <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+  </div>
+  <div class="complete-title">ご注文ありがとうございます！</div>
+  <div class="complete-sub">
+    〇〇農園に注文が送られました。<br>
+    発送準備ができ次第、メールでお知らせします。
+  </div>
+
+  <div class="complete-order-card">
+    <div class="complete-order-row">
+      <span class="label">注文番号</span>
+      <span class="value">#2311</span>
+    </div>
+    <div class="complete-order-row">
+      <span class="label">お支払い金額</span>
+      <span class="value" id="completeTotal">¥6,000</span>
+    </div>
+    <div class="complete-order-row">
+      <span class="label">お届け先</span>
+      <span class="value">京都府京都市中京区</span>
+    </div>
+    <div class="complete-order-row">
+      <span class="label">配送方法</span>
+      <span class="value">クール便（冷蔵）</span>
+    </div>
+  </div>
+
+  <div class="complete-point-card" id="completePointCard">
+    <div class="complete-point-label">🌿 獲得ポイント</div>
+    <div class="complete-point-value" id="completeEarnPt">+30pt</div>
+    <div class="complete-point-note">次回のお買い物に使えます（1pt＝1円）</div>
+  </div>
+
+  <!-- ゲスト向け登録促進 -->
+  <div class="guest-prompt" id="guestPrompt" style="display:none;">
+    <div class="guest-prompt-title">🌿 会員登録でポイントを受け取れます</div>
+    <div class="guest-prompt-text">
+      今回の購入で<strong>30pt</strong>が発生しています。<br>
+      会員登録すると次回のお買い物に使えます。登録は無料・1分で完了！
+    </div>
+    <button class="guest-prompt-btn" onclick="window.location.href='komcho-market-terms.html'">無料で会員登録する</button>
+  </div>
+
+  <button class="complete-btn" onclick="goHome()">ショッピングを続ける</button>
+  <span class="complete-btn-sub" onclick="goOrders()">注文履歴を確認する</span>
+</div>
+
+<!-- BOTTOM CTA（フォーム表示中のみ） -->
+<div class="bottom-cta" id="bottomCta">
+  <div class="cta-total-row">
+    <div>
+      <div class="cta-total-label">お支払い合計</div>
+      <div class="cta-total-sub" id="ctaPointNote">🌿 30pt 獲得予定</div>
+    </div>
+    <div class="cta-total-amount" id="ctaTotal">¥6,000</div>
+  </div>
+  <button class="order-btn" onclick="placeOrder()">
+    <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+    注文を確定する
+  </button>
+  <div class="order-note">「注文を確定する」を押すと購入が確定します</div>
+</div>
+
+<script>
+  const POINT_BALANCE = 1240;
+  const SUBTOTAL = 5000;
+  const SHIPPING = 1000;
+  let baseTotal = SUBTOTAL + SHIPPING; // 6000
+
+  // 住所選択
+  function selectAddress(el) {
+    document.querySelectorAll('.address-option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    // 新しい住所フォームを閉じる
+    document.getElementById('newAddressForm').classList.remove('open');
+  }
+
+  // 新住所フォーム開閉
+  function toggleNewAddress() {
+    const form = document.getElementById('newAddressForm');
+    form.classList.toggle('open');
+    if (form.classList.contains('open')) {
+      // 選択解除
+      document.querySelectorAll('.address-option').forEach(o => o.classList.remove('selected'));
+    }
+  }
+
+  // 支払い選択
+  function selectPayment(el, isNew) {
+    document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    const form = document.getElementById('newCardForm');
+    form.classList.toggle('open', isNew);
+  }
+
+  // 全部使うボタン
+  function useAllPoint() {
+    const max = Math.min(POINT_BALANCE, baseTotal);
+    document.getElementById('pointInput').value = max;
+    onPointInput();
+  }
+
+  // ポイント入力
+  function onPointInput() {
+    const input = document.getElementById('pointInput');
+    let val = parseInt(input.value) || 0;
+    const max = Math.min(POINT_BALANCE, baseTotal);
+    if (val < 0) val = 0;
+    if (val > max) { val = max; input.value = max; }
+
+    const preview = document.getElementById('pointDiscountPreview');
+    if (val > 0) {
+      preview.classList.add('visible');
+      preview.textContent = `✓ ${val.toLocaleString()}円分のポイントを使用します`;
+    } else {
+      preview.classList.remove('visible');
+    }
+    updateTotal(val);
+  }
+
+  function updateTotal(discount) {
+    discount = discount || 0;
+    const total = Math.max(0, baseTotal - discount);
+    const earnPt = Math.floor(total / 200);
+
+    document.getElementById('pointDiscountRow').style.display = discount > 0 ? 'flex' : 'none';
+    document.getElementById('pointDiscountAmount').textContent = '−¥' + discount.toLocaleString();
+    document.getElementById('grandTotal').textContent = '¥' + total.toLocaleString();
+    document.getElementById('ctaTotal').textContent = '¥' + total.toLocaleString();
+    document.getElementById('earnPt').textContent = earnPt + 'pt';
+    document.getElementById('ctaPointNote').textContent = '🌿 ' + earnPt + 'pt 獲得予定';
+    document.getElementById('completeEarnPt').textContent = '+' + earnPt + 'pt';
+    document.getElementById('completeTotal').textContent = '¥' + total.toLocaleString();
+  }
+
+  // カード番号フォーマット
+  function formatCardNumber(input) {
+    let val = input.value.replace(/\D/g, '').substring(0, 16);
+    input.value = val.replace(/(\d{4})/g, '$1 ').trim();
+    const icon = document.getElementById('cardTypeIcon');
+    if (val.startsWith('4')) icon.textContent = 'VISA';
+    else if (/^5[1-5]/.test(val)) icon.textContent = 'MC';
+    else icon.textContent = '';
+  }
+
+  function formatExpiry(input) {
+    let val = input.value.replace(/\D/g, '');
+    if (val.length >= 3) val = val.substring(0,2) + ' / ' + val.substring(2,4);
+    input.value = val;
+  }
+
+  function toggleCvv() {
+    const input = document.getElementById('cvvInput');
+    input.type = input.type === 'password' ? 'text' : 'password';
+  }
+
+  // 注文確定
+  function placeOrder() {
+    // ステップバー更新
+    document.querySelectorAll('.step-circle').forEach((el, i) => {
+      el.className = 'step-circle ' + (i < 2 ? 'done' : 'active');
+    });
+    document.querySelectorAll('.step-label').forEach((el, i) => {
+      el.className = 'step-label ' + (i === 2 ? 'active' : '');
+    });
+    document.querySelectorAll('.step-line').forEach(el => el.classList.add('done'));
+
+    document.getElementById('checkoutForm').style.display = 'none';
+    document.getElementById('bottomCta').style.display = 'none';
+    document.getElementById('completeScreen').classList.add('visible');
+    window.scrollTo({ top: 0 });
+  }
+
+  function goHome() { window.location.href = 'komcho-market-top.html'; }
+  function goOrders() { window.location.href = 'komcho-market-orders.html'; }
+</script>
+</body>
+</html>

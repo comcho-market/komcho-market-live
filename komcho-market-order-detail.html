@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>注文詳細 - こむちょマーケット</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 48 48%27%3E%3Crect width=%2748%27 height=%2748%27 rx=%2710%27 fill=%27%233D5A3E%27/%3E%3Cg transform=%27translate(24,24) scale(0.55)%27%3E%3Cpath d=%27M -26 7 C -17 -17 5 -24 24 -10 C 12 5 -2 19 -21 24%27 fill=%27none%27 stroke=%27%23F8F5EF%27 stroke-width=%275%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/%3E%3C/g%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg:          #F8F5EF;
+    --bg-card:     #FFFFFF;
+    --green-dark:  #3D5A3E;
+    --green-mid:   #5A7A5B;
+    --green-light: #EAF0E8;
+    --gold:        #B8973A;
+    --text-main:   #2C2C2C;
+    --text-sub:    #6B6B6B;
+    --border:      #E2DDD5;
+    --radius-card: 12px;
+    --shadow-card: 0 2px 12px rgba(0,0,0,0.07);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Yu Gothic', 'Meiryo', sans-serif;
+    background: var(--bg);
+    color: var(--text-main);
+    max-width: 430px;
+    margin: 0 auto;
+    min-height: 100vh;
+    padding-bottom: 80px;
+  }
+  button { cursor: pointer; border: none; background: none; font-family: inherit; }
+
+  /* HEADER */
+  .header {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px;
+  }
+  .header-back svg {
+    width: 22px; height: 22px;
+    stroke: var(--text-main); fill: none;
+    stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .header-logo {
+    display: flex; align-items: center; gap: 7px;
+  }
+  .header-logo .logo-icon {
+    width: 24px; height: 19px; flex-shrink: 0;
+  }
+  .header-logo .logo-icon path {
+    fill: none; stroke: var(--green-dark);
+    stroke-width: 3; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .header-logo .logo-text {
+    font-size: 15px; font-weight: 700; letter-spacing: 0.04em;
+    color: var(--text-main);
+  }
+  .header-spacer { width: 30px; }
+
+  /* GAP */
+  .gap { height: 8px; background: var(--bg); }
+
+  /* STATUS HERO */
+  .status-hero {
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 16px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .status-hero-top {
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .order-meta { display: flex; flex-direction: column; gap: 3px; }
+  .order-number-lg { font-size: 13px; color: var(--text-sub); }
+  .order-date-lg { font-size: 12px; color: var(--text-sub); }
+  .order-status-lg {
+    font-size: 13px; font-weight: 700;
+    padding: 6px 14px; border-radius: 20px;
+  }
+  .order-status-lg.shipping  { background: #FFF3CD; color: #856404; }
+  .order-status-lg.delivered { background: var(--green-light); color: var(--green-dark); }
+  .order-status-lg.preparing { background: #E8F0FE; color: #1A56DB; }
+  .order-status-lg.cancelled { background: #F5F5F5; color: #999; }
+
+  /* STATUS TIMELINE */
+  .status-timeline {
+    display: flex; align-items: flex-start;
+    gap: 0; margin-top: 4px;
+  }
+  .timeline-step {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px;
+  }
+  .timeline-dot {
+    width: 20px; height: 20px; border-radius: 50%;
+    background: var(--border);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; position: relative; z-index: 1;
+  }
+  .timeline-dot.done {
+    background: var(--green-dark);
+  }
+  .timeline-dot.done::after {
+    content: '';
+    display: block; width: 6px; height: 10px;
+    border-right: 2px solid #fff; border-bottom: 2px solid #fff;
+    transform: rotate(40deg) translate(-1px, -2px);
+  }
+  .timeline-dot.current {
+    background: var(--gold);
+    box-shadow: 0 0 0 3px rgba(184,151,58,0.2);
+  }
+  .timeline-dot.current::after {
+    content: '';
+    width: 8px; height: 8px; border-radius: 50%; background: #fff;
+    display: block;
+  }
+  .timeline-label { font-size: 10px; color: var(--text-sub); text-align: center; line-height: 1.3; }
+  .timeline-label.done { color: var(--green-dark); font-weight: 600; }
+  .timeline-label.current { color: var(--gold); font-weight: 700; }
+  .timeline-line {
+    flex: 0 0 auto;
+    width: 32px; height: 2px;
+    background: var(--border);
+    margin-top: 9px;
+  }
+  .timeline-line.done { background: var(--green-dark); }
+
+  /* SECTION BLOCK */
+  .section-block {
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 16px;
+  }
+  .block-title {
+    font-size: 14px; font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .block-title svg {
+    width: 16px; height: 16px;
+    stroke: var(--green-dark); fill: none;
+    stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .block-title::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+
+  /* SHOP ROW */
+  .shop-row {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 14px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .shop-logo-sm {
+    width: 32px; height: 32px; border-radius: 8px;
+    border: 1px dashed var(--border); background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 8px; color: var(--text-sub); text-align: center;
+    line-height: 1.3; flex-shrink: 0;
+  }
+  .shop-name-sm { font-size: 13px; font-weight: 700; }
+
+  /* PRODUCT LIST */
+  .product-list { display: flex; flex-direction: column; gap: 12px; }
+  .product-row {
+    display: flex; align-items: center; gap: 12px;
+  }
+  .product-thumb {
+    width: 60px; height: 60px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; flex-shrink: 0;
+  }
+  .product-thumb.g1 { background: linear-gradient(135deg,#f0e8d0,#d8c8a0); }
+  .product-thumb.g2 { background: linear-gradient(135deg,#e0e8d0,#b8c890); }
+  .product-thumb.g3 { background: linear-gradient(135deg,#f4ead8,#d4c0a0); }
+  .product-thumb.g4 { background: linear-gradient(135deg,#ece8e0,#c8c0b0); }
+  .product-info { flex: 1; }
+  .product-name { font-size: 13px; font-weight: 600; line-height: 1.4; margin-bottom: 3px; }
+  .product-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 4px; }
+  .product-tag {
+    font-size: 9px; background: var(--green-light);
+    color: var(--green-dark); border-radius: 20px;
+    padding: 2px 7px; font-weight: 500;
+  }
+  .product-meta { font-size: 11px; color: var(--text-sub); }
+  .product-price { font-size: 14px; font-weight: 700; white-space: nowrap; }
+
+  /* PRICE TABLE */
+  .price-table { display: flex; flex-direction: column; gap: 8px; }
+  .price-row {
+    display: flex; justify-content: space-between;
+    font-size: 13px; color: var(--text-sub);
+  }
+  .price-row.discount { color: #CC4444; }
+  .price-row.total {
+    font-size: 16px; font-weight: 700; color: var(--text-main);
+    padding-top: 12px; margin-top: 4px;
+    border-top: 1.5px solid var(--border);
+  }
+  .price-row.point-earn {
+    font-size: 11px; color: var(--green-dark);
+    background: var(--green-light); border-radius: 8px;
+    padding: 8px 12px; margin-top: 4px;
+  }
+
+  /* INFO TABLE */
+  .info-table { width: 100%; border-collapse: collapse; }
+  .info-table tr { border-bottom: 1px solid var(--border); }
+  .info-table tr:last-child { border-bottom: none; }
+  .info-table th {
+    text-align: left; padding: 10px 12px 10px 0;
+    font-size: 12px; color: var(--text-sub); font-weight: 500;
+    white-space: nowrap; width: 6em; vertical-align: top;
+  }
+  .info-table td {
+    padding: 10px 0; font-size: 13px;
+    color: var(--text-main); line-height: 1.6;
+  }
+
+  /* DELIVERY INFO */
+  .delivery-info-block {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+    padding: 14px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .delivery-info-row {
+    display: flex; align-items: flex-start; gap: 10px;
+  }
+  .delivery-info-label {
+    font-size: 11px; color: var(--text-sub);
+    font-weight: 600; white-space: nowrap; width: 5em; flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .delivery-info-value {
+    font-size: 13px; color: var(--text-main); line-height: 1.6; flex: 1;
+  }
+  .tracking-number {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  }
+  .tracking-number-text {
+    font-size: 14px; font-weight: 700;
+    color: var(--text-main); letter-spacing: 0.05em;
+  }
+  .copy-btn {
+    font-size: 11px; color: var(--green-dark);
+    border: 1px solid var(--green-dark);
+    border-radius: 20px; padding: 3px 10px;
+    background: var(--bg-card); cursor: pointer; font-weight: 600;
+  }
+  .delivery-note {
+    font-size: 11px; color: var(--text-sub); line-height: 1.6;
+    background: #FFF9EC; border: 1px solid #E8D898;
+    border-radius: 8px; padding: 8px 12px; margin-top: 4px;
+  }
+
+  /* PAYMENT INFO */
+  .payment-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px;
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+  }
+  .card-icon {
+    width: 40px; height: 26px; border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700; flex-shrink: 0;
+  }
+  .card-icon.visa   { background: #1A1F71; color: #fff; }
+  .card-icon.master { background: #EB001B; color: #fff; }
+  .payment-detail { flex: 1; }
+  .payment-brand  { font-size: 13px; font-weight: 600; }
+  .payment-number { font-size: 11px; color: var(--text-sub); margin-top: 1px; }
+
+  /* CONTACT BLOCK */
+  .contact-block {
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border);
+    padding: 16px;
+  }
+  .contact-note {
+    font-size: 12px; color: var(--text-sub);
+    line-height: 1.7; margin-bottom: 12px;
+  }
+  .contact-btn {
+    width: 100%; height: 46px; border-radius: 23px;
+    border: 1.5px solid var(--border);
+    background: var(--bg-card);
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    font-size: 13px; font-weight: 600; color: var(--text-main);
+    cursor: pointer; transition: background 0.15s;
+  }
+  .contact-btn:active { background: var(--bg); }
+  .contact-btn svg {
+    width: 16px; height: 16px;
+    stroke: var(--text-sub); fill: none;
+    stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
+  }
+
+  /* REORDER */
+  .reorder-block {
+    padding: 16px;
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border);
+  }
+  .reorder-btn {
+    width: 100%; height: 48px; border-radius: 24px;
+    border: 2px solid var(--green-dark);
+    background: transparent; color: var(--green-dark);
+    font-size: 14px; font-weight: 700;
+    cursor: pointer; transition: background 0.15s;
+  }
+  .reorder-btn:active { background: var(--green-light); }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 430px;
+    background: var(--bg-card); border-top: 1px solid var(--border);
+    display: flex; z-index: 200;
+  }
+  .nav-item {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+    padding: 10px 0 14px; color: var(--text-sub);
+    font-size: 10px; letter-spacing: 0.04em; cursor: pointer;
+  }
+  .nav-item.active { color: var(--green-dark); }
+  .nav-item svg {
+    width: 22px; height: 22px;
+    stroke: currentColor; fill: none;
+    stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
+  }
+
+  /* TOAST */
+  .toast {
+    position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+    background: var(--green-dark); color: #fff;
+    font-size: 13px; font-weight: 600;
+    padding: 10px 24px; border-radius: 20px;
+    z-index: 400; opacity: 0; pointer-events: none;
+    transition: opacity 0.2s; white-space: nowrap;
+  }
+  .toast.show { opacity: 1; }
+  /* ============ DESKTOP (≥900px) ============ */
+  @media (min-width: 900px) {
+    body { max-width: 720px; padding-bottom: 40px; }
+    .header { padding: 16px 32px; }
+    .bottom-nav { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <button class="header-back" onclick="history.back()">
+    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
+  <a class="header-logo" href="komcho-market-top.html">
+    <svg class="logo-icon" viewBox="0 0 60 48">
+      <path transform="translate(30,24)" d="M -26 7 C -17 -17 5 -24 24 -10 C 12 5 -2 19 -21 24"/>
+    </svg>
+    <span class="logo-text">こむちょマーケット</span>
+  </a>
+  <div class="header-spacer"></div>
+</header>
+
+<!-- STATUS HERO -->
+<div class="status-hero">
+  <div class="status-hero-top">
+    <div class="order-meta">
+      <div class="order-number-lg">注文 #2311</div>
+      <div class="order-date-lg">2026年6月20日</div>
+    </div>
+    <div class="order-status-lg shipping">配送中</div>
+  </div>
+
+  <!-- ステータスタイムライン -->
+  <div class="status-timeline">
+    <div class="timeline-step">
+      <div class="timeline-dot done"></div>
+      <div class="timeline-label done">注文確定</div>
+    </div>
+    <div class="timeline-line done"></div>
+    <div class="timeline-step">
+      <div class="timeline-dot done"></div>
+      <div class="timeline-label done">発送済み</div>
+    </div>
+    <div class="timeline-line done"></div>
+    <div class="timeline-step">
+      <div class="timeline-dot current"></div>
+      <div class="timeline-label current">配送中</div>
+    </div>
+    <div class="timeline-line"></div>
+    <div class="timeline-step">
+      <div class="timeline-dot"></div>
+      <div class="timeline-label">お届け済み</div>
+    </div>
+  </div>
+</div>
+
+<div class="gap"></div>
+
+<!-- 商品一覧 -->
+<div class="section-block">
+  <div class="block-title">
+    <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+    ご注文商品
+  </div>
+
+  <!-- 店舗情報 -->
+  <div class="shop-row">
+    <div class="shop-logo-sm">SHOP<br>LOGO</div>
+    <div class="shop-name-sm">〇〇農園</div>
+  </div>
+
+  <div class="product-list">
+    <div class="product-row">
+      <div class="product-thumb g1">🫙</div>
+      <div class="product-info">
+        <div class="product-name">無添加 自家製味噌 500g</div>
+        <div class="product-tags">
+          <span class="product-tag">砂糖不使用</span>
+          <span class="product-tag">国産100%</span>
+        </div>
+        <div class="product-meta">数量：1</div>
+      </div>
+      <div class="product-price">¥1,800</div>
+    </div>
+    <div class="product-row">
+      <div class="product-thumb g2">🥕</div>
+      <div class="product-info">
+        <div class="product-name">季節の野菜セット（S）</div>
+        <div class="product-tags">
+          <span class="product-tag">無農薬</span>
+        </div>
+        <div class="product-meta">数量：1</div>
+      </div>
+      <div class="product-price">¥3,200</div>
+    </div>
+  </div>
+</div>
+
+<div class="gap"></div>
+
+<!-- お支払い金額 -->
+<div class="section-block">
+  <div class="block-title">
+    <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+    お支払い金額
+  </div>
+  <div class="price-table">
+    <div class="price-row">
+      <span>商品合計</span>
+      <span>¥5,000</span>
+    </div>
+    <div class="price-row">
+      <span>送料（クール便・冷蔵）</span>
+      <span>¥1,000</span>
+    </div>
+    <div class="price-row discount">
+      <span>ポイント利用</span>
+      <span>−¥200</span>
+    </div>
+    <div class="price-row total">
+      <span>合計</span>
+      <span>¥5,800</span>
+    </div>
+    <div class="price-row point-earn">
+      🌿 この注文で <strong>+29pt</strong> 獲得予定
+    </div>
+  </div>
+</div>
+
+<div class="gap"></div>
+
+<!-- 配送情報 -->
+<div class="section-block">
+  <div class="block-title">
+    <svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+    配送情報
+  </div>
+  <div class="delivery-info-block">
+    <div class="delivery-info-row">
+      <div class="delivery-info-label">配送業者</div>
+      <div class="delivery-info-value">ヤマト運輸</div>
+    </div>
+    <div class="delivery-info-row">
+      <div class="delivery-info-label">お荷物番号</div>
+      <div class="delivery-info-value">
+        <div class="tracking-number">
+          <span class="tracking-number-text">1234-5678-9012</span>
+          <button class="copy-btn" onclick="copyTracking()">番号をコピー</button>
+        </div>
+      </div>
+    </div>
+    <div class="delivery-info-row">
+      <div class="delivery-info-label">配送方法</div>
+      <div class="delivery-info-value">クール便（冷蔵）</div>
+    </div>
+    <div class="delivery-info-row">
+      <div class="delivery-info-label">発送日</div>
+      <div class="delivery-info-value">2026年6月21日</div>
+    </div>
+  </div>
+  <div class="delivery-note" style="margin-top:12px;">
+    📦 お荷物番号をコピーして、配送業者のサイトで配送状況を確認できます。
+  </div>
+</div>
+
+<div class="gap"></div>
+
+<!-- 配送先住所 -->
+<div class="section-block">
+  <div class="block-title">
+    <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+    配送先住所
+  </div>
+  <table class="info-table">
+    <tr>
+      <th>お名前</th>
+      <td>山田 花子</td>
+    </tr>
+    <tr>
+      <th>住所</th>
+      <td>〒604-0000<br>京都府京都市中京区○○町1-2-3</td>
+    </tr>
+    <tr>
+      <th>電話番号</th>
+      <td>090-0000-0000</td>
+    </tr>
+  </table>
+</div>
+
+<div class="gap"></div>
+
+<!-- お支払い方法 -->
+<div class="section-block">
+  <div class="block-title">
+    <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+    お支払い方法
+  </div>
+  <div class="payment-row">
+    <div class="card-icon visa">VISA</div>
+    <div class="payment-detail">
+      <div class="payment-brand">Visa</div>
+      <div class="payment-number">**** **** **** 4242</div>
+    </div>
+  </div>
+</div>
+
+<div class="gap"></div>
+
+<!-- 再注文 -->
+<div class="reorder-block">
+  <button class="reorder-btn" onclick="showToast('カゴに追加しました'); setTimeout(() => { window.location.href='komcho-market-cart.html'; }, 800)">
+    同じ商品を再注文する
+  </button>
+</div>
+
+<!-- お問い合わせ -->
+<div class="contact-block">
+  <div class="contact-note">
+    商品や配送について、ご不明な点がございましたらお気軽にお問い合わせください。
+  </div>
+  <button class="contact-btn" onclick="window.location.href='komcho-market-shop-contact.html'">
+    <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+    〇〇農園にお問い合わせ
+  </button>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <a class="nav-item" href="komcho-market-top.html">
+    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <span>ホーム</span>
+  </a>
+  <a class="nav-item" href="komcho-market-search.html">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <span>探す</span>
+  </a>
+  <a class="nav-item" href="komcho-market-mypage.html">
+    <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    <span>お気に入り</span>
+  </a>
+  <a class="nav-item" href="komcho-market-cart.html">
+    <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+    <span>カゴ</span>
+  </a>
+  <a class="nav-item active" href="komcho-market-top.html">
+    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <span>マイページ</span>
+  </a>
+</nav>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+  function copyTracking() {
+    navigator.clipboard.writeText('1234-5678-9012').then(() => {
+      showToast('お荷物番号をコピーしました');
+    }).catch(() => {
+      showToast('1234-5678-9012');
+    });
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+</script>
+</body>
+</html>

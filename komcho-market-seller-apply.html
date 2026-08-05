@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>出店者 新規登録 - こむちょマーケット</title>
+<style>
+  :root {
+    --bg:          #F8F5EF;
+    --bg-card:     #FFFFFF;
+    --green-dark:  #3D5A3E;
+    --green-mid:   #5A7A5B;
+    --green-light: #EAF0E8;
+    --gold:        #B8973A;
+    --text-main:   #2C2C2C;
+    --text-sub:    #6B6B6B;
+    --border:      #E2DDD5;
+    --radius-card: 12px;
+    --shadow-card: 0 2px 12px rgba(0,0,0,0.07);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Yu Gothic', 'Meiryo', sans-serif;
+    background: var(--bg);
+    color: var(--text-main);
+    max-width: 430px;
+    margin: 0 auto;
+    min-height: 100vh;
+  }
+  button { cursor: pointer; border: none; background: none; font-family: inherit; }
+  input, textarea { font-family: inherit; }
+
+  /* HEADER */
+  .header {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px;
+  }
+  .header-back { display: flex; align-items: center; padding: 4px 0; }
+  .header-back svg {
+    width: 22px; height: 22px;
+    stroke: var(--text-main); fill: none;
+    stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .header-logo {
+    display: flex; align-items: center; gap: 7px;
+  }
+  .header-logo .logo-icon {
+    width: 24px; height: 19px; flex-shrink: 0;
+  }
+  .header-logo .logo-icon path {
+    fill: none; stroke: var(--green-dark);
+    stroke-width: 3; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .header-logo .logo-text {
+    font-size: 15px; font-weight: 700; letter-spacing: 0.04em;
+    color: var(--text-main);
+  }
+  .header-spacer { width: 30px; }
+
+  /* HERO */
+  .hero { padding: 32px 24px 20px; text-align: center; }
+  .hero-eyebrow {
+    font-size: 11px; color: var(--green-mid);
+    letter-spacing: 0.15em; font-weight: 500;
+    margin-bottom: 8px;
+  }
+  .hero-title {
+    font-size: 22px; font-weight: 700;
+    color: var(--text-main);
+    letter-spacing: 0.04em;
+    line-height: 1.4;
+    margin-bottom: 10px;
+  }
+  .hero-sub { font-size: 13px; color: var(--text-sub); line-height: 1.8; }
+
+  /* PHILOSOPHY BOX */
+  .philosophy-box {
+    margin: 0 16px 24px;
+    background: var(--green-light);
+    border-radius: var(--radius-card);
+    padding: 16px 18px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .philosophy-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    font-size: 12.5px; color: var(--text-main); line-height: 1.6;
+  }
+  .philosophy-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+  .philosophy-text strong { color: var(--green-dark); }
+
+  /* SECTION HEADING */
+  .section-heading {
+    margin: 28px 16px 12px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-heading-num {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--green-dark); color: #fff;
+    font-size: 12px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .section-heading-text { font-size: 15px; font-weight: 700; color: var(--text-main); }
+  .section-heading-sub {
+    margin: -4px 16px 12px;
+    font-size: 12px; color: var(--text-sub); line-height: 1.7;
+  }
+
+  /* FORM CARD */
+  .form-card {
+    margin: 0 16px 8px;
+    background: var(--bg-card);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
+    padding: 22px 20px;
+  }
+  .form-field { margin-bottom: 18px; }
+  .form-field:last-child { margin-bottom: 0; }
+  .form-label {
+    display: block;
+    font-size: 12px; font-weight: 600;
+    color: var(--text-sub); margin-bottom: 6px;
+  }
+  .form-label-required::after {
+    content: '必須';
+    font-size: 10px; color: #fff;
+    background: var(--green-dark);
+    border-radius: 4px; padding: 1px 5px;
+    margin-left: 6px; font-weight: 600;
+    vertical-align: middle;
+  }
+  .form-label-optional::after {
+    content: '任意';
+    font-size: 10px; color: var(--text-sub);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px; padding: 1px 5px;
+    margin-left: 6px; font-weight: 600;
+    vertical-align: middle;
+  }
+  .form-input {
+    width: 100%;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 13px 14px;
+    font-size: 15px; color: var(--text-main);
+    background: var(--bg);
+    outline: none; -webkit-appearance: none;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .form-input:focus { border-color: var(--green-dark); background: #fff; }
+  .form-input.error { border-color: #CC4444; }
+  .field-hint { font-size: 11px; color: var(--text-sub); margin-top: 5px; line-height: 1.5; }
+  .field-error { font-size: 11px; color: #CC4444; margin-top: 5px; display: none; }
+  .field-error.visible { display: block; }
+  .field-row { display: flex; gap: 10px; }
+  .field-row .form-field { flex: 1; }
+
+  /* ENTITY TYPE TOGGLE */
+  .entity-toggle { display: flex; gap: 10px; }
+  .entity-option {
+    flex: 1;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 13px 10px;
+    text-align: center;
+    font-size: 14px; font-weight: 600; color: var(--text-sub);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .entity-option.active {
+    border-color: var(--green-dark);
+    background: var(--green-light);
+    color: var(--green-dark);
+  }
+
+  /* CATEGORY CHIPS */
+  .category-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+  .category-chip {
+    padding: 8px 14px;
+    border-radius: 20px;
+    border: 1.5px solid var(--border);
+    font-size: 13px; font-weight: 600; color: var(--text-sub);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .category-chip.active {
+    border-color: var(--green-dark);
+    background: var(--green-light);
+    color: var(--green-dark);
+  }
+
+  /* FILE UPLOAD */
+  .file-upload-btn {
+    display: flex; align-items: center; gap: 10px;
+    border: 1.5px dashed var(--green-dark);
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 13px; font-weight: 600; color: var(--green-dark);
+    background: var(--green-light);
+    cursor: pointer;
+  }
+  .file-upload-btn svg {
+    width: 18px; height: 18px;
+    stroke: var(--green-dark); fill: none;
+    stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+    flex-shrink: 0;
+  }
+  .file-upload-btn.filled { border-style: solid; }
+
+  /* CHECK CARD (審査セルフチェック) */
+  .check-card {
+    margin: 0 16px 12px;
+    background: var(--bg-card);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
+    padding: 20px;
+  }
+  .check-card-title {
+    font-size: 13px; font-weight: 700; color: var(--text-main);
+    margin-bottom: 10px;
+  }
+  .check-list {
+    list-style: none;
+    margin-bottom: 14px;
+  }
+  .check-list li {
+    font-size: 12.5px; color: var(--text-sub);
+    line-height: 1.9;
+    padding-left: 16px;
+    position: relative;
+  }
+  .check-list li::before {
+    content: '・';
+    position: absolute; left: 0;
+    color: var(--gold);
+  }
+  .check-confirm {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+  }
+  .check-confirm input {
+    width: 20px; height: 20px;
+    accent-color: var(--green-dark);
+    flex-shrink: 0; margin-top: 1px; cursor: pointer;
+  }
+  .check-confirm label {
+    font-size: 13px; color: var(--text-main); line-height: 1.7; font-weight: 600;
+  }
+
+  /* TERMS */
+  .terms-wrap {
+    margin: 20px 16px;
+    display: flex; align-items: flex-start; gap: 10px;
+  }
+  .terms-checkbox {
+    width: 20px; height: 20px;
+    accent-color: var(--green-dark);
+    flex-shrink: 0; margin-top: 1px; cursor: pointer;
+  }
+  .terms-text { font-size: 12px; color: var(--text-sub); line-height: 1.7; }
+  .terms-link { color: var(--green-dark); text-decoration: underline; cursor: pointer; }
+
+  /* SUBMIT BTN */
+  .submit-wrap { padding: 0 16px 48px; }
+  .submit-btn {
+    width: 100%; height: 52px; border-radius: 26px;
+    background: var(--green-dark); color: #fff;
+    font-size: 16px; font-weight: 700; letter-spacing: 0.06em;
+    cursor: pointer; border: none;
+    transition: opacity 0.15s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .submit-btn:not(:disabled):active { opacity: 0.85; }
+  .submit-btn svg {
+    width: 18px; height: 18px;
+    stroke: #fff; fill: none;
+    stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .submit-note {
+    text-align: center; font-size: 11px; color: var(--text-sub);
+    margin-top: 10px; line-height: 1.6;
+  }
+
+  /* SUCCESS SCREEN */
+  .success-screen {
+    display: none;
+    padding: 60px 24px 40px;
+    text-align: center;
+    min-height: 90vh;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .success-screen.visible { display: flex; }
+  .success-icon {
+    width: 80px; height: 80px;
+    background: var(--green-light);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 24px;
+  }
+  .success-icon svg {
+    width: 36px; height: 36px;
+    stroke: var(--green-dark); fill: none;
+    stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .success-title { font-size: 22px; font-weight: 700; color: var(--text-main); margin-bottom: 10px; }
+  .success-sub { font-size: 13px; color: var(--text-sub); line-height: 1.9; margin-bottom: 28px; }
+  .success-info-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+    padding: 18px 20px;
+    width: 100%;
+    margin-bottom: 32px;
+    text-align: left;
+  }
+  .success-info-row {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 13px; padding: 8px 0;
+  }
+  .success-info-row + .success-info-row { border-top: 1px solid var(--border); }
+  .success-info-label { color: var(--text-sub); }
+  .success-info-value { color: var(--text-main); font-weight: 700; }
+  .success-btn {
+    width: 100%; height: 52px; border-radius: 26px;
+    background: var(--green-dark); color: #fff;
+    font-size: 16px; font-weight: 700;
+    cursor: pointer; border: none;
+  }
+  /* ============ DESKTOP (≥900px) ============ */
+  @media (min-width: 900px) {
+    body { max-width: 720px; padding-bottom: 40px; }
+    .header { padding: 16px 32px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <button class="header-back" onclick="history.back()">
+    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
+  <a class="header-logo" href="komcho-market-top.html">
+    <svg class="logo-icon" viewBox="0 0 60 48">
+      <path transform="translate(30,24)" d="M -26 7 C -17 -17 5 -24 24 -10 C 12 5 -2 19 -21 24"/>
+    </svg>
+    <span class="logo-text">こむちょマーケット</span>
+  </a>
+  <div class="header-spacer"></div>
+</header>
+
+<div id="formScreen">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-eyebrow">Seller Registration</div>
+    <div class="hero-title">出店者 新規登録</div>
+    <div class="hero-sub">こだわりの逸品を、届けたい人へ。<br>下記フォームへのご入力とご同意で、出店者登録が完了します（生鮮食品・惣菜は内容確認後）。</div>
+  </div>
+
+  <!-- PHILOSOPHY -->
+  <div class="philosophy-box">
+    <div class="philosophy-item">
+      <div class="philosophy-icon">🌿</div>
+      <div class="philosophy-text"><strong>厳しく絞るより、正直に開示</strong><br>最低限の基準を満たせば、あとは商品タグで見つけてもらえます。</div>
+    </div>
+    <div class="philosophy-item">
+      <div class="philosophy-icon">✅</div>
+      <div class="philosophy-text"><strong>審査は最小限です</strong><br>生鮮食品・惣菜のみ内容確認があります。それ以外はその場で登録が完了します。</div>
+    </div>
+  </div>
+
+  <!-- ① 事業者情報 -->
+  <div class="section-heading">
+    <div class="section-heading-num">1</div>
+    <div class="section-heading-text">事業者情報</div>
+  </div>
+
+  <div class="form-card">
+    <div class="form-field">
+      <label class="form-label form-label-required">事業形態</label>
+      <div class="entity-toggle">
+        <div class="entity-option active" id="entityIndividual" onclick="selectEntity('individual')">個人事業主</div>
+        <div class="entity-option" id="entityCorporate" onclick="selectEntity('corporate')">法人</div>
+      </div>
+    </div>
+
+    <div class="form-field">
+      <label class="form-label form-label-required" for="shopNameInput">屋号・会社名</label>
+      <input class="form-input" type="text" id="shopNameInput" placeholder="〇〇農園 / 株式会社〇〇" oninput="validateField('shopName')">
+      <div class="field-error" id="shopNameError">屋号・会社名を入力してください</div>
+    </div>
+
+    <div class="form-field">
+      <label class="form-label form-label-required" for="repNameInput">代表者名</label>
+      <input class="form-input" type="text" id="repNameInput" placeholder="山田 太郎" autocomplete="name" oninput="validateField('repName')">
+      <div class="field-error" id="repNameError">代表者名を入力してください</div>
+    </div>
+
+    <div class="form-field">
+      <label class="form-label form-label-required" for="zipInput">郵便番号</label>
+      <input class="form-input" type="text" id="zipInput" placeholder="123-4567" inputmode="numeric" style="max-width:160px;" oninput="validateField('zip')">
+      <div class="field-error" id="zipError">郵便番号を入力してください</div>
+    </div>
+
+    <div class="form-field">
+      <label class="form-label form-label-required" for="addressInput">所在地</label>
+      <input class="form-input" type="text" id="addressInput" placeholder="都道府県・市区町村・番地・建物名" autocomplete="address-line1" oninput="validateField('address')">
+      <div class="field-error" id="addressError">所在地を入力してください</div>
+    </div>
+
+    <div class="form-field">
+      <label class="form-label form-label-required" for="telInput">電話番号</label>
+      <input class="form-input" type="tel" id="telInput" placeholder="090-1234-5678" inputmode="tel" autocomplete="tel" oninput="validateField('tel')">
+      <div class="field-error" id="telError">電話番号を入力してください</div>
+    </div>
+
+    <div class="form-field">
+      <label class="form-label form-label-required" for="emailInput">メールアドレス</label>
+      <input class="form-input" type="email" id="emailInput" placeholder="example@email.com" inputmode="email" autocomplete="email" oninput="validateField('email')">
+      <div class="field-error" id="emailError">正しいメールアドレスを入力してください</div>
+    </div>
+
+    <div class="form-field">
+      <label class="form-label form-label-required">取り扱い予定カテゴリー</label>
+      <div class="field-hint" style="margin-bottom:8px;">複数選択できます。生鮮食品・惣菜を選ぶと、下に確認事項が表示されます。</div>
+      <div class="category-grid" id="categoryGrid">
+        <div class="category-chip" data-cat="fresh" onclick="toggleCategory(this)">生鮮食品</div>
+        <div class="category-chip" data-cat="deli" onclick="toggleCategory(this)">惣菜</div>
+        <div class="category-chip" data-cat="seasoning" onclick="toggleCategory(this)">調味料</div>
+        <div class="category-chip" data-cat="sweets" onclick="toggleCategory(this)">お菓子</div>
+        <div class="category-chip" data-cat="drink" onclick="toggleCategory(this)">飲み物</div>
+        <div class="category-chip" data-cat="daily" onclick="toggleCategory(this)">日用品</div>
+        <div class="category-chip" data-cat="oem" onclick="toggleCategory(this)">OEM委託あり</div>
+      </div>
+    </div>
+
+    <div class="form-field" id="licenseField" style="display:none;">
+      <label class="form-label form-label-required">営業許可書の添付</label>
+      <div class="field-hint" style="margin-bottom:8px;">生鮮食品・惣菜を自社製造する場合は、食品衛生法に基づく営業許可書（許可証）を添付してください。</div>
+      <label class="file-upload-btn" for="licenseInput" id="licenseUploadBtn">
+        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <span id="licenseFileName">画像またはPDFを選択</span>
+      </label>
+      <input type="file" id="licenseInput" accept="image/*,.pdf" style="display:none;" onchange="handleLicenseUpload(this)">
+    </div>
+
+    <div class="form-field" id="oemField" style="display:none;">
+      <label class="form-label form-label-required">主なOEM工場</label>
+      <div class="field-hint" style="margin-bottom:8px;">複数拠点がある場合は、主な1箇所をご記入ください。</div>
+      <input class="form-input" type="text" id="oemNameInput" placeholder="工場名（例：〇〇食品工業株式会社）" style="margin-bottom:10px;" oninput="validateOem()">
+      <input class="form-input" type="text" id="oemAddressInput" placeholder="所在地（都道府県・市区町村）" oninput="validateOem()">
+    </div>
+  </div>
+
+  <!-- ② 出店基準セルフチェック -->
+  <div class="section-heading">
+    <div class="section-heading-num">2</div>
+    <div class="section-heading-text">出店基準セルフチェック</div>
+  </div>
+  <div class="section-heading-sub">こむちょマーケットでは以下の2点を出店の最低基準としています。ご自身で内容をご確認のうえチェックしてください（担当者による個別審査は行いません）。</div>
+
+  <div class="check-card">
+    <div class="check-card-title">🚫 以下の成分・農薬を含む商品を取り扱っていない</div>
+    <ul class="check-list">
+      <li>タール色素・合成着色料</li>
+      <li>アスパルテーム・スクラロース・アセスルファムK・サッカリンなどの人工甘味料</li>
+      <li>亜硝酸ナトリウム・硝酸塩</li>
+      <li>ポストハーベスト農薬（例：OPP・TBZ・イマザリルなど、輸入柑橘類やバナナ等に使われる防カビ剤）</li>
+    </ul>
+    <div class="check-confirm">
+      <input type="checkbox" id="ngCheck" onchange="updateSubmitBtn()">
+      <label for="ngCheck">上記4項目のいずれにも該当しないことを確認しました</label>
+    </div>
+  </div>
+
+  <div class="check-card">
+    <div class="check-card-title">📋 全商品で以下の情報を開示できる</div>
+    <ul class="check-list">
+      <li>全原材料表示（バックラベルと同じ内容。原産地は使用量が最も多い原材料のみでOK）</li>
+      <li>アレルギー8品目（卵・乳・小麦・そば・落花生・えび・かに・くるみ）</li>
+      <li>製造者情報</li>
+    </ul>
+    <div class="check-confirm">
+      <input type="checkbox" id="disclosureCheck" onchange="updateSubmitBtn()">
+      <label for="disclosureCheck">上記情報を全商品で開示できることを確認しました</label>
+    </div>
+  </div>
+
+  <!-- ③ 出店者規約 -->
+  <div class="section-heading">
+    <div class="section-heading-num">3</div>
+    <div class="section-heading-text">出店者規約への同意</div>
+  </div>
+
+  <div class="terms-wrap">
+    <input type="checkbox" class="terms-checkbox" id="termsCheck" onchange="updateSubmitBtn()">
+    <label class="terms-text" for="termsCheck">
+      <a href="komcho-market-terms-seller.html" class="terms-link" onclick="event.stopPropagation()">出店者規約</a>の内容を読み、同意します
+    </label>
+  </div>
+
+  <!-- 送信 -->
+  <div class="submit-wrap">
+    <button class="submit-btn" id="submitBtn" disabled onclick="submitApplication()">
+      <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      出店登録を完了する
+    </button>
+    <div class="submit-note">生鮮食品・惣菜以外は、送信後すぐに登録が完了します。<br>該当する場合は内容確認後、最短当日〜5営業日以内にご連絡します。</div>
+  </div>
+
+</div>
+
+<!-- 送信完了画面 -->
+<div class="success-screen" id="successScreen">
+  <div class="success-icon">
+    <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+  </div>
+  <div class="success-title" id="successTitle">登録が完了しました</div>
+  <div class="success-sub" id="successSub">
+    こむちょマーケットへようこそ。<br>
+    さっそくショップ情報を設定しましょう。
+  </div>
+  <div class="success-info-card">
+    <div class="success-info-row">
+      <div class="success-info-label">ステータス</div>
+      <div class="success-info-value" id="successStatus">出店者登録 完了</div>
+    </div>
+    <div class="success-info-row">
+      <div class="success-info-label">次のステップ</div>
+      <div class="success-info-value" id="successNext">ショップ情報の設定</div>
+    </div>
+  </div>
+  <button class="success-btn" id="successBtn" onclick="goShopAdmin()">ショップ情報を設定する</button>
+</div>
+
+<script>
+  // 事業形態トグル
+  function selectEntity(type) {
+    document.getElementById('entityIndividual').classList.toggle('active', type === 'individual');
+    document.getElementById('entityCorporate').classList.toggle('active', type === 'corporate');
+  }
+
+  // バリデーション状態
+  const valid = {
+    shopName: false, repName: false, zip: false,
+    address: false, tel: false, email: false
+  };
+
+  const fieldMap = {
+    shopName: { input: 'shopNameInput', error: 'shopNameError', type: 'text' },
+    repName:  { input: 'repNameInput',  error: 'repNameError',  type: 'text' },
+    zip:      { input: 'zipInput',      error: 'zipError',      type: 'zip' },
+    address:  { input: 'addressInput',  error: 'addressError',  type: 'text' },
+    tel:      { input: 'telInput',      error: 'telError',      type: 'tel' },
+    email:    { input: 'emailInput',    error: 'emailError',    type: 'email' }
+  };
+
+  function validateField(key) {
+    const { input, error, type } = fieldMap[key];
+    const v = document.getElementById(input).value.trim();
+    let ok = false;
+    if (type === 'text') ok = v.length >= 1;
+    if (type === 'zip') ok = /^\d{3}-?\d{4}$/.test(v);
+    if (type === 'tel') ok = /^[\d-]{10,}$/.test(v);
+    if (type === 'email') ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+
+    valid[key] = ok;
+    document.getElementById(input).classList.toggle('error', v.length > 0 && !ok);
+    document.getElementById(error).classList.toggle('visible', v.length > 0 && !ok);
+    updateSubmitBtn();
+  }
+
+  // カテゴリー・営業許可・OEM
+  const regulatedCategories = ['fresh', 'deli'];
+  let selectedCategories = [];
+  let licenseRequired = false;
+  let oemRequired = false;
+  let licenseUploaded = false;
+  let oemValid = false;
+
+  function toggleCategory(el) {
+    const cat = el.dataset.cat;
+    el.classList.toggle('active');
+    if (el.classList.contains('active')) {
+      if (!selectedCategories.includes(cat)) selectedCategories.push(cat);
+    } else {
+      selectedCategories = selectedCategories.filter(c => c !== cat);
+    }
+    updateConditionalFields();
+    updateSubmitBtn();
+  }
+
+  function updateConditionalFields() {
+    const hasRegulated = selectedCategories.some(c => regulatedCategories.includes(c));
+    const hasOem = selectedCategories.includes('oem');
+
+    licenseRequired = hasRegulated && !hasOem;
+    oemRequired = hasRegulated && hasOem;
+
+    document.getElementById('licenseField').style.display = licenseRequired ? 'block' : 'none';
+    document.getElementById('oemField').style.display = oemRequired ? 'block' : 'none';
+  }
+
+  function handleLicenseUpload(input) {
+    const file = input.files[0];
+    if (file) {
+      licenseUploaded = true;
+      document.getElementById('licenseFileName').textContent = file.name;
+      document.getElementById('licenseUploadBtn').classList.add('filled');
+    }
+    updateSubmitBtn();
+  }
+
+  function validateOem() {
+    const name = document.getElementById('oemNameInput').value.trim();
+    const address = document.getElementById('oemAddressInput').value.trim();
+    oemValid = name.length > 0 && address.length > 0;
+    updateSubmitBtn();
+  }
+
+  function updateSubmitBtn() {
+    const allFieldsValid = Object.values(valid).every(v => v);
+    const categoryValid = selectedCategories.length > 0;
+    const licenseValid = !licenseRequired || licenseUploaded;
+    const oemFieldValid = !oemRequired || oemValid;
+    const ngChecked = document.getElementById('ngCheck').checked;
+    const disclosureChecked = document.getElementById('disclosureCheck').checked;
+    const termsChecked = document.getElementById('termsCheck').checked;
+    document.getElementById('submitBtn').disabled =
+      !(allFieldsValid && categoryValid && licenseValid && oemFieldValid && ngChecked && disclosureChecked && termsChecked);
+  }
+
+  function submitApplication() {
+    document.getElementById('formScreen').style.display = 'none';
+    document.getElementById('successScreen').classList.add('visible');
+
+    const pendingReview = licenseRequired || oemRequired;
+    const titleEl = document.getElementById('successTitle');
+    const subEl = document.getElementById('successSub');
+    const statusEl = document.getElementById('successStatus');
+    const nextEl = document.getElementById('successNext');
+    const btnEl = document.getElementById('successBtn');
+
+    if (pendingReview) {
+      titleEl.textContent = '申請を受け付けました';
+      subEl.innerHTML = '内容を確認のうえ<br>最短当日〜5営業日以内にご連絡いたします。';
+      statusEl.textContent = '内容確認中';
+      nextEl.textContent = '確認完了のご連絡をお待ちください';
+      btnEl.textContent = 'TOPへ戻る';
+      btnEl.onclick = goTop;
+    } else {
+      titleEl.textContent = '登録が完了しました';
+      subEl.innerHTML = 'こむちょマーケットへようこそ。<br>さっそくショップ情報を設定しましょう。';
+      statusEl.textContent = '出店者登録 完了';
+      nextEl.textContent = 'ショップ情報の設定';
+      btnEl.textContent = 'ショップ情報を設定する';
+      btnEl.onclick = goShopAdmin;
+    }
+    window.scrollTo({ top: 0 });
+  }
+
+  function goShopAdmin() {
+    window.location.href = 'komcho-market-shop-admin.html';
+  }
+
+  function goTop() {
+    window.location.href = 'komcho-market-top.html';
+  }
+</script>
+</body>
+</html>
