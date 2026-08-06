@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ログイン - こむちょマーケット</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 48 48%27%3E%3Crect width=%2748%27 height=%2748%27 rx=%2710%27 fill=%27%233D5A3E%27/%3E%3Cg transform=%27translate(24,24) scale(0.55)%27%3E%3Cpath d=%27M -26 7 C -17 -17 5 -24 24 -10 C 12 5 -2 19 -21 24%27 fill=%27none%27 stroke=%27%23F8F5EF%27 stroke-width=%275%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/%3E%3C/g%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg:          #F8F5EF;
+    --bg-card:     #FFFFFF;
+    --green-dark:  #3D5A3E;
+    --green-mid:   #5A7A5B;
+    --green-light: #EAF0E8;
+    --gold:        #B8973A;
+    --text-main:   #2C2C2C;
+    --text-sub:    #6B6B6B;
+    --border:      #E2DDD5;
+    --radius-card: 12px;
+    --shadow-card: 0 2px 12px rgba(0,0,0,0.07);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Yu Gothic', 'Meiryo', sans-serif;
+    background: var(--bg);
+    color: var(--text-main);
+    max-width: 430px;
+    margin: 0 auto;
+    min-height: 100vh;
+  }
+  button { cursor: pointer; border: none; background: none; font-family: inherit; }
+  input { font-family: inherit; }
+
+  /* HEADER */
+  .header {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px;
+  }
+  .header-back svg {
+    width: 22px; height: 22px;
+    stroke: var(--text-main); fill: none;
+    stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .header-logo {
+    display: flex; align-items: center; gap: 7px;
+  }
+  .header-logo .logo-icon {
+    width: 24px; height: 19px; flex-shrink: 0;
+  }
+  .header-logo .logo-icon path {
+    fill: none; stroke: var(--green-dark);
+    stroke-width: 3; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .header-logo .logo-text {
+    font-size: 15px; font-weight: 700; letter-spacing: 0.04em;
+    color: var(--text-main);
+  }
+  .header-spacer { width: 30px; }
+
+  /* HERO */
+  .hero {
+    padding: 40px 24px 28px;
+    text-align: center;
+  }
+  .hero-eyebrow {
+    font-size: 11px; color: var(--green-mid);
+    letter-spacing: 0.15em; font-weight: 500; margin-bottom: 8px;
+  }
+  .hero-title {
+    font-size: 24px; font-weight: 700;
+    color: var(--text-main); letter-spacing: 0.04em;
+  }
+
+  /* FORM CARD */
+  .form-card {
+    margin: 0 16px 16px;
+    background: var(--bg-card);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
+    padding: 24px 20px;
+  }
+
+  /* FORM FIELDS */
+  .form-field { margin-bottom: 18px; }
+  .form-field:last-child { margin-bottom: 0; }
+  .form-label {
+    display: block;
+    font-size: 12px; font-weight: 600;
+    color: var(--text-sub); margin-bottom: 6px;
+  }
+  .form-input-wrap { position: relative; }
+  .form-input {
+    width: 100%;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 13px 44px 13px 14px;
+    font-size: 15px; color: var(--text-main);
+    background: var(--bg); outline: none;
+    -webkit-appearance: none;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .form-input:focus {
+    border-color: var(--green-dark); background: #fff;
+  }
+  .form-input.error { border-color: #CC4444; }
+  .form-input-icon {
+    position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+    pointer-events: none;
+  }
+  .form-input-icon svg {
+    width: 18px; height: 18px;
+    stroke: var(--text-sub); fill: none;
+    stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .pw-toggle {
+    position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+    cursor: pointer; padding: 4px; background: none; border: none;
+  }
+  .pw-toggle svg {
+    width: 18px; height: 18px;
+    stroke: var(--text-sub); fill: none;
+    stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
+  }
+
+  /* FORGOT PASSWORD */
+  .forgot-link {
+    text-align: right;
+    margin-top: 8px;
+  }
+  .forgot-link a {
+    font-size: 12px; color: var(--green-mid);
+    text-decoration: underline; cursor: pointer;
+  }
+
+  /* ERROR MESSAGE */
+  .login-error {
+    display: none;
+    background: #FFF0F0;
+    border: 1px solid #FFCCCC;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 12px; color: #CC4444;
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+  .login-error.visible { display: block; }
+
+  /* LOGIN BTN */
+  .login-btn {
+    width: 100%; height: 52px; border-radius: 26px;
+    background: var(--green-dark); color: #fff;
+    font-size: 16px; font-weight: 700; letter-spacing: 0.06em;
+    cursor: pointer; border: none;
+    transition: opacity 0.15s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    margin-bottom: 0;
+  }
+  .login-btn:active { opacity: 0.85; }
+  .login-btn svg {
+    width: 18px; height: 18px;
+    stroke: #fff; fill: none;
+    stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+  }
+
+  /* DIVIDER */
+  .divider {
+    display: flex; align-items: center; gap: 12px;
+    padding: 16px 16px 0;
+  }
+  .divider-line { flex: 1; height: 1px; background: var(--border); }
+  .divider-text { font-size: 12px; color: var(--text-sub); white-space: nowrap; }
+
+  /* GUEST BTN */
+  .guest-wrap { padding: 16px 16px 0; }
+  .guest-btn {
+    width: 100%; height: 48px; border-radius: 24px;
+    border: 1.5px solid var(--border);
+    background: var(--bg-card);
+    font-size: 14px; font-weight: 600; color: var(--text-main);
+    cursor: pointer; transition: background 0.15s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .guest-btn:active { background: var(--bg); }
+  .guest-btn svg {
+    width: 16px; height: 16px;
+    stroke: var(--text-sub); fill: none;
+    stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .guest-note {
+    text-align: center;
+    font-size: 11px; color: var(--text-sub);
+    padding: 8px 16px 0; line-height: 1.6;
+  }
+
+  /* REGISTER LINK */
+  .register-link-wrap {
+    text-align: center;
+    padding: 24px 16px 48px;
+    font-size: 13px; color: var(--text-sub);
+  }
+  .register-link {
+    color: var(--green-dark); font-weight: 700;
+    text-decoration: underline; cursor: pointer;
+  }
+
+  /* FORGOT PASSWORD MODAL */
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 300;
+    background: rgba(0,0,0,0.5);
+    display: flex; align-items: flex-end;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.25s;
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: auto; }
+  .modal {
+    width: 100%; max-width: 430px; margin: 0 auto;
+    background: var(--bg-card); border-radius: 20px 20px 0 0;
+    padding: 0 0 48px;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+  }
+  .modal-overlay.open .modal { transform: translateY(0); }
+  .modal-handle {
+    width: 36px; height: 4px; background: var(--border);
+    border-radius: 2px; margin: 12px auto 20px;
+  }
+  .modal-title {
+    font-size: 16px; font-weight: 700;
+    padding: 0 20px 6px;
+  }
+  .modal-sub {
+    font-size: 13px; color: var(--text-sub);
+    padding: 0 20px 20px; line-height: 1.7;
+    border-bottom: 1px solid var(--border);
+  }
+  .modal-body { padding: 20px 20px 0; }
+  .modal-field { margin-bottom: 16px; }
+  .modal-label {
+    display: block; font-size: 12px; font-weight: 600;
+    color: var(--text-sub); margin-bottom: 6px;
+  }
+  .modal-input {
+    width: 100%; border: 1.5px solid var(--border); border-radius: 10px;
+    padding: 13px 14px; font-size: 15px; color: var(--text-main);
+    background: var(--bg); outline: none; font-family: inherit;
+    -webkit-appearance: none; transition: border-color 0.15s;
+  }
+  .modal-input:focus { border-color: var(--green-dark); background: #fff; }
+  .modal-submit-btn {
+    width: 100%; height: 50px; border-radius: 25px;
+    background: var(--green-dark); color: #fff;
+    font-size: 15px; font-weight: 700;
+    cursor: pointer; border: none; transition: opacity 0.15s;
+  }
+  .modal-submit-btn:active { opacity: 0.85; }
+  .modal-sent {
+    display: none; text-align: center; padding: 20px 0 0;
+  }
+  .modal-sent-icon {
+    font-size: 40px; margin-bottom: 12px;
+  }
+  .modal-sent-title {
+    font-size: 16px; font-weight: 700; margin-bottom: 8px;
+  }
+  .modal-sent-text {
+    font-size: 13px; color: var(--text-sub); line-height: 1.8;
+  }
+
+  /* TOAST */
+  .toast {
+    position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%);
+    background: var(--green-dark); color: #fff;
+    font-size: 13px; font-weight: 600;
+    padding: 10px 24px; border-radius: 20px;
+    z-index: 400; opacity: 0; pointer-events: none;
+    transition: opacity 0.2s; white-space: nowrap;
+  }
+  .toast.show { opacity: 1; }
+  /* ============ DESKTOP (≥900px) ============ */
+  @media (min-width: 900px) {
+    body { max-width: 720px; padding-bottom: 40px; }
+    .header { padding: 16px 32px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <button class="header-back" onclick="history.back()">
+    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
+  <a class="header-logo" href="komcho-market-top.html">
+    <svg class="logo-icon" viewBox="0 0 60 48">
+      <path transform="translate(30,24)" d="M -26 7 C -17 -17 5 -24 24 -10 C 12 5 -2 19 -21 24"/>
+    </svg>
+    <span class="logo-text">こむちょマーケット</span>
+  </a>
+  <div class="header-spacer"></div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">Member Login</div>
+  <div class="hero-title">ログイン</div>
+</div>
+
+<!-- FORM -->
+<div class="form-card">
+
+  <!-- エラーメッセージ -->
+  <div class="login-error" id="loginError">
+    メールアドレスまたはパスワードが正しくありません。もう一度お試しください。
+  </div>
+
+  <!-- メールアドレス -->
+  <div class="form-field">
+    <label class="form-label" for="emailInput">メールアドレス</label>
+    <div class="form-input-wrap">
+      <input class="form-input" type="email" id="emailInput"
+        placeholder="example@email.com"
+        autocomplete="email" inputmode="email"
+        oninput="clearError()">
+      <div class="form-input-icon">
+        <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- パスワード -->
+  <div class="form-field">
+    <label class="form-label" for="pwInput">パスワード</label>
+    <div class="form-input-wrap">
+      <input class="form-input" type="password" id="pwInput"
+        placeholder="パスワードを入力"
+        autocomplete="current-password"
+        oninput="clearError()">
+      <button class="pw-toggle" onclick="togglePw()" type="button">
+        <svg id="pwEyeIcon" viewBox="0 0 24 24">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+          <circle cx="12" cy="12" r="3"/>
+        </svg>
+      </button>
+    </div>
+    <div class="forgot-link">
+      <a onclick="openForgotModal()">パスワードをお忘れの方</a>
+    </div>
+  </div>
+
+  <!-- ログインボタン -->
+  <button class="login-btn" onclick="doLogin()">
+    <svg viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+    ログイン
+  </button>
+
+</div>
+
+<!-- ゲスト購入 -->
+<div class="divider">
+  <div class="divider-line"></div>
+  <div class="divider-text">または</div>
+  <div class="divider-line"></div>
+</div>
+
+<div class="guest-wrap">
+  <button class="guest-btn" onclick="window.location.href='komcho-market-top.html'">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 8 12 12 14 14"/></svg>
+    登録せずにゲスト購入へ
+  </button>
+</div>
+<div class="guest-note">
+  ※ポイントの付与・注文履歴の保存はされません。<br>購入後に登録することもできます。
+</div>
+
+<!-- 新規登録リンク -->
+<div class="register-link-wrap">
+  アカウントをお持ちでない方は
+  <a href="komcho-market-terms.html" class="register-link" style="text-decoration:underline;">新規登録（無料）</a>
+</div>
+
+<!-- パスワードリセットモーダル -->
+<div class="modal-overlay" id="forgotModal" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">パスワードをお忘れの方</div>
+    <div class="modal-sub">
+      ご登録のメールアドレスを入力してください。<br>
+      パスワード再設定のメールをお送りします。
+    </div>
+    <div class="modal-body">
+      <div id="forgotForm">
+        <div class="modal-field">
+          <label class="modal-label">メールアドレス</label>
+          <input class="modal-input" type="email" id="forgotEmail"
+            placeholder="example@email.com" inputmode="email">
+        </div>
+        <button class="modal-submit-btn" onclick="sendReset()">
+          再設定メールを送る
+        </button>
+      </div>
+      <div class="modal-sent" id="forgotSent">
+        <div class="modal-sent-icon">📩</div>
+        <div class="modal-sent-title">メールを送信しました</div>
+        <div class="modal-sent-text">
+          ご入力のメールアドレスに<br>
+          再設定用のリンクをお送りしました。<br>
+          メールをご確認ください。
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- Supabase接続 -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+  const SUPABASE_URL = 'https://uawhrpizzlchkvmzrjzo.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_FaOqUE1PDbo-fpT9KhkWaw__BShLngI';
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+</script>
+
+<script>
+  // パスワード表示切替
+  function togglePw() {
+    const input = document.getElementById('pwInput');
+    const icon  = document.getElementById('pwEyeIcon');
+    const isText = input.type === 'text';
+    input.type = isText ? 'password' : 'text';
+    icon.innerHTML = isText
+      ? '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>'
+      : '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+  }
+
+  // ログイン処理（Supabaseで実際に認証する）
+  async function doLogin() {
+    const email = document.getElementById('emailInput').value.trim();
+    const pw    = document.getElementById('pwInput').value;
+
+    if (!email || !pw) {
+      document.getElementById('loginError').classList.add('visible');
+      document.getElementById('emailInput').classList.add('error');
+      document.getElementById('pwInput').classList.add('error');
+      return;
+    }
+
+    const { data, error } = await supabaseClient.auth.signInWithPassword({
+      email: email,
+      password: pw
+    });
+
+    if (error) {
+      document.getElementById('loginError').classList.add('visible');
+      document.getElementById('emailInput').classList.add('error');
+      document.getElementById('pwInput').classList.add('error');
+      return;
+    }
+
+    showToast('ログインしました ✓');
+    setTimeout(() => { window.location.href = 'komcho-market-top.html'; }, 800);
+  }
+
+  function clearError() {
+    document.getElementById('loginError').classList.remove('visible');
+    document.getElementById('emailInput').classList.remove('error');
+    document.getElementById('pwInput').classList.remove('error');
+  }
+
+  // パスワードリセットモーダル
+  function openForgotModal() {
+    document.getElementById('forgotModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+    // リセット
+    document.getElementById('forgotForm').style.display = 'block';
+    document.getElementById('forgotSent').style.display = 'none';
+    document.getElementById('forgotEmail').value = '';
+  }
+  function closeForgotModal() {
+    document.getElementById('forgotModal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  function closeModalOutside(e) {
+    if (e.target === document.getElementById('forgotModal')) closeForgotModal();
+  }
+  function sendReset() {
+    const email = document.getElementById('forgotEmail').value.trim();
+    if (!email) {
+      document.getElementById('forgotEmail').style.borderColor = '#CC4444';
+      return;
+    }
+    document.getElementById('forgotForm').style.display = 'none';
+    document.getElementById('forgotSent').style.display = 'block';
+  }
+
+  // トースト
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+</script>
+</body>
+</html>

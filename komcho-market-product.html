@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>無添加 自家製味噌 500g - こむちょマーケット</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 48 48%27%3E%3Crect width=%2748%27 height=%2748%27 rx=%2710%27 fill=%27%233D5A3E%27/%3E%3Cg transform=%27translate(24,24) scale(0.55)%27%3E%3Cpath d=%27M -26 7 C -17 -17 5 -24 24 -10 C 12 5 -2 19 -21 24%27 fill=%27none%27 stroke=%27%23F8F5EF%27 stroke-width=%275%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/%3E%3C/g%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg:          #F8F5EF;
+    --bg-card:     #FFFFFF;
+    --green-dark:  #3D5A3E;
+    --green-mid:   #5A7A5B;
+    --green-light: #EAF0E8;
+    --gold:        #B8973A;
+    --text-main:   #2C2C2C;
+    --text-sub:    #6B6B6B;
+    --border:      #E2DDD5;
+    --radius-card: 12px;
+    --shadow-card: 0 2px 12px rgba(0,0,0,0.07);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Yu Gothic', 'Meiryo', sans-serif;
+    background: var(--bg);
+    color: var(--text-main);
+    max-width: 430px;
+    margin: 0 auto;
+    min-height: 100vh;
+    padding-bottom: 140px;
+  }
+  a { text-decoration: none; color: inherit; }
+  button { cursor: pointer; border: none; background: none; font-family: inherit; }
+
+  /* HEADER */
+  .header {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px;
+  }
+  .header-back {
+    display: flex; align-items: center;
+    padding: 4px 0;
+  }
+  .header-back svg {
+    width: 22px; height: 22px;
+    stroke: var(--text-main); fill: none;
+    stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .header-logo {
+    display: flex; align-items: center; gap: 7px;
+  }
+  .header-logo .logo-icon {
+    width: 24px; height: 19px; flex-shrink: 0;
+  }
+  .header-logo .logo-icon path {
+    fill: none; stroke: var(--green-dark);
+    stroke-width: 3; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .header-logo .logo-text {
+    font-size: 15px; font-weight: 700; letter-spacing: 0.04em;
+    color: var(--text-main);
+  }
+  .header-icons { display: flex; align-items: center; gap: 18px; }
+  .header-icons svg {
+    width: 22px; height: 22px;
+    stroke: var(--text-main); fill: none;
+    stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
+  }
+
+  /* IMAGE SLIDER */
+  .slider-wrap {
+    position: relative;
+    background: #E8E0D0;
+    aspect-ratio: 1;
+    overflow: hidden;
+  }
+  .slider-inner {
+    display: flex;
+    width: 500%;
+    height: 100%;
+    transition: transform 0.35s ease;
+  }
+  .slide {
+    width: 20%;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; color: #A89878; letter-spacing: 0.05em;
+    flex-direction: column; gap: 8px;
+  }
+  .slide svg {
+    width: 44px; height: 44px;
+    stroke: #C8B898; fill: none;
+    stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .slide.s1 { background: linear-gradient(145deg, #e8dcc8, #d0c4a8); }
+  .slide.s2 { background: linear-gradient(145deg, #ddd8c8, #c8bc9c); }
+  .slide.s3 { background: linear-gradient(145deg, #e4dcd0, #ccbca4); }
+  .slide.s4 { background: linear-gradient(145deg, #d8d4c4, #c4b898); }
+  .slide.s5 { background: linear-gradient(145deg, #e0d8c8, #c8b898); }
+
+  .wish-float {
+    position: absolute; top: 12px; right: 12px; z-index: 10;
+    width: 36px; height: 36px;
+    background: rgba(255,255,255,0.88);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    cursor: pointer; border: none;
+  }
+  .wish-float svg {
+    width: 18px; height: 18px;
+    stroke: var(--text-sub); fill: none;
+    stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+    transition: stroke 0.2s, fill 0.2s;
+  }
+  .wish-float.active svg { stroke: #E05A5A; fill: #E05A5A; }
+
+  /* DOTS */
+  .dots {
+    display: flex; justify-content: center; gap: 6px;
+    padding: 10px 0 6px;
+    background: var(--bg);
+  }
+  .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--border);
+    transition: background 0.2s, width 0.2s;
+    cursor: pointer;
+  }
+  .dot.active { background: var(--green-dark); width: 18px; border-radius: 3px; }
+
+  /* PRODUCT BODY */
+  .product-body {
+    background: var(--bg-card);
+    padding: 16px 16px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .shop-badge {
+    display: inline-flex; align-items: center;
+    background: var(--green-light);
+    color: var(--green-dark);
+    font-size: 11px; font-weight: 600;
+    padding: 3px 10px; border-radius: 20px;
+    margin-bottom: 8px;
+  }
+  .product-name {
+    font-size: 20px; font-weight: 700;
+    line-height: 1.4; letter-spacing: 0.02em;
+    color: var(--text-main);
+    margin-bottom: 8px;
+  }
+  .rating-row {
+    display: flex; align-items: center; gap: 6px;
+    margin-bottom: 12px;
+  }
+  .stars { color: var(--gold); font-size: 14px; letter-spacing: 1px; }
+  .rating-score { font-size: 13px; font-weight: 700; color: var(--text-main); }
+  .rating-count { font-size: 12px; color: var(--text-sub); }
+  .price-row {
+    display: flex; align-items: baseline; gap: 6px;
+    margin-bottom: 14px;
+  }
+  .price { font-size: 26px; font-weight: 700; color: var(--text-main); }
+  .price-tax { font-size: 12px; color: var(--text-sub); }
+
+  .tag-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag-pill {
+    font-size: 11px; background: var(--bg);
+    color: var(--text-main);
+    border: 1px solid var(--border);
+    border-radius: 20px; padding: 4px 10px; font-weight: 500;
+  }
+
+  /* GAP */
+  .gap { height: 8px; background: var(--bg); }
+
+  /* SECTIONS */
+  .section-block {
+    background: var(--bg-card);
+    padding: 20px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .block-title {
+    font-size: 14px; font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .block-title::after {
+    content: '';
+    flex: 1; height: 1px;
+    background: var(--border);
+  }
+
+  /* DESCRIPTION */
+  .desc-text {
+    font-size: 13px; line-height: 2;
+    color: var(--text-main);
+  }
+
+  /* INFO TABLE */
+  .info-table {
+    width: 100%; border-collapse: collapse;
+    font-size: 13px;
+  }
+  .info-table tr { border-bottom: 1px solid var(--border); }
+  .info-table tr:last-child { border-bottom: none; }
+  .info-table th {
+    text-align: left;
+    padding: 10px 12px 10px 0;
+    color: var(--text-sub);
+    font-weight: 500;
+    white-space: nowrap;
+    width: 5.5em;
+    vertical-align: top;
+  }
+  .info-table td {
+    padding: 10px 0;
+    color: var(--text-main);
+    line-height: 1.6;
+  }
+
+  /* DELIVERY */
+  .delivery-text {
+    font-size: 13px; color: var(--text-main);
+    line-height: 1.8;
+  }
+  .delivery-note {
+    font-size: 11px; color: var(--text-sub);
+    margin-top: 4px;
+  }
+
+  /* SHOP CARD */
+  .shop-card {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 16px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+    cursor: pointer;
+  }
+  .shop-logo {
+    width: 52px; height: 52px;
+    border-radius: 10px;
+    background: var(--bg-card);
+    border: 1.5px dashed var(--border);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    font-size: 9px; color: var(--text-sub);
+    text-align: center; line-height: 1.3; padding: 4px;
+  }
+  .shop-info { flex: 1; }
+  .shop-name { font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 2px; }
+  .shop-link { font-size: 11px; color: var(--green-mid); }
+  .shop-arrow svg {
+    width: 16px; height: 16px;
+    stroke: var(--text-sub); fill: none;
+    stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+  }
+
+  /* REVIEW */
+  .review-header {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 14px;
+  }
+  .review-score-big { font-size: 28px; font-weight: 700; color: var(--text-main); }
+  .review-stars-col { display: flex; flex-direction: column; gap: 2px; }
+  .review-stars-big { color: var(--gold); font-size: 16px; letter-spacing: 2px; }
+  .review-count { font-size: 11px; color: var(--text-sub); }
+
+  .reviews-scroll {
+    display: flex;
+    overflow-x: auto;
+    gap: 10px;
+    scrollbar-width: none;
+    margin: 0 -16px;
+    padding: 2px 16px 4px;
+  }
+  .reviews-scroll::-webkit-scrollbar { display: none; }
+  .review-card {
+    flex: 0 0 220px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+    padding: 14px;
+  }
+  .review-card-stars { color: var(--gold); font-size: 12px; margin-bottom: 4px; }
+  .review-card-meta { font-size: 10px; color: var(--text-sub); margin-bottom: 6px; }
+  .review-card-text { font-size: 12px; line-height: 1.7; color: var(--text-main); }
+
+  /* BOTTOM CTA */
+  .bottom-cta {
+    position: fixed;
+    bottom: 56px; /* ボトムナビの高さ分上げる */
+    left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 430px;
+    background: var(--bg-card);
+    border-top: 1px solid var(--border);
+    padding: 10px 16px 10px;
+    display: flex; gap: 10px;
+    z-index: 150;
+  }
+  .btn-cart {
+    flex: 1;
+    height: 46px; border-radius: 24px;
+    border: 2px solid var(--green-dark);
+    background: transparent;
+    color: var(--green-dark);
+    font-size: 14px; font-weight: 700;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn-cart:active { background: var(--green-light); }
+  .btn-buy {
+    flex: 1.4;
+    height: 46px; border-radius: 24px;
+    background: var(--green-dark);
+    color: #fff;
+    font-size: 14px; font-weight: 700;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    border: none;
+    transition: opacity 0.15s;
+  }
+  .btn-buy:active { opacity: 0.85; }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 430px;
+    background: var(--bg-card); border-top: 1px solid var(--border);
+    display: flex; z-index: 200;
+  }
+  .nav-item {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+    padding: 8px 0 12px; color: var(--text-sub);
+    font-size: 10px; letter-spacing: 0.04em; cursor: pointer;
+  }
+  .nav-item.active { color: var(--green-dark); }
+  .nav-item svg {
+    width: 22px; height: 22px;
+    stroke: currentColor; fill: none;
+    stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
+  }
+
+  /* ============ DESKTOP (≥900px) ============ */
+  @media (min-width: 900px) {
+    body { max-width: 1160px; padding-bottom: 40px; }
+    .header { padding: 16px 40px; }
+
+    .pdp-flex {
+      display: flex; align-items: flex-start; gap: 48px;
+      padding: 28px 40px 0;
+    }
+    .pdp-media { flex: 0 0 44%; position: sticky; top: 90px; }
+    .pdp-info { flex: 1; min-width: 0; }
+
+    .slider-wrap { border-radius: 16px; overflow: hidden; }
+    .product-body { border-radius: 16px; border-bottom: none; box-shadow: var(--shadow-card); }
+    .section-block { border-radius: 16px; box-shadow: var(--shadow-card); border-bottom: none; margin: 0 0 16px; }
+
+    .bottom-cta {
+      left: auto; right: 32px; transform: none;
+      width: 360px; max-width: 360px;
+      border-top: none; border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.14);
+      bottom: 24px;
+    }
+
+    .bottom-nav { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <button class="header-back" onclick="history.back()">
+    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
+  <a class="header-logo" href="komcho-market-top.html">
+    <svg class="logo-icon" viewBox="0 0 60 48">
+      <path transform="translate(30,24)" d="M -26 7 C -17 -17 5 -24 24 -10 C 12 5 -2 19 -21 24"/>
+    </svg>
+    <span class="logo-text">こむちょマーケット</span>
+  </a>
+  <div class="header-icons">
+    <a href="komcho-market-mypage.html" style="display:flex;"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></a>
+    <a href="komcho-market-cart.html" style="display:flex;"><svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></a>
+  </div>
+</header>
+
+<div class="pdp-flex">
+<div class="pdp-media">
+
+<!-- IMAGE SLIDER -->
+<div class="slider-wrap" id="slider">
+  <div class="slider-inner" id="sliderInner">
+    <div class="slide s1">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      <span>写真1</span>
+    </div>
+    <div class="slide s2">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      <span>写真2</span>
+    </div>
+    <div class="slide s3">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      <span>写真3</span>
+    </div>
+    <div class="slide s4">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      <span>写真4</span>
+    </div>
+    <div class="slide s5">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      <span>写真5</span>
+    </div>
+  </div>
+  <button class="wish-float" id="wishBtn">
+    <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+  </button>
+</div>
+
+<!-- DOTS -->
+<div class="dots" id="dots">
+  <div class="dot active" onclick="goSlide(0)"></div>
+  <div class="dot" onclick="goSlide(1)"></div>
+  <div class="dot" onclick="goSlide(2)"></div>
+  <div class="dot" onclick="goSlide(3)"></div>
+  <div class="dot" onclick="goSlide(4)"></div>
+</div>
+
+</div>
+<div class="pdp-info">
+
+<!-- PRODUCT INFO -->
+<div class="product-body">
+  <div class="shop-badge">〇〇農園</div>
+  <h1 class="product-name">無添加 自家製味噌 500g</h1>
+  <div class="rating-row">
+    <span class="stars">★★★★★</span>
+    <span class="rating-score">4.8</span>
+    <span class="rating-count">（23件のレビュー）</span>
+  </div>
+  <div class="price-row">
+    <span class="price">¥1,800</span>
+    <span class="price-tax">（税込）</span>
+  </div>
+  <div class="tag-pills">
+    <span class="tag-pill">グルテンフリー</span>
+    <span class="tag-pill">砂糖不使用</span>
+    <span class="tag-pill">化学調味料不使用</span>
+    <span class="tag-pill">国産100%</span>
+  </div>
+</div>
+
+<div class="gap"></div>
+
+<!-- DESCRIPTION -->
+<div class="section-block">
+  <div class="block-title">商品説明</div>
+  <p class="desc-text">厳選された国産の大豆と米麹を使用し、伝統的な製法で丁寧に仕込んだ自家製味噌です。豊かな香りと深いコク、自然な甘みをお楽しみください。毎日の食卓に、体に優しい本物の味を。</p>
+</div>
+
+<div class="gap"></div>
+
+<!-- PRODUCT INFO TABLE -->
+<div class="section-block">
+  <div class="block-title">商品情報</div>
+  <table class="info-table">
+    <tr>
+      <th>内容量</th>
+      <td>500g</td>
+    </tr>
+    <tr>
+      <th>原材料</th>
+      <td>大豆（国産）、米麹、塩</td>
+    </tr>
+    <tr>
+      <th>アレルギー</th>
+      <td>大豆</td>
+    </tr>
+    <tr>
+      <th>賞味期限</th>
+      <td>製造から6ヶ月</td>
+    </tr>
+    <tr>
+      <th>保存方法</th>
+      <td>冷蔵</td>
+    </tr>
+    <tr>
+      <th>製造者</th>
+      <td>〇〇農園（京都府△△市）</td>
+    </tr>
+  </table>
+</div>
+
+<div class="gap"></div>
+
+<!-- DELIVERY -->
+<div class="section-block">
+  <div class="block-title">配送について</div>
+  <p class="delivery-text">全国一律 <strong>¥800</strong>（クール便）</p>
+  <p class="delivery-note">※ご注文後3〜5営業日以内に発送します。</p>
+</div>
+
+<div class="gap"></div>
+
+<!-- SHOP CARD -->
+<div class="section-block">
+  <a class="shop-card" href="komcho-market-shop.html" style="text-decoration:none;color:inherit;">
+    <div class="shop-logo">SHOP<br>LOGO</div>
+    <div class="shop-info">
+      <div class="shop-name">〇〇農園</div>
+      <div class="shop-link">→ 店舗ページを見る</div>
+    </div>
+    <div class="shop-arrow">
+      <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+    </div>
+  </a>
+</div>
+
+<div class="gap"></div>
+
+<!-- REVIEWS -->
+<div class="section-block">
+  <div class="block-title">レビュー</div>
+  <div class="review-header">
+    <span class="review-score-big">4.8</span>
+    <div class="review-stars-col">
+      <span class="review-stars-big">★★★★★</span>
+      <span class="review-count">23件のレビュー</span>
+    </div>
+  </div>
+  <div class="reviews-scroll">
+    <div class="review-card">
+      <div class="review-card-stars">★★★★★</div>
+      <div class="review-card-meta">M様・2026.5</div>
+      <div class="review-card-text">毎朝のお味噌汁が楽しみになりました。素材の味がしっかりしていて、少量でも深い味わいです。</div>
+    </div>
+    <div class="review-card">
+      <div class="review-card-stars">★★★★★</div>
+      <div class="review-card-meta">K様・2026.4</div>
+      <div class="review-card-text">添加物が気になる方に自信を持っておすすめできます。子どもも喜んで食べています。</div>
+    </div>
+    <div class="review-card">
+      <div class="review-card-stars">★★★★☆</div>
+      <div class="review-card-meta">T様・2026.3</div>
+      <div class="review-card-text">香りがよく、甘さも控えめで使いやすい。リピート確定です。</div>
+    </div>
+  </div>
+</div>
+
+</div>
+</div>
+
+<!-- BOTTOM CTA -->
+<div class="bottom-cta">
+  <button class="btn-cart" onclick="location.href='komcho-market-cart.html'">カゴに入れる</button>
+  <button class="btn-buy" onclick="location.href='komcho-market-checkout.html'">今すぐ買う</button>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <div class="nav-item">
+    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <span>ホーム</span>
+  </div>
+  <div class="nav-item">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <span>探す</span>
+  </div>
+  <div class="nav-item active">
+    <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    <span>お気に入り</span>
+  </div>
+  <div class="nav-item">
+    <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+    <span>カゴ</span>
+  </div>
+  <div class="nav-item">
+    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    <span>履歴</span>
+  </div>
+</nav>
+
+<script>
+  // Slider
+  let current = 0;
+  const total = 5;
+  const inner = document.getElementById('sliderInner');
+  const dotsEl = document.querySelectorAll('.dot');
+
+  function goSlide(n) {
+    current = n;
+    inner.style.transform = `translateX(-${(100 / total) * n}%)`;
+    dotsEl.forEach((d, i) => d.classList.toggle('active', i === n));
+  }
+
+  // Touch swipe
+  let startX = 0;
+  const sliderEl = document.getElementById('slider');
+  sliderEl.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, { passive: true });
+  sliderEl.addEventListener('touchend', e => {
+    const diff = startX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 40) {
+      if (diff > 0 && current < total - 1) goSlide(current + 1);
+      else if (diff < 0 && current > 0) goSlide(current - 1);
+    }
+  });
+
+  // Wishlist toggle
+  const wishBtn = document.getElementById('wishBtn');
+  wishBtn.addEventListener('click', () => wishBtn.classList.toggle('active'));
+</script>
+</body>
+</html>

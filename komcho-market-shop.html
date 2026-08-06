@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>〇〇農園 - こむちょマーケット</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 48 48%27%3E%3Crect width=%2748%27 height=%2748%27 rx=%2710%27 fill=%27%233D5A3E%27/%3E%3Cg transform=%27translate(24,24) scale(0.55)%27%3E%3Cpath d=%27M -26 7 C -17 -17 5 -24 24 -10 C 12 5 -2 19 -21 24%27 fill=%27none%27 stroke=%27%23F8F5EF%27 stroke-width=%275%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/%3E%3C/g%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg:          #F8F5EF;
+    --bg-card:     #FFFFFF;
+    --green-dark:  #3D5A3E;
+    --green-mid:   #5A7A5B;
+    --green-light: #EAF0E8;
+    --gold:        #B8973A;
+    --text-main:   #2C2C2C;
+    --text-sub:    #6B6B6B;
+    --border:      #E2DDD5;
+    --radius-card: 12px;
+    --shadow-card: 0 2px 12px rgba(0,0,0,0.07);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Yu Gothic', 'Meiryo', sans-serif;
+    background: var(--bg);
+    color: var(--text-main);
+    max-width: 430px;
+    margin: 0 auto;
+    min-height: 100vh;
+    padding-bottom: 80px;
+  }
+  a { text-decoration: none; color: inherit; }
+  button { cursor: pointer; border: none; background: none; font-family: inherit; }
+
+  /* HEADER */
+  .header {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px;
+  }
+  .header-back svg {
+    width: 22px; height: 22px;
+    stroke: var(--text-main); fill: none;
+    stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .header-logo {
+    display: flex; align-items: center; gap: 7px;
+  }
+  .header-logo .logo-icon {
+    width: 24px; height: 19px; flex-shrink: 0;
+  }
+  .header-logo .logo-icon path {
+    fill: none; stroke: var(--green-dark);
+    stroke-width: 3; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .header-logo .logo-text {
+    font-size: 15px; font-weight: 700; letter-spacing: 0.04em;
+    color: var(--text-main);
+  }
+  .header-icons { display: flex; align-items: center; gap: 18px; }
+  .header-icons svg {
+    width: 22px; height: 22px;
+    stroke: var(--text-main); fill: none;
+    stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .header-icons .heart-active {
+    fill: #E05A5A; stroke: #E05A5A;
+  }
+
+  /* SHOP TOP SECTION */
+  .shop-top {
+    background: var(--bg-card);
+    padding: 28px 16px 24px;
+    display: flex; flex-direction: column; align-items: center;
+    border-bottom: 1px solid var(--border);
+  }
+  .shop-logo-circle {
+    width: 90px; height: 90px;
+    border-radius: 50%;
+    border: 1.5px dashed var(--green-dark);
+    display: flex; align-items: center; justify-content: center;
+    background: var(--bg);
+    font-size: 11px; color: var(--green-dark);
+    font-weight: 600; letter-spacing: 0.06em;
+    text-align: center; line-height: 1.5;
+    margin-bottom: 14px;
+  }
+  .shop-name {
+    font-size: 20px; font-weight: 700;
+    letter-spacing: 0.04em;
+    margin-bottom: 4px;
+  }
+  .shop-tagline {
+    font-size: 12px; color: var(--text-sub);
+    margin-bottom: 16px;
+  }
+  .follow-btn {
+    display: flex; align-items: center; gap: 6px;
+    border: 1.5px solid var(--green-dark);
+    border-radius: 20px;
+    padding: 8px 20px;
+    font-size: 13px; font-weight: 600;
+    color: var(--green-dark);
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+  .follow-btn svg {
+    width: 14px; height: 14px;
+    stroke: var(--green-dark); fill: none;
+    stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+    transition: stroke 0.15s, fill 0.15s;
+  }
+  .follow-btn.active {
+    background: var(--green-dark); color: #fff;
+  }
+  .follow-btn.active svg { stroke: #fff; fill: #fff; }
+
+  /* GAP */
+  .gap { height: 8px; background: var(--bg); }
+
+  /* SECTION BLOCK */
+  .section-block {
+    background: var(--bg-card);
+    padding: 24px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-heading {
+    font-size: 17px; font-weight: 700;
+    text-align: center;
+    margin-bottom: 14px;
+    letter-spacing: 0.04em;
+  }
+
+  /* STORY */
+  .story-text {
+    font-size: 13px; line-height: 2;
+    color: var(--text-main);
+  }
+
+  /* VALUES */
+  .values-heading {
+    font-size: 17px; font-weight: 700;
+    text-align: center;
+    margin-bottom: 14px;
+    letter-spacing: 0.04em;
+  }
+  .values-list {
+    list-style: none;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .values-list li {
+    display: flex; align-items: flex-start; gap: 8px;
+    font-size: 13px; line-height: 1.7; color: var(--text-main);
+  }
+  .values-list li::before {
+    content: '🌿';
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* SHOP INFO ROW */
+  .shop-info-row {
+    background: var(--bg-card);
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 0;
+    font-size: 12px; color: var(--text-sub);
+    flex-wrap: wrap; gap: 8px;
+  }
+  .info-item {
+    display: flex; align-items: center; gap: 4px;
+  }
+  .info-item svg {
+    width: 14px; height: 14px;
+    stroke: var(--text-sub); fill: none;
+    stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
+    flex-shrink: 0;
+  }
+  .info-divider {
+    color: var(--border);
+    font-size: 14px;
+    padding: 0 4px;
+  }
+  .info-links {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .info-link-icon {
+    width: 28px; height: 28px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+  }
+  .info-link-icon svg {
+    width: 14px; height: 14px;
+    stroke: var(--text-sub); fill: none;
+    stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
+  }
+
+  /* NEWS */
+  .news-list {
+    display: flex; flex-direction: column; gap: 8px;
+    margin-bottom: 12px;
+  }
+  .news-item {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+    padding: 12px 14px;
+    cursor: pointer;
+  }
+  .news-date { font-size: 10px; color: var(--text-sub); margin-bottom: 4px; }
+  .news-title { font-size: 13px; color: var(--text-main); line-height: 1.5; }
+  .news-more {
+    text-align: center;
+    font-size: 12px; color: var(--green-mid);
+    cursor: pointer;
+    padding: 4px 0;
+  }
+
+  /* PRODUCTS */
+  .products-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .products-heading {
+    font-size: 17px; font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+  .sort-tabs {
+    display: flex; align-items: center; gap: 0;
+    font-size: 11px; color: var(--text-sub);
+  }
+  .sort-tab {
+    padding: 2px 6px; cursor: pointer;
+    color: var(--text-sub);
+  }
+  .sort-tab.active { color: var(--green-dark); font-weight: 700; }
+  .sort-divider { color: var(--border); }
+
+  .products-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .product-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+  }
+  .new-badge {
+    position: absolute; top: 8px; left: 8px; z-index: 1;
+    background: var(--gold); color: #fff;
+    font-size: 10px; font-weight: 700;
+    padding: 3px 7px; border-radius: 4px; letter-spacing: 0.05em;
+  }
+  .product-img {
+    width: 100%; aspect-ratio: 1;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 36px;
+    position: relative;
+  }
+  .product-img.g1 { background: linear-gradient(135deg,#f0e8d0,#d8c8a0); }
+  .product-img.g2 { background: linear-gradient(135deg,#e0e8d0,#b8c890); }
+  .product-img.g3 { background: linear-gradient(135deg,#f4ead8,#d4c0a0); }
+  .product-img.g4 { background: linear-gradient(135deg,#ece8e0,#c8c0b0); }
+
+  .wish-btn {
+    position: absolute; bottom: 8px; right: 8px;
+    width: 28px; height: 28px;
+    background: rgba(255,255,255,0.88); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+    cursor: pointer; border: none;
+  }
+  .wish-btn svg {
+    width: 14px; height: 14px;
+    stroke: #aaa; fill: none;
+    stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+    transition: stroke 0.2s, fill 0.2s;
+  }
+  .wish-btn.active svg { stroke: #E05A5A; fill: #E05A5A; }
+
+  .product-info { padding: 10px 10px 12px; }
+  .product-name-sm { font-size: 12px; font-weight: 600; line-height: 1.4; margin-bottom: 4px; }
+  .product-price-sm { font-size: 13px; font-weight: 700; color: var(--text-main); }
+
+  /* CONTACT BTN */
+  .contact-wrap {
+    background: var(--bg-card);
+    padding: 16px;
+    border-top: 1px solid var(--border);
+  }
+  .contact-btn {
+    width: 100%;
+    height: 48px;
+    border-radius: 24px;
+    border: 1.5px solid var(--border);
+    background: var(--bg-card);
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    font-size: 13px; font-weight: 600; color: var(--text-main);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .contact-btn:active { background: var(--bg); }
+  .contact-btn svg {
+    width: 16px; height: 16px;
+    stroke: var(--text-main); fill: none;
+    stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
+  }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 430px;
+    background: var(--bg-card); border-top: 1px solid var(--border);
+    display: flex; z-index: 200;
+  }
+  .nav-item {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+    padding: 8px 0 12px; color: var(--text-sub);
+    font-size: 10px; letter-spacing: 0.04em; cursor: pointer;
+  }
+  .nav-item.active { color: var(--green-dark); }
+  .nav-item svg {
+    width: 22px; height: 22px;
+    stroke: currentColor; fill: none;
+    stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .nav-item.active .nav-home-icon {
+    fill: var(--green-dark); stroke: var(--green-dark);
+  }
+
+  /* ============ DESKTOP (≥900px) ============ */
+  @media (min-width: 900px) {
+    body { max-width: 1160px; padding-bottom: 40px; }
+    .header { padding: 12px 40px; }
+
+    .shop-top { padding: 36px 40px 28px; }
+    .section-block { padding: 28px 40px; border-radius: 16px; margin-bottom: 12px; border-bottom: none; box-shadow: var(--shadow-card); }
+    .shop-info-row { padding: 16px 40px; border-radius: 16px; margin-bottom: 12px; border-bottom: none; box-shadow: var(--shadow-card); }
+    .contact-wrap { padding-left: 40px; padding-right: 40px; }
+
+    .products-grid { grid-template-columns: repeat(4, 1fr); gap: 18px; }
+
+    .bottom-nav { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <button class="header-back" onclick="history.back()">
+    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
+  <a class="header-logo" href="komcho-market-top.html">
+    <svg class="logo-icon" viewBox="0 0 60 48">
+      <path transform="translate(30,24)" d="M -26 7 C -17 -17 5 -24 24 -10 C 12 5 -2 19 -21 24"/>
+    </svg>
+    <span class="logo-text">こむちょマーケット</span>
+  </a>
+  <div class="header-icons">
+    <svg viewBox="0 0 24 24"><path class="heart-active" d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+  </div>
+</header>
+
+<!-- SHOP TOP -->
+<div class="shop-top">
+  <div class="shop-logo-circle">SHOP<br>LOGO</div>
+  <div class="shop-name">「〇〇農園」</div>
+  <div class="shop-tagline">土と暮らす、京丹後の小さな農園</div>
+  <button class="follow-btn" id="followBtn">
+    <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    フォローする
+  </button>
+</div>
+
+<div class="gap"></div>
+
+<!-- STORY -->
+<div class="section-block">
+  <div class="section-heading">わたしたちについて</div>
+  <p class="story-text">京都の北、海と山に囲まれた京丹後市で、自然の恵みとともに野菜や果物を育てています。農薬や化学肥料を使わず、土の力を信じて、種から大切に育てた在来種の野菜たちをお届けします。日々の食卓に、自然本来の味わいと安心をお届けできれば幸いです。</p>
+</div>
+
+<div class="gap"></div>
+
+<!-- VALUES -->
+<div class="section-block">
+  <div class="values-heading">大切にしていること</div>
+  <ul class="values-list">
+    <li>農薬・化学肥料を使わない土づくり</li>
+    <li>種から育てる在来種野菜</li>
+    <li>季節と向き合う手仕事</li>
+  </ul>
+</div>
+
+<div class="gap"></div>
+
+<!-- SHOP INFO ROW -->
+<div class="shop-info-row">
+  <div class="info-item">
+    <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+    <span>京都府京丹後市</span>
+  </div>
+  <span class="info-divider">｜</span>
+  <span style="font-size:12px; color:var(--text-sub);">リンク</span>
+  <div class="info-links">
+    <div class="info-link-icon">
+      <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+    </div>
+    <div class="info-link-icon">
+      <svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+    </div>
+    <div class="info-link-icon">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    </div>
+  </div>
+</div>
+
+<div class="gap"></div>
+
+<!-- NEWS -->
+<div class="section-block">
+  <div class="section-heading">お知らせ</div>
+  <div class="news-list">
+    <div class="news-item">
+      <div class="news-date">2026.6.10</div>
+      <div class="news-title">夏季休業のお知らせ（8/12〜8/16）</div>
+    </div>
+    <div class="news-item">
+      <div class="news-date">2026.6.1</div>
+      <div class="news-title">新商品 梅シロップの予約受付を開始しました</div>
+    </div>
+  </div>
+  <div class="news-more">もっと見る →</div>
+</div>
+
+<div class="gap"></div>
+
+<!-- PRODUCTS -->
+<div class="section-block">
+  <div class="products-header">
+    <div class="products-heading">商品一覧</div>
+  </div>
+
+  <div class="products-grid">
+    <a class="product-card" href="komcho-market-product.html" style="text-decoration:none;color:inherit;display:block;">
+      <div class="new-badge">NEW</div>
+      <div class="product-img g1">🍯
+        <button class="wish-btn">
+          <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </button>
+      </div>
+      <div class="product-info">
+        <div class="product-name-sm">完熟梅の無添加シロップ</div>
+        <div class="product-price-sm">¥1,800</div></div></a>
+
+    <a class="product-card" href="komcho-market-product.html" style="text-decoration:none;color:inherit;display:block;">
+      <div class="product-img g2">🥕
+        <button class="wish-btn active">
+          <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </button>
+      </div>
+      <div class="product-info">
+        <div class="product-name-sm">季節の野菜セット（S）</div>
+        <div class="product-price-sm">¥3,200</div></div></a>
+
+    <a class="product-card" href="komcho-market-product.html" style="text-decoration:none;color:inherit;display:block;">
+      <div class="product-img g3">🌾
+        <button class="wish-btn">
+          <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </button>
+      </div>
+      <div class="product-info">
+        <div class="product-name-sm">無農薬コシヒカリ玄米 2kg</div>
+        <div class="product-price-sm">¥2,100</div></div></a>
+
+    <a class="product-card" href="komcho-market-product.html" style="text-decoration:none;color:inherit;display:block;">
+      <div class="product-img g4">🫙
+        <button class="wish-btn active">
+          <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </button>
+      </div>
+      <div class="product-info">
+        <div class="product-name-sm">手作り干し柿（5個入り）</div>
+        <div class="product-price-sm">¥1,500</div></div></a>
+  </div>
+</div>
+
+<div class="gap"></div>
+
+<!-- CONTACT -->
+<div class="contact-wrap">
+  <button class="contact-btn" onclick="window.location.href='komcho-market-shop-contact.html'">
+    <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+    この店舗にお問い合わせ
+  </button>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <a class="nav-item" href="komcho-market-top.html">
+    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <span>ホーム</span>
+  </a>
+  <a class="nav-item" href="komcho-market-search.html">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <span>探す</span>
+  </a>
+  <a class="nav-item" href="komcho-market-mypage.html">
+    <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    <span>お気に入り</span>
+  </a>
+  <a class="nav-item" href="komcho-market-cart.html">
+    <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+    <span>カゴ</span>
+  </a>
+  <a class="nav-item" href="komcho-market-orders.html">
+    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    <span>履歴</span>
+  </a>
+</nav>
+
+<script>
+  // Follow toggle
+  const followBtn = document.getElementById('followBtn');
+  followBtn.addEventListener('click', () => {
+    const isActive = followBtn.classList.toggle('active');
+    followBtn.innerHTML = isActive
+      ? `<svg viewBox="0 0 24 24" width="14" height="14" stroke="#fff" fill="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>フォロー中`
+      : `<svg viewBox="0 0 24 24" width="14" height="14" stroke="var(--green-dark)" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>フォローする`;
+  });
+
+  // Wish toggles
+  document.querySelectorAll('.wish-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      btn.classList.toggle('active');
+    });
+  });
+
+  // Sort tabs
+  document.querySelectorAll('.sort-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.sort-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>

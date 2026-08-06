@@ -491,10 +491,11 @@
 
 <!-- POINT CARD -->
 <div class="point-card-wrap">
+  <div style="font-size:14px; font-weight:700; color:var(--text-main); margin-bottom:10px;" id="welcomeName">ようこそ</div>
   <div class="point-card">
     <div class="point-label">🌿 保有ポイント</div>
     <div class="point-value">
-      <span class="point-num">1,240</span>
+      <span class="point-num" id="pointNum">0</span>
       <span class="point-unit">pt</span>
     </div>
     <div class="point-sub">1pt = 1円　／　200円のお買い物で1pt貯まります</div>
@@ -775,7 +776,7 @@
 
 <!-- LOGOUT -->
 <div class="logout-wrap">
-  <button class="logout-btn" onclick="window.location.href='komcho-market-login.html'">ログアウト</button>
+  <button class="logout-btn" onclick="logout()">ログアウト</button>
 </div>
 
 <!-- BOTTOM NAV -->
@@ -842,6 +843,40 @@
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
+
+<!-- Supabase接続 -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+  const SUPABASE_URL = 'https://uawhrpizzlchkvmzrjzo.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_FaOqUE1PDbo-fpT9KhkWaw__BShLngI';
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  // ログインチェック＆プロフィール読み込み
+  (async function initMypage() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) {
+      window.location.href = 'komcho-market-login.html';
+      return;
+    }
+
+    const { data: profile, error } = await supabaseClient
+      .from('profiles')
+      .select('name, points')
+      .eq('id', session.user.id)
+      .single();
+
+    if (profile) {
+      document.getElementById('welcomeName').textContent = 'ようこそ、' + profile.name + ' 様';
+      document.getElementById('pointNum').textContent = profile.points.toLocaleString();
+    }
+  })();
+
+  // ログアウト処理
+  async function logout() {
+    await supabaseClient.auth.signOut();
+    window.location.href = 'komcho-market-login.html';
+  }
+</script>
 
 <script>
   function removeWish(btn) {

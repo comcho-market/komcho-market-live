@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>商品編集 - こむちょマーケット</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 48 48%27%3E%3Crect width=%2748%27 height=%2748%27 rx=%2710%27 fill=%27%233D5A3E%27/%3E%3Cg transform=%27translate(24,24) scale(0.55)%27%3E%3Cpath d=%27M -26 7 C -17 -17 5 -24 24 -10 C 12 5 -2 19 -21 24%27 fill=%27none%27 stroke=%27%23F8F5EF%27 stroke-width=%275%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/%3E%3C/g%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg:          #F8F5EF;
+    --bg-card:     #FFFFFF;
+    --green-dark:  #3D5A3E;
+    --green-mid:   #5A7A5B;
+    --green-light: #EAF0E8;
+    --gold:        #B8973A;
+    --text-main:   #2C2C2C;
+    --text-sub:    #6B6B6B;
+    --border:      #E2DDD5;
+    --radius-card: 12px;
+    --shadow-card: 0 2px 12px rgba(0,0,0,0.07);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Yu Gothic', 'Meiryo', sans-serif;
+    background: var(--bg);
+    color: var(--text-main);
+    max-width: 430px;
+    margin: 0 auto;
+    min-height: 100vh;
+    padding-bottom: 40px;
+  }
+  button { cursor: pointer; border: none; background: none; font-family: inherit; }
+  textarea, input, select { font-family: inherit; }
+
+  /* HEADER */
+  .header {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px;
+  }
+  .header-back svg {
+    width: 22px; height: 22px;
+    stroke: var(--text-main); fill: none;
+    stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .header-title {
+    font-size: 15px; font-weight: 700; letter-spacing: 0.04em;
+  }
+  .header-save {
+    background: var(--green-dark);
+    color: #fff;
+    font-size: 13px; font-weight: 700;
+    padding: 7px 16px; border-radius: 20px;
+    letter-spacing: 0.04em;
+  }
+
+  /* GAP */
+  .gap { height: 8px; background: var(--bg); }
+
+  /* SECTION BLOCK */
+  .section-block {
+    background: var(--bg-card);
+    padding: 20px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .block-title {
+    font-size: 14px; font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .block-title::after {
+    content: '';
+    flex: 1; height: 1px;
+    background: var(--border);
+  }
+
+  /* FORM FIELDS */
+  .field { margin-bottom: 16px; }
+  .field:last-child { margin-bottom: 0; }
+  .field-label {
+    font-size: 12px; font-weight: 600;
+    color: var(--text-sub);
+    margin-bottom: 6px;
+    display: block;
+  }
+  .field-required::after {
+    content: '必須';
+    font-size: 10px;
+    color: #fff;
+    background: var(--green-dark);
+    border-radius: 4px;
+    padding: 1px 5px;
+    margin-left: 6px;
+    font-weight: 600;
+    vertical-align: middle;
+  }
+  .field-input {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 14px;
+    color: var(--text-main);
+    background: var(--bg);
+    outline: none;
+    transition: border-color 0.15s;
+    -webkit-appearance: none;
+  }
+  .field-input:focus { border-color: var(--green-dark); background: #fff; }
+  .field-textarea {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 13px;
+    color: var(--text-main);
+    background: var(--bg);
+    outline: none;
+    resize: vertical;
+    min-height: 90px;
+    line-height: 1.8;
+    transition: border-color 0.15s;
+    -webkit-appearance: none;
+  }
+  .field-textarea:focus { border-color: var(--green-dark); background: #fff; }
+  .field-hint {
+    font-size: 11px; color: var(--text-sub);
+    margin-top: 5px; line-height: 1.5;
+  }
+
+  /* PHOTO UPLOAD */
+  .photo-upload-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+  .photo-slot {
+    aspect-ratio: 1;
+    border-radius: 8px;
+    border: 1.5px dashed var(--border);
+    background: var(--bg);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 4px; cursor: pointer;
+    position: relative; overflow: hidden;
+    transition: border-color 0.15s;
+  }
+  .photo-slot:first-child {
+    border-color: var(--green-dark);
+    background: var(--green-light);
+  }
+  .photo-slot svg {
+    width: 22px; height: 22px;
+    stroke: var(--text-sub); fill: none;
+    stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .photo-slot:first-child svg { stroke: var(--green-dark); }
+  .photo-slot span {
+    font-size: 10px; color: var(--text-sub); text-align: center; line-height: 1.3;
+  }
+  .photo-slot:first-child span { color: var(--green-dark); font-weight: 600; }
+  .photo-slot .main-label {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: var(--green-dark); color: #fff;
+    font-size: 9px; font-weight: 700;
+    text-align: center; padding: 3px 0;
+  }
+
+  /* PRICE ROW */
+  .price-input-wrap {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .price-yen {
+    font-size: 16px; font-weight: 700; color: var(--text-main);
+    flex-shrink: 0;
+  }
+  .price-input-wrap .field-input { flex: 1; }
+
+  /* STOCK */
+  .stock-row {
+    display: flex; align-items: center; gap: 12px;
+  }
+  .stock-input-wrap {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .stock-btn {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    font-size: 20px; color: var(--green-dark);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 300;
+  }
+  .stock-num {
+    width: 56px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 0;
+    font-size: 16px; font-weight: 700;
+    text-align: center;
+    background: var(--bg);
+    outline: none;
+    -webkit-appearance: none;
+  }
+  .stock-num:focus { border-color: var(--green-dark); background: #fff; }
+  .stock-hint {
+    font-size: 11px; color: var(--text-sub); line-height: 1.5;
+  }
+
+  /* TAG GRID */
+  .tag-grid {
+    display: flex; flex-wrap: wrap; gap: 8px;
+  }
+  .tag-check {
+    display: none;
+  }
+  .tag-label {
+    display: inline-flex; align-items: center;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 12px;
+    font-size: 12px; color: var(--text-main);
+    cursor: pointer;
+    transition: all 0.15s;
+    background: var(--bg);
+    user-select: none;
+  }
+  .tag-check:checked + .tag-label {
+    background: var(--green-dark);
+    border-color: var(--green-dark);
+    color: #fff;
+    font-weight: 600;
+  }
+
+  /* CATEGORY SELECT */
+  .category-select {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 14px;
+    color: var(--text-main);
+    background: var(--bg);
+    outline: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236B6B6B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 32px;
+  }
+  .category-select:focus { border-color: var(--green-dark); background-color: #fff; }
+
+  /* ALLERGY GRID */
+  .allergy-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  .allergy-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .allergy-item input[type="checkbox"] {
+    width: 16px; height: 16px;
+    accent-color: var(--green-dark);
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+  .allergy-item label {
+    font-size: 13px; color: var(--text-main);
+    cursor: pointer; flex: 1;
+  }
+  .allergy-item:has(input:checked) {
+    border-color: var(--green-dark);
+    background: var(--green-light);
+  }
+
+  /* INFO TABLE EDIT */
+  .info-edit-table {
+    width: 100%; border-collapse: collapse;
+  }
+  .info-edit-table tr { border-bottom: 1px solid var(--border); }
+  .info-edit-table tr:last-child { border-bottom: none; }
+  .info-edit-table th {
+    text-align: left;
+    padding: 10px 8px 10px 0;
+    font-size: 12px; color: var(--text-sub);
+    font-weight: 500;
+    white-space: nowrap;
+    width: 5.5em;
+    vertical-align: middle;
+  }
+  .info-edit-table td { padding: 6px 0; }
+  .info-edit-table input {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 7px 10px;
+    font-size: 13px;
+    color: var(--text-main);
+    background: var(--bg);
+    outline: none;
+    -webkit-appearance: none;
+  }
+  .info-edit-table input:focus { border-color: var(--green-dark); background: #fff; }
+
+  /* DELIVERY */
+  .delivery-options {
+    display: flex; flex-direction: column; gap: 10px;
+    margin-bottom: 14px;
+  }
+  .delivery-option {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .delivery-option input[type="radio"],
+  .delivery-option input[type="checkbox"] {
+    width: 16px; height: 16px;
+    accent-color: var(--green-dark);
+    flex-shrink: 0;
+  }
+  .delivery-option label {
+    font-size: 13px; color: var(--text-main); cursor: pointer; flex: 1;
+  }
+  .delivery-option label span {
+    display: block; font-size: 11px; color: var(--text-sub); margin-top: 2px;
+  }
+  .delivery-option:has(input:checked) {
+    border-color: var(--green-dark);
+    background: var(--green-light);
+  }
+  .delivery-price.is-free {
+    color: var(--green-dark);
+    font-weight: 700;
+  }
+
+  /* DELETE PRODUCT BTN */
+  .delete-product-wrap {
+    padding: 20px 16px;
+    background: var(--bg-card);
+    border-top: 1px solid var(--border);
+    text-align: center;
+  }
+  .delete-product-btn {
+    font-size: 13px; color: #CC4444;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  /* TOAST */
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: var(--green-dark); color: #fff;
+    font-size: 13px; font-weight: 600;
+    padding: 10px 24px; border-radius: 20px;
+    z-index: 300;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+  }
+  .toast.show { opacity: 1; }
+  /* ============ DESKTOP (≥900px) ============ */
+  @media (min-width: 900px) {
+    body { max-width: 720px; padding-bottom: 40px; }
+    .header { padding: 16px 32px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <button class="header-back" onclick="history.back()">
+    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
+  <div class="header-title">商品編集</div>
+  <button class="header-save" id="saveBtn">保存する</button>
+</header>
+
+<!-- ① 商品写真 -->
+<div class="section-block">
+  <div class="block-title">商品写真</div>
+  <div class="photo-upload-grid">
+    <div class="photo-slot">
+      <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <span>メイン写真</span>
+      <div class="main-label">メイン</div>
+    </div>
+    <div class="photo-slot">
+      <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <span>追加</span>
+    </div>
+    <div class="photo-slot">
+      <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <span>追加</span>
+    </div>
+    <div class="photo-slot">
+      <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <span>追加</span>
+    </div>
+    <div class="photo-slot">
+      <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <span>追加</span>
+    </div>
+    <div class="photo-slot">
+      <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <span>追加</span>
+    </div>
+  </div>
+  <p class="field-hint" style="margin-top:10px;">最大5枚まで。1枚目がメイン表示になります。</p>
+</div>
+
+<div class="gap"></div>
+
+<!-- ② 商品名・説明 -->
+<div class="section-block">
+  <div class="block-title">基本情報</div>
+  <div class="field">
+    <label class="field-label field-required">商品名</label>
+    <input class="field-input" type="text" value="無添加 自家製味噌 500g" placeholder="商品名を入力">
+  </div>
+  <div class="field">
+    <label class="field-label field-required">商品説明</label>
+    <textarea class="field-textarea">厳選された国産の大豆と米麹を使用し、伝統的な製法で丁寧に仕込んだ自家製味噌です。豊かな香りと深いコク、自然な甘みをお楽しみください。毎日の食卓に、体に優しい本物の味を。</textarea>
+  </div>
+</div>
+
+<div class="gap"></div>
+
+<!-- ③ 価格 -->
+<div class="section-block">
+  <div class="block-title">価格</div>
+  <div class="field">
+    <label class="field-label field-required">販売価格（税込）</label>
+    <div class="price-input-wrap">
+      <span class="price-yen">¥</span>
+      <input class="field-input" type="number" value="1800" placeholder="0" inputmode="numeric">
+    </div>
+  </div>
+</div>
+
+<div class="gap"></div>
+
+<!-- ④ 在庫 -->
+<div class="section-block">
+  <div class="block-title">在庫数</div>
+  <div class="stock-row">
+    <div class="stock-input-wrap">
+      <button class="stock-btn" id="stockMinus">－</button>
+      <input class="stock-num" type="number" value="10" id="stockNum" inputmode="numeric">
+      <button class="stock-btn" id="stockPlus">＋</button>
+    </div>
+    <p class="stock-hint">在庫が<strong>0</strong>になると<br>お客様の画面に「売り切れ」と表示されます。</p>
+  </div>
+</div>
+
+<div class="gap"></div>
+
+<!-- ⑤ こだわりタグ -->
+<div class="section-block">
+  <div class="block-title">こだわりタグ</div>
+  <p class="field-hint" style="margin-bottom:12px;">当てはまるものをすべて選んでください。</p>
+
+  <p style="font-size:11px; font-weight:700; color:var(--text-sub); margin-bottom:8px;">食品タグ</p>
+  <div class="tag-grid" style="margin-bottom:16px;">
+    <input type="checkbox" class="tag-check" id="t1"><label class="tag-label" for="t1">着色料不使用</label>
+    <input type="checkbox" class="tag-check" id="t2"><label class="tag-label" for="t2">保存料不使用</label>
+    <input type="checkbox" class="tag-check" id="t3"><label class="tag-label" for="t3">人工甘味料不使用</label>
+    <input type="checkbox" class="tag-check" id="t4" checked><label class="tag-label" for="t4">化学調味料不使用</label>
+    <input type="checkbox" class="tag-check" id="t5"><label class="tag-label" for="t5">無農薬</label>
+    <input type="checkbox" class="tag-check" id="t6"><label class="tag-label" for="t6">減農薬</label>
+    <input type="checkbox" class="tag-check" id="t7"><label class="tag-label" for="t7">有機・オーガニック</label>
+    <input type="checkbox" class="tag-check" id="t8" checked><label class="tag-label" for="t8">国産100%</label>
+    <input type="checkbox" class="tag-check" id="t9" checked><label class="tag-label" for="t9">砂糖不使用</label>
+    <input type="checkbox" class="tag-check" id="t10"><label class="tag-label" for="t10">白砂糖不使用</label>
+    <input type="checkbox" class="tag-check" id="t11" checked><label class="tag-label" for="t11">グルテンフリー</label>
+    <input type="checkbox" class="tag-check" id="t12"><label class="tag-label" for="t12">卵不使用</label>
+    <input type="checkbox" class="tag-check" id="t13"><label class="tag-label" for="t13">乳製品不使用</label>
+    <input type="checkbox" class="tag-check" id="t14"><label class="tag-label" for="t14">ビーガン</label>
+    <input type="checkbox" class="tag-check" id="t15"><label class="tag-label" for="t15">ペスカタリアン</label>
+    <input type="checkbox" class="tag-check" id="t16p"><label class="tag-label" for="t16p">放牧・平飼い</label>
+  </div>
+
+  <p style="font-size:11px; font-weight:700; color:var(--text-sub); margin-bottom:8px;">日用品タグ</p>
+  <div class="tag-grid" style="margin-bottom:16px;">
+    <input type="checkbox" class="tag-check" id="t16"><label class="tag-label" for="t16">合成界面活性剤不使用</label>
+    <input type="checkbox" class="tag-check" id="t17"><label class="tag-label" for="t17">合成香料不使用</label>
+    <input type="checkbox" class="tag-check" id="t18"><label class="tag-label" for="t18">石油由来成分不使用</label>
+    <input type="checkbox" class="tag-check" id="t19"><label class="tag-label" for="t19">無香料</label>
+    <input type="checkbox" class="tag-check" id="t20"><label class="tag-label" for="t20">天然素材100%</label>
+    <input type="checkbox" class="tag-check" id="t21"><label class="tag-label" for="t21">有機・オーガニック素材</label>
+    <input type="checkbox" class="tag-check" id="t22"><label class="tag-label" for="t22">赤ちゃん・子ども向け</label>
+    <input type="checkbox" class="tag-check" id="t23"><label class="tag-label" for="t23">プラスチックフリー</label>
+  </div>
+
+  <p style="font-size:11px; font-weight:700; color:var(--text-sub); margin-bottom:8px;">共通タグ</p>
+  <div class="tag-grid">
+    <input type="checkbox" class="tag-check" id="t24"><label class="tag-label" for="t24">ギフト</label>
+  </div>
+</div>
+
+<div class="gap"></div>
+
+<!-- ⑥ カテゴリー -->
+<div class="section-block">
+  <div class="block-title">カテゴリー</div>
+  <div class="field">
+    <label class="field-label field-required">カテゴリーを選択</label>
+    <select class="category-select">
+      <option value="">選択してください</option>
+      <option value="1">生鮮食品</option>
+      <option value="2" selected>惣菜</option>
+      <option value="3">調味料</option>
+      <option value="4">お菓子</option>
+      <option value="5">飲み物</option>
+      <option value="6">日用品</option>
+    </select>
+  </div>
+</div>
+
+<div class="gap"></div>
+
+<!-- ⑦ アレルギー -->
+<div class="section-block">
+  <div class="block-title">アレルギー情報</div>
+  <p class="field-hint" style="margin-bottom:12px;">この商品に含まれるアレルゲンをすべて選んでください。</p>
+  <div class="allergy-grid">
+    <div class="allergy-item">
+      <input type="checkbox" id="a1" checked>
+      <label for="a1">卵</label>
+    </div>
+    <div class="allergy-item">
+      <input type="checkbox" id="a2">
+      <label for="a2">乳</label>
+    </div>
+    <div class="allergy-item">
+      <input type="checkbox" id="a3">
+      <label for="a3">小麦</label>
+    </div>
+    <div class="allergy-item">
+      <input type="checkbox" id="a4">
+      <label for="a4">そば</label>
+    </div>
+    <div class="allergy-item">
+      <input type="checkbox" id="a5">
+      <label for="a5">落花生（ピーナッツ）</label>
+    </div>
+    <div class="allergy-item">
+      <input type="checkbox" id="a6">
+      <label for="a6">えび</label>
+    </div>
+    <div class="allergy-item">
+      <input type="checkbox" id="a7">
+      <label for="a7">かに</label>
+    </div>
+    <div class="allergy-item">
+      <input type="checkbox" id="a8">
+      <label for="a8">くるみ</label>
+    </div>
+  </div>
+  <p class="field-hint" style="margin-top:10px;">※ここで選んだ情報は商品ページのアレルギー欄に表示されます。</p>
+</div>
+
+<div class="gap"></div>
+
+<!-- ⑧ 商品情報テーブル -->
+<div class="section-block">
+  <div class="block-title">商品情報</div>
+  <table class="info-edit-table">
+    <tr>
+      <th>内容量</th>
+      <td><input type="text" value="500g" placeholder="例：500g"></td>
+    </tr>
+    <tr>
+      <th>原材料</th>
+      <td><input type="text" value="大豆（国産）、米麹、塩" placeholder="原材料を入力"></td>
+    </tr>
+    <tr>
+      <th>賞味期限</th>
+      <td><input type="text" value="製造から6ヶ月" placeholder="例：製造から〇ヶ月"></td>
+    </tr>
+    <tr>
+      <th>保存方法</th>
+      <td><input type="text" value="冷蔵" placeholder="例：冷蔵・常温など"></td>
+    </tr>
+    <tr>
+      <th>製造者</th>
+      <td><input type="text" value="〇〇農園（京都府△△市）" placeholder="製造者名・所在地"></td>
+    </tr>
+  </table>
+</div>
+
+<div class="gap"></div>
+
+<!-- ⑨ 配送設定 -->
+<div class="section-block">
+  <div class="block-title">配送設定</div>
+  <p class="field-hint" style="margin-bottom:12px;">送料はショップ管理画面で設定した金額が自動で反映されます。「送料無料にする」をONにすると、金額に関わらずこの商品の送料は無料になります。</p>
+
+  <div class="delivery-option" style="margin-bottom:14px;">
+    <input type="checkbox" id="alwaysFree">
+    <label for="alwaysFree">この商品は送料無料にする
+      <span>ショップの送料無料ライン（注文合計金額）とは別に、この商品単体で常に送料無料になります</span>
+    </label>
+  </div>
+
+  <div class="delivery-options">
+    <div class="delivery-option">
+      <input type="radio" name="delivery" id="d1" value="normal">
+      <label for="d1">通常便
+        <span class="delivery-price" data-price="¥800（ショップ設定）">¥800（ショップ設定）</span>
+      </label>
+    </div>
+    <div class="delivery-option">
+      <input type="radio" name="delivery" id="d2" value="cool" checked>
+      <label for="d2">クール便（冷蔵）
+        <span class="delivery-price" data-price="¥1,000（ショップ設定）">¥1,000（ショップ設定）</span>
+      </label>
+    </div>
+    <div class="delivery-option">
+      <input type="radio" name="delivery" id="d3" value="frozen">
+      <label for="d3">クール便（冷凍）
+        <span class="delivery-price" data-price="¥1,200（ショップ設定）">¥1,200（ショップ設定）</span>
+      </label>
+    </div>
+  </div>
+
+  <div class="field">
+    <label class="field-label">備考（任意）</label>
+    <input class="field-input" type="text" placeholder="例：ご注文後3〜5営業日以内に発送します">
+  </div>
+</div>
+
+<!-- 商品削除 -->
+<div class="delete-product-wrap">
+  <button class="delete-product-btn" onclick="if(confirm('この商品を削除しますか？')){ window.location.href='komcho-market-shop-admin.html'; }">この商品を削除する</button>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">保存しました ✓</div>
+
+<script>
+  // 在庫数
+  let stock = 10;
+  document.getElementById('stockPlus').addEventListener('click', () => {
+    stock = Math.min(stock + 1, 9999);
+    document.getElementById('stockNum').value = stock;
+  });
+  document.getElementById('stockMinus').addEventListener('click', () => {
+    stock = Math.max(stock - 1, 0);
+    document.getElementById('stockNum').value = stock;
+  });
+  document.getElementById('stockNum').addEventListener('change', e => {
+    stock = Math.max(0, Math.min(9999, parseInt(e.target.value) || 0));
+    e.target.value = stock;
+  });
+
+  // 送料無料トグル（商品ごと）
+  const alwaysFree = document.getElementById('alwaysFree');
+  const deliveryPrices = document.querySelectorAll('.delivery-price');
+  alwaysFree.addEventListener('change', () => {
+    deliveryPrices.forEach(el => {
+      if (alwaysFree.checked) {
+        el.textContent = '無料';
+        el.classList.add('is-free');
+      } else {
+        el.textContent = el.dataset.price;
+        el.classList.remove('is-free');
+      }
+    });
+  });
+
+  // 保存トースト
+  document.getElementById('saveBtn').addEventListener('click', () => {
+    const toast = document.getElementById('toast');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2000);
+  });
+</script>
+</body>
+</html>

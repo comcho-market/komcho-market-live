@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>出店者規約 - こむちょマーケット</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 48 48%27%3E%3Crect width=%2748%27 height=%2748%27 rx=%2710%27 fill=%27%233D5A3E%27/%3E%3Cg transform=%27translate(24,24) scale(0.55)%27%3E%3Cpath d=%27M -26 7 C -17 -17 5 -24 24 -10 C 12 5 -2 19 -21 24%27 fill=%27none%27 stroke=%27%23F8F5EF%27 stroke-width=%275%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/%3E%3C/g%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg:#F8F5EF; --bg-card:#FFFFFF; --green-dark:#3D5A3E; --green-mid:#5A7A5B;
+    --green-light:#EAF0E8; --gold:#B8973A; --text-main:#2C2C2C; --text-sub:#6B6B6B;
+    --border:#E2DDD5; --radius-card:12px; --shadow-card:0 2px 12px rgba(0,0,0,0.07);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Hiragino Kaku Gothic ProN','Hiragino Sans','Yu Gothic','Meiryo',sans-serif;
+    background: var(--bg); color: var(--text-main);
+    max-width: 430px; margin: 0 auto; min-height: 100vh; padding-bottom: 100px;
+  }
+  a { text-decoration: none; color: inherit; }
+  button { cursor: pointer; border: none; background: none; font-family: inherit; }
+
+  .header {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--bg); border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px;
+  }
+  .header-logo {
+    display: flex; align-items: center; gap: 7px;
+  }
+  .header-logo .logo-icon {
+    width: 24px; height: 19px; flex-shrink: 0;
+  }
+  .header-logo .logo-icon path {
+    fill: none; stroke: var(--green-dark);
+    stroke-width: 3; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .header-logo .logo-text {
+    font-size: 15px; font-weight: 700; letter-spacing: 0.04em;
+    color: var(--text-main);
+  }
+  .header-title { font-size: 15px; font-weight: 700; }
+  .header-spacer { width: 50px; }
+
+  .hero {
+    background: var(--green-dark); padding: 28px 20px 24px;
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: ''; position: absolute; top: -40px; right: -40px;
+    width: 180px; height: 180px; border-radius: 50%;
+    background: rgba(255,255,255,0.05);
+  }
+  .hero-label { font-size: 10px; color: rgba(255,255,255,0.6); letter-spacing: 0.15em; margin-bottom: 8px; }
+  .hero-title { font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+  .hero-sub { font-size: 12px; color: rgba(255,255,255,0.7); margin-bottom: 8px; }
+  .hero-date { font-size: 11px; color: rgba(255,255,255,0.5); }
+
+  .content { padding: 20px 16px; }
+
+  .draft-banner {
+    background: #FFF9EC; border: 1px solid #E8D898;
+    border-radius: 8px; padding: 12px 14px; margin-bottom: 20px;
+    font-size: 12px; color: #8A7000; line-height: 1.8;
+  }
+
+  .toc-card {
+    background: var(--bg-card); border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card); padding: 16px; margin-bottom: 24px;
+  }
+  .toc-title { font-size: 12px; font-weight: 700; color: var(--text-sub); margin-bottom: 10px; letter-spacing: 0.08em; }
+  .toc-list { display: flex; flex-direction: column; gap: 6px; }
+  .toc-item { font-size: 12px; color: var(--green-dark); display: flex; align-items: center; gap: 8px; }
+  .toc-item::before { content: '▸'; font-size: 10px; }
+
+  .section { margin-bottom: 24px; }
+  .section-title {
+    font-size: 14px; font-weight: 700; color: var(--green-dark);
+    padding: 10px 14px; background: var(--green-light);
+    border-radius: 8px; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-title::before { content: ''; width: 3px; height: 16px; background: var(--green-dark); border-radius: 2px; flex-shrink: 0; }
+  .section-body {
+    background: var(--bg-card); border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card); padding: 16px;
+    font-size: 13px; line-height: 1.9; color: var(--text-main);
+  }
+  .section-body p { margin-bottom: 10px; }
+  .section-body p:last-child { margin-bottom: 0; }
+  .section-body ul { padding-left: 18px; margin: 8px 0; }
+  .section-body ul li { margin-bottom: 6px; }
+  .section-body .note {
+    font-size: 11px; color: var(--text-sub); background: var(--bg);
+    border-radius: 6px; padding: 10px 12px; margin-top: 10px; line-height: 1.8;
+  }
+  .section-body .important {
+    background: #FFF0F0; border: 1px solid #FFCCCC;
+    border-radius: 6px; padding: 10px 12px; margin-top: 10px;
+    font-size: 12px; color: #C04040; line-height: 1.8; font-weight: 600;
+  }
+  .section-body .good {
+    background: var(--green-light); border-radius: 6px;
+    padding: 10px 12px; margin-top: 10px; font-size: 12px;
+    color: var(--green-dark); line-height: 1.8;
+  }
+
+  /* NGリスト */
+  .ng-list {
+    display: flex; flex-direction: column; gap: 8px; margin: 10px 0;
+  }
+  .ng-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    background: #FFF5F5; border-radius: 8px; padding: 10px 12px;
+    border: 1px solid #FFDDDD;
+  }
+  .ng-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  .ng-text { font-size: 12px; color: var(--text-main); line-height: 1.7; }
+  .ng-text strong { color: #C04040; }
+
+  /* 同意ボタンエリア */
+  .agree-wrap {
+    background: var(--bg-card); border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card); padding: 20px 16px; margin-top: 8px;
+  }
+  .agree-check-row {
+    display: flex; align-items: flex-start; gap: 12px; margin-bottom: 16px;
+  }
+  .agree-checkbox {
+    width: 22px; height: 22px; border: 2px solid var(--border);
+    border-radius: 6px; appearance: none; -webkit-appearance: none;
+    cursor: pointer; flex-shrink: 0; margin-top: 1px;
+    transition: background 0.15s, border-color 0.15s;
+    position: relative;
+  }
+  .agree-checkbox:checked { background: var(--green-dark); border-color: var(--green-dark); }
+  .agree-checkbox:checked::after {
+    content: ''; position: absolute;
+    left: 5px; top: 2px; width: 8px; height: 12px;
+    border: 2px solid #fff; border-top: none; border-left: none;
+    transform: rotate(45deg);
+  }
+  .agree-label { font-size: 13px; line-height: 1.8; color: var(--text-main); }
+  .agree-label span { color: var(--green-dark); font-weight: 600; }
+  .agree-btn {
+    width: 100%; height: 52px; border-radius: 26px;
+    background: var(--border); color: #fff;
+    font-size: 16px; font-weight: 700; letter-spacing: 0.04em;
+    border: none; cursor: not-allowed;
+    transition: background 0.2s;
+  }
+  .agree-btn.active { background: var(--green-dark); cursor: pointer; }
+  .agree-btn.active:active { opacity: 0.85; }
+
+  /* BOTTOM NAV なし（管理・出店者向けページ） */
+  /* ============ DESKTOP (≥900px) ============ */
+  @media (min-width: 900px) {
+    body { max-width: 720px; padding-bottom: 40px; }
+    .header { padding: 16px 32px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <a class="header-logo" href="komcho-market-top.html">
+    <svg class="logo-icon" viewBox="0 0 60 48">
+      <path transform="translate(30,24)" d="M -26 7 C -17 -17 5 -24 24 -10 C 12 5 -2 19 -21 24"/>
+    </svg>
+    <span class="logo-text">こむちょマーケット</span>
+  </a>
+  <div class="header-title">出店者規約</div>
+  <div class="header-spacer"></div>
+</header>
+
+<div class="hero">
+  <div class="hero-label">SELLER AGREEMENT</div>
+  <div class="hero-title">出店者規約</div>
+  <div class="hero-sub">出店者様向け</div>
+  <div class="hero-date">制定日：2026年○月○日　／　最終改定：2026年○月○日</div>
+</div>
+
+<div class="content">
+
+  <div class="draft-banner">
+    ⚠️ このページはドラフト版です。公開前に弁護士による監修を受けることを推奨します。
+  </div>
+
+
+
+  <div class="toc-card">
+    <div class="toc-title">目次</div>
+    <div class="toc-list">
+      <div class="toc-item">第1条　適用範囲</div>
+      <div class="toc-item">第2条　出店審査</div>
+      <div class="toc-item">第3条　絶対NG成分</div>
+      <div class="toc-item">第4条　商品情報の開示義務</div>
+      <div class="toc-item">第5条　こだわりタグの使用ルール</div>
+      <div class="toc-item">第6条　システム手数料・振込</div>
+      <div class="toc-item">第7条　ポイント・キャンペーン</div>
+      <div class="toc-item">第8条　禁止事項</div>
+      <div class="toc-item">第9条　契約解除</div>
+      <div class="toc-item">第10条　免責・損害賠償</div>
+      <div class="toc-item">第11条　規約の変更</div>
+      <div class="toc-item">第12条　準拠法・管轄裁判所</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">第1条　適用範囲</div>
+    <div class="section-body">
+      <p>本規約は、○○（以下「当社」）が運営する「こむちょマーケット」（以下「本サービス」）に出店する事業者（以下「出店者」）に適用されます。</p>
+      <p>出店申請を行った時点で、本規約に同意したものとみなします。</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">第2条　出店審査</div>
+    <div class="section-body">
+      <p>出店には当社による審査が必要です。審査は以下の基準で行います。</p>
+      <ul>
+        <li>第3条の絶対NG成分を含む商品がないこと</li>
+        <li>第4条の開示必須項目が揃っていること</li>
+        <li>販売実績・製造体制・衛生管理について合理的な信頼性があること</li>
+      </ul>
+      <div class="note">審査は「厳しく絞る」ではなく「最低限の信頼性担保」を目的としています。条件を満たした出店者には広く出店の機会を提供します。</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">第3条　絶対NG成分</div>
+    <div class="section-body">
+      <p>以下の成分を1つでも含む商品は、出品できません。審査時・出品後を問わず確認された場合、即時出品停止となります。</p>
+      <div class="ng-list">
+        <div class="ng-item">
+          <div class="ng-icon">🚫</div>
+          <div class="ng-text"><strong>タール色素・合成着色料</strong><br>赤色○号、青色○号など</div>
+        </div>
+        <div class="ng-item">
+          <div class="ng-icon">🚫</div>
+          <div class="ng-text"><strong>人工甘味料</strong><br>アスパルテーム・スクラロース・アセスルファムK・サッカリンなど</div>
+        </div>
+        <div class="ng-item">
+          <div class="ng-icon">🚫</div>
+          <div class="ng-text"><strong>亜硝酸ナトリウム・硝酸塩</strong><br>発色剤として使用されるもの</div>
+        </div>
+        <div class="ng-item">
+          <div class="ng-icon">🚫</div>
+          <div class="ng-text"><strong>ポストハーベスト農薬が使用された原材料を含む商品</strong><br>例：輸入レモン・オレンジの皮（防カビ剤）、輸入小麦（グリホサート）、輸入バナナなど</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">第4条　商品情報の開示義務</div>
+    <div class="section-body">
+      <p>全商品について、以下の情報を正確に開示することが必須です。</p>
+      <ul>
+        <li>全原材料表示（バックラベルと同じ情報）</li>
+        <li>アレルギー8品目（卵・乳・小麦・そば・落花生・えび・かに・くるみ）</li>
+        <li>産地（主要原材料の産地）</li>
+        <li>製造者情報（製造者名・所在地）</li>
+      </ul>
+      <div class="important">虚偽・不正確な情報の開示は、即時出品停止・契約解除の対象となります。</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">第5条　こだわりタグの使用ルール</div>
+    <div class="section-body">
+      <p>こだわりタグは、商品の実態に合致する場合のみ使用できます。</p>
+      <ul>
+        <li>「無農薬」：農薬不使用を証明できる商品のみ</li>
+        <li>「有機・オーガニック」：有機JAS認証取得商品のみ</li>
+        <li>「ビーガン」：動物性原材料を一切含まない商品のみ</li>
+        <li>その他タグも、表示する根拠が明確な場合のみ使用可</li>
+      </ul>
+      <div class="note">タグの不正使用が確認された場合、警告なく出品停止する場合があります。</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">第6条　システム手数料・振込</div>
+    <div class="section-body">
+      <p>システム手数料は別途定める料金に従います。当社と出店者が個別に合意した場合は、その合意内容が優先されます。</p>
+      <p>売上からシステム手数料・振込手数料を差し引いた金額を、翌月末までにご指定口座へお振り込みします。</p>
+      <ul>
+        <li>振込は月1回、前月分をまとめて行います。</li>
+        <li>振込手数料は出店者のご負担となります。</li>
+        <li>返金・キャンセルが発生した場合、該当売上分の手数料は調整します。</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">第7条　ポイント・キャンペーン</div>
+    <div class="section-body">
+      <p>本サービスのポイントプログラムおよびキャンペーンについて、以下のとおりです。</p>
+      <ul>
+        <li>ポイントの原資はすべて当社（こむちょマーケット運営）が負担します。出店者への追加費用負担は一切ありません。</li>
+        <li>月1回の「めぐる週間（仮称）」などの購買イベントへの参加は任意です。強制しません。</li>
+        <li>出店者が自店舗独自の割引・特典を設定することは自由です。ただし、NG成分を含む商品の優遇的な販促は禁止します。</li>
+      </ul>
+      <div class="good">🌿 ポイントやキャンペーンによる負担は運営が全て引き受けます。出店者の皆さんは商品づくりに集中してください。</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">第8条　禁止事項</div>
+    <div class="section-body">
+      <p>出店者は以下の行為を行ってはなりません。</p>
+      <ul>
+        <li>虚偽・誇大な商品説明・タグの使用</li>
+        <li>絶対NG成分を含む商品の出品</li>
+        <li>お客様への不誠実な対応・発送の著しい遅延</li>
+        <li>本サービスを通じて得たお客様情報の目的外利用・第三者提供</li>
+        <li>当社の書面による許可なく、本サービスを通じたお客様への直接取引の誘導</li>
+        <li>法令・公序良俗に反する行為</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">第9条　契約解除</div>
+    <div class="section-body">
+      <p>以下の場合、当社は出品停止・契約解除を行うことができます。</p>
+      <ul>
+        <li>本規約への違反が確認された場合</li>
+        <li>虚偽の情報で出店申請を行っていた場合</li>
+        <li>お客様からの重大なクレームが繰り返された場合</li>
+        <li>法令違反・行政処分を受けた場合</li>
+      </ul>
+      <div class="note">軽微な違反については、まず改善を求めるご連絡をいたします。</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">第10条　免責・損害賠償</div>
+    <div class="section-body">
+      <p>商品の品質・安全性・効果に関するトラブルの責任は出店者が負います。当社は仲介に努めますが、解決を保証するものではありません。</p>
+      <p>出店者の故意・過失による損害が生じた場合、出店者は当社および第三者に対して損害賠償責任を負います。</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">第11条　規約の変更</div>
+    <div class="section-body">
+      <p>当社は、必要に応じて本規約を変更することができます。重要な変更については、30日前までにメールまたはサービス上でお知らせします。変更後も出店を継続した場合、変更後の規約に同意したものとみなします。</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">第12条　準拠法・管轄裁判所</div>
+    <div class="section-body">
+      <p>本規約は日本法に準拠します。本サービスに関する紛争については、京都地方裁判所を第一審の専属的合意管轄裁判所とします。</p>
+    </div>
+  </div>
+
+  <!-- 同意ボタン -->
+  <div class="agree-wrap">
+    <div class="agree-check-row">
+      <input type="checkbox" class="agree-checkbox" id="agreeCheck" onchange="toggleBtn()">
+      <label class="agree-label" for="agreeCheck">
+        <span>出店者規約</span>の内容をすべて読み、同意します
+      </label>
+    </div>
+    <button class="agree-btn" id="agreeBtn" disabled onclick="handleAgree()">同意して出店申請を進める</button>
+  </div>
+
+</div>
+
+<script>
+function toggleBtn() {
+  const checked = document.getElementById('agreeCheck').checked;
+  const btn = document.getElementById('agreeBtn');
+  btn.classList.toggle('active', checked);
+  btn.disabled = !checked;
+}
+function handleAgree() {
+  window.location.href = 'komcho-market-seller-apply.html';
+}
+</script>
+</body>
+</html>
