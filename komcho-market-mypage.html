@@ -716,25 +716,10 @@
       配送先住所
     </div>
   </div>
-  <div class="address-list">
-    <div class="address-item default-addr">
-      <div class="address-default-badge">デフォルト</div>
-      <div class="address-name">山田 花子</div>
-      <div class="address-text">〒604-0000<br>京都府京都市中京区○○町1-2-3<br>090-0000-0000</div>
-      <div class="address-actions">
-        <button class="address-action-btn">編集</button>
-      </div>
-    </div>
-    <div class="address-item">
-      <div class="address-name">山田 太郎（実家）</div>
-      <div class="address-text">〒615-0000<br>京都府京都市西京区△△町4-5<br>075-000-0000</div>
-      <div class="address-actions">
-        <button class="address-action-btn">編集</button>
-        <button class="address-action-btn" style="color:#CC4444; border-color:#FFCCCC;" onclick="deleteAddress(this)">削除</button>
-      </div>
-    </div>
+  <div class="address-list" id="addressList">
+    <div style="padding:8px 16px; font-size:12px; color:var(--text-sub);">読み込み中...</div>
   </div>
-  <button class="add-btn-sub">
+  <button class="add-btn-sub" onclick="openAddressModal()">
     <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
     住所を追加する
   </button>
@@ -841,6 +826,44 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="addressModal" onclick="closeModalOutside2(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="addressModalTitle">住所を追加する</div>
+    <div class="modal-body">
+      <div class="form-field">
+        <label class="form-label">お名前</label>
+        <input class="form-input" type="text" placeholder="山田 花子" id="addrName">
+      </div>
+      <div class="form-field">
+        <label class="form-label">郵便番号</label>
+        <input class="form-input" type="text" placeholder="000-0000" id="addrPostal">
+      </div>
+      <div class="form-field">
+        <label class="form-label">都道府県</label>
+        <input class="form-input" type="text" placeholder="京都府" id="addrPrefecture">
+      </div>
+      <div class="form-field">
+        <label class="form-label">市区町村・番地</label>
+        <input class="form-input" type="text" placeholder="京都市中京区○○町1-2-3" id="addrLine">
+      </div>
+      <div class="form-field">
+        <label class="form-label">建物名・部屋番号（任意）</label>
+        <input class="form-input" type="text" placeholder="○○マンション 101号室" id="addrBuilding">
+      </div>
+      <div class="form-field">
+        <label class="form-label">電話番号</label>
+        <input class="form-input" type="tel" placeholder="090-0000-0000" id="addrPhone">
+      </div>
+      <label class="save-check-wrap" style="display:flex;align-items:center;gap:8px;margin-top:4px;">
+        <input type="checkbox" id="addrIsDefault">
+        <span class="save-check-label">この住所をデフォルトに設定する</span>
+      </label>
+      <button class="modal-submit-btn" onclick="saveAddressModal()">この住所を保存する</button>
+    </div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
@@ -869,12 +892,123 @@
       document.getElementById('welcomeName').textContent = 'ようこそ、' + profile.name + ' 様';
       document.getElementById('pointNum').textContent = profile.points.toLocaleString();
     }
+
+    await loadAddresses();
   })();
 
   // ログアウト処理
   async function logout() {
     await supabaseClient.auth.signOut();
     window.location.href = 'komcho-market-login.html';
+  }
+
+  // ===== 住所まわり =====
+  let editingAddressId = null;
+
+  async function loadAddresses() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) return;
+
+    const { data: addresses, error } = await supabaseClient
+      .from('addresses')
+      .select('*')
+      .eq('user_id', session.user.id)
+      .order('is_default', { ascending: false })
+      .order('created_at', { ascending: true });
+
+    const list = document.getElementById('addressList');
+    if (error || !addresses || addresses.length === 0) {
+      list.innerHTML = '<div style="padding:8px 16px; font-size:12px; color:var(--text-sub);">登録済みの住所はまだありません</div>';
+      return;
+    }
+
+    list.innerHTML = addresses.map(addr => `
+      <div class="address-item ${addr.is_default ? 'default-addr' : ''}">
+        ${addr.is_default ? '<div class="address-default-badge">デフォルト</div>' : ''}
+        <div class="address-name">${addr.name}</div>
+        <div class="address-text">〒${addr.postal_code || ''}<br>${addr.prefecture || ''}${addr.address_line || ''}${addr.building ? '<br>' + addr.building : ''}<br>${addr.phone || ''}</div>
+        <div class="address-actions">
+          <button class="address-action-btn" onclick="openAddressModal('${addr.id}')">編集</button>
+          <button class="address-action-btn" style="color:#CC4444; border-color:#FFCCCC;" onclick="deleteAddressReal('${addr.id}')">削除</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  async function openAddressModal(id) {
+    editingAddressId = id || null;
+    document.getElementById('addressModalTitle').textContent = id ? '住所を編集する' : '住所を追加する';
+
+    if (id) {
+      const { data: addr } = await supabaseClient.from('addresses').select('*').eq('id', id).single();
+      if (addr) {
+        document.getElementById('addrName').value = addr.name || '';
+        document.getElementById('addrPostal').value = addr.postal_code || '';
+        document.getElementById('addrPrefecture').value = addr.prefecture || '';
+        document.getElementById('addrLine').value = addr.address_line || '';
+        document.getElementById('addrBuilding').value = addr.building || '';
+        document.getElementById('addrPhone').value = addr.phone || '';
+        document.getElementById('addrIsDefault').checked = addr.is_default;
+      }
+    } else {
+      ['addrName','addrPostal','addrPrefecture','addrLine','addrBuilding','addrPhone'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('addrIsDefault').checked = false;
+    }
+
+    document.getElementById('addressModal').classList.add('open');
+  }
+
+  function closeAddressModal() {
+    document.getElementById('addressModal').classList.remove('open');
+  }
+
+  function closeModalOutside2(e) {
+    if (e.target === document.getElementById('addressModal')) closeAddressModal();
+  }
+
+  async function saveAddressModal() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) { window.location.href = 'komcho-market-login.html'; return; }
+
+    const name = document.getElementById('addrName').value.trim();
+    const addressLine = document.getElementById('addrLine').value.trim();
+    if (!name || !addressLine) {
+      showToast('お名前と住所は必須です');
+      return;
+    }
+
+    const payload = {
+      user_id: session.user.id,
+      name: name,
+      postal_code: document.getElementById('addrPostal').value.trim(),
+      prefecture: document.getElementById('addrPrefecture').value.trim(),
+      address_line: addressLine,
+      building: document.getElementById('addrBuilding').value.trim(),
+      phone: document.getElementById('addrPhone').value.trim(),
+      is_default: document.getElementById('addrIsDefault').checked
+    };
+
+    // デフォルトに設定する場合、他の住所のデフォルトを解除
+    if (payload.is_default) {
+      await supabaseClient.from('addresses').update({ is_default: false }).eq('user_id', session.user.id);
+    }
+
+    if (editingAddressId) {
+      await supabaseClient.from('addresses').update(payload).eq('id', editingAddressId);
+    } else {
+      await supabaseClient.from('addresses').insert(payload);
+    }
+
+    closeAddressModal();
+    showToast('住所を保存しました ✓');
+    await loadAddresses();
+  }
+
+  async function deleteAddressReal(id) {
+    if (!confirm('この住所を削除しますか？')) return;
+    await supabaseClient.from('addresses').delete().eq('id', id);
+    showToast('住所を削除しました');
+    await loadAddresses();
   }
 </script>
 
@@ -890,12 +1024,6 @@
     if (confirm('このカードを削除しますか？')) {
       btn.closest('.payment-item').remove();
       showToast('カードを削除しました');
-    }
-  }
-  function deleteAddress(btn) {
-    if (confirm('この住所を削除しますか？')) {
-      btn.closest('.address-item').remove();
-      showToast('住所を削除しました');
     }
   }
   function openCardModal() {

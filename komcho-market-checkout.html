@@ -519,20 +519,7 @@
 
     <!-- 登録済み住所（会員のみ表示） -->
     <div class="address-options" id="addressOptions">
-      <div class="address-option selected" onclick="selectAddress(this)">
-        <div class="radio-circle"></div>
-        <div class="address-option-body">
-          <div class="address-option-name">山田 花子 <span class="address-default-badge">デフォルト</span></div>
-          <div class="address-option-text">〒604-0000<br>京都府京都市中京区○○町1-2-3<br>090-0000-0000</div>
-        </div>
-      </div>
-      <div class="address-option" onclick="selectAddress(this)">
-        <div class="radio-circle"></div>
-        <div class="address-option-body">
-          <div class="address-option-name">山田 太郎（実家）</div>
-          <div class="address-option-text">〒615-0000<br>京都府京都市西京区△△町4-5<br>075-000-0000</div>
-        </div>
-      </div>
+      <div style="padding:8px 0; font-size:12px; color:var(--text-sub);">読み込み中...</div>
     </div>
 
     <!-- 新しい住所を追加 -->
@@ -545,32 +532,32 @@
       <div class="form-row">
         <div class="form-field">
           <label class="form-label form-label-req">姓</label>
-          <input class="form-input" type="text" placeholder="山田">
+          <input class="form-input" type="text" placeholder="山田" id="newAddrLastName">
         </div>
         <div class="form-field">
           <label class="form-label form-label-req">名</label>
-          <input class="form-input" type="text" placeholder="花子">
+          <input class="form-input" type="text" placeholder="花子" id="newAddrFirstName">
         </div>
       </div>
       <div class="form-field">
         <label class="form-label form-label-req">郵便番号</label>
-        <input class="form-input" type="text" placeholder="000-0000" inputmode="numeric" maxlength="8">
+        <input class="form-input" type="text" placeholder="000-0000" inputmode="numeric" maxlength="8" id="newAddrPostal">
       </div>
       <div class="form-field">
         <label class="form-label form-label-req">都道府県</label>
-        <input class="form-input" type="text" placeholder="京都府">
+        <input class="form-input" type="text" placeholder="京都府" id="newAddrPrefecture">
       </div>
       <div class="form-field">
         <label class="form-label form-label-req">市区町村・番地</label>
-        <input class="form-input" type="text" placeholder="京都市中京区○○町1-2-3">
+        <input class="form-input" type="text" placeholder="京都市中京区○○町1-2-3" id="newAddrLine">
       </div>
       <div class="form-field">
         <label class="form-label">建物名・部屋番号（任意）</label>
-        <input class="form-input" type="text" placeholder="○○マンション 101号室">
+        <input class="form-input" type="text" placeholder="○○マンション 101号室" id="newAddrBuilding">
       </div>
       <div class="form-field">
         <label class="form-label form-label-req">電話番号</label>
-        <input class="form-input" type="tel" placeholder="090-0000-0000" inputmode="tel">
+        <input class="form-input" type="tel" placeholder="090-0000-0000" inputmode="tel" id="newAddrPhone">
       </div>
       <!-- 住所保存チェック -->
       <label class="save-check-wrap">
@@ -809,6 +796,82 @@
   <div class="order-note">「注文を確定する」を押すと購入が確定します</div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+  const SUPABASE_URL = 'https://uawhrpizzlchkvmzrjzo.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_FaOqUE1PDbo-fpT9KhkWaw__BShLngI';
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  let savedAddresses = [];
+
+  // 登録済み住所の読み込み（ログイン中の場合のみ）
+  async function loadSavedAddresses() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    const wrap = document.getElementById('addressOptions');
+
+    if (!session) {
+      // ゲストの場合は新規入力フォームを開いて表示
+      wrap.innerHTML = '';
+      document.getElementById('newAddressForm').classList.add('open');
+      document.getElementById('saveAddress').checked = false;
+      document.getElementById('saveAddress').closest('.save-check-wrap').style.display = 'none';
+      return;
+    }
+
+    const { data: addresses } = await supabaseClient
+      .from('addresses')
+      .select('*')
+      .eq('user_id', session.user.id)
+      .order('is_default', { ascending: false })
+      .order('created_at', { ascending: true });
+
+    savedAddresses = addresses || [];
+
+    if (savedAddresses.length === 0) {
+      wrap.innerHTML = '';
+      document.getElementById('newAddressForm').classList.add('open');
+      return;
+    }
+
+    wrap.innerHTML = savedAddresses.map((addr, i) => `
+      <div class="address-option ${i === 0 ? 'selected' : ''}" onclick="selectAddress(this)" data-address-id="${addr.id}">
+        <div class="radio-circle"></div>
+        <div class="address-option-body">
+          <div class="address-option-name">${addr.name} ${addr.is_default ? '<span class="address-default-badge">デフォルト</span>' : ''}</div>
+          <div class="address-option-text">〒${addr.postal_code || ''}<br>${addr.prefecture || ''}${addr.address_line || ''}${addr.building ? '<br>' + addr.building : ''}<br>${addr.phone || ''}</div>
+        </div>
+      </div>
+    `).join('');
+  }
+  loadSavedAddresses();
+
+  // 新しい住所をデータベースに保存（会員かつチェック済みの場合）
+  async function saveNewAddressIfNeeded() {
+    const form = document.getElementById('newAddressForm');
+    if (!form.classList.contains('open')) return;
+    if (!document.getElementById('saveAddress').checked) return;
+
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) return;
+
+    const lastName = document.getElementById('newAddrLastName').value.trim();
+    const firstName = document.getElementById('newAddrFirstName').value.trim();
+    const addressLine = document.getElementById('newAddrLine').value.trim();
+    if (!lastName || !addressLine) return;
+
+    await supabaseClient.from('addresses').insert({
+      user_id: session.user.id,
+      name: (lastName + ' ' + firstName).trim(),
+      postal_code: document.getElementById('newAddrPostal').value.trim(),
+      prefecture: document.getElementById('newAddrPrefecture').value.trim(),
+      address_line: addressLine,
+      building: document.getElementById('newAddrBuilding').value.trim(),
+      phone: document.getElementById('newAddrPhone').value.trim(),
+      is_default: savedAddresses.length === 0
+    });
+  }
+</script>
+
 <script>
   const POINT_BALANCE = 1240;
   const SUBTOTAL = 5000;
@@ -903,7 +966,9 @@
   }
 
   // 注文確定
-  function placeOrder() {
+  async function placeOrder() {
+    await saveNewAddressIfNeeded();
+
     // ステップバー更新
     document.querySelectorAll('.step-circle').forEach((el, i) => {
       el.className = 'step-circle ' + (i < 2 ? 'done' : 'active');
