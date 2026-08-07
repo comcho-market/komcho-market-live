@@ -430,6 +430,18 @@
     </div>
 
     <div class="form-field">
+      <label class="form-label form-label-required" for="pwInput">パスワード（出店者ログイン用）</label>
+      <input class="form-input" type="password" id="pwInput" placeholder="8文字以上" autocomplete="new-password" oninput="validateField('password')">
+      <div class="field-error" id="passwordError">パスワードは8文字以上で入力してください</div>
+    </div>
+
+    <div class="form-field">
+      <label class="form-label form-label-required" for="pwConfirmInput">パスワード（確認）</label>
+      <input class="form-input" type="password" id="pwConfirmInput" placeholder="もう一度入力してください" autocomplete="new-password" oninput="validateField('passwordConfirm')">
+      <div class="field-error" id="passwordConfirmError">パスワードが一致しません</div>
+    </div>
+
+    <div class="form-field">
       <label class="form-label form-label-required">取り扱い予定カテゴリー</label>
       <div class="field-hint" style="margin-bottom:8px;">複数選択できます。生鮮食品・惣菜を選ぶと、下に確認事項が表示されます。</div>
       <div class="category-grid" id="categoryGrid">
@@ -510,7 +522,8 @@
 
   <!-- 送信 -->
   <div class="submit-wrap">
-    <button class="submit-btn" id="submitBtn" disabled onclick="submitApplication()">
+    <div class="field-error" id="submitError" style="text-align:center; margin-bottom:8px;"></div>
+  <button class="submit-btn" id="submitBtn" disabled onclick="submitApplication()">
       <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
       出店登録を完了する
     </button>
@@ -542,7 +555,12 @@
   <button class="success-btn" id="successBtn" onclick="goShopAdmin()">ショップ情報を設定する</button>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
+  const SUPABASE_URL = 'https://uawhrpizzlchkvmzrjzo.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_FaOqUE1PDbo-fpT9KhkWaw__BShLngI';
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
   // 事業形態トグル
   function selectEntity(type) {
     document.getElementById('entityIndividual').classList.toggle('active', type === 'individual');
@@ -552,7 +570,8 @@
   // バリデーション状態
   const valid = {
     shopName: false, repName: false, zip: false,
-    address: false, tel: false, email: false
+    address: false, tel: false, email: false,
+    password: false, passwordConfirm: false
   };
 
   const fieldMap = {
@@ -561,7 +580,9 @@
     zip:      { input: 'zipInput',      error: 'zipError',      type: 'zip' },
     address:  { input: 'addressInput',  error: 'addressError',  type: 'text' },
     tel:      { input: 'telInput',      error: 'telError',      type: 'tel' },
-    email:    { input: 'emailInput',    error: 'emailError',    type: 'email' }
+    email:    { input: 'emailInput',    error: 'emailError',    type: 'email' },
+    password: { input: 'pwInput', error: 'passwordError', type: 'password' },
+    passwordConfirm: { input: 'pwConfirmInput', error: 'passwordConfirmError', type: 'passwordConfirm' }
   };
 
   function validateField(key) {
@@ -572,6 +593,8 @@
     if (type === 'zip') ok = /^\d{3}-?\d{4}$/.test(v);
     if (type === 'tel') ok = /^[\d-]{10,}$/.test(v);
     if (type === 'email') ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+    if (type === 'password') ok = v.length >= 8;
+    if (type === 'passwordConfirm') ok = v.length >= 8 && v === document.getElementById('pwInput').value;
 
     valid[key] = ok;
     document.getElementById(input).classList.toggle('error', v.length > 0 && !ok);
@@ -639,11 +662,70 @@
       !(allFieldsValid && categoryValid && licenseValid && oemFieldValid && ngChecked && disclosureChecked && termsChecked);
   }
 
-  function submitApplication() {
+  async function submitApplication() {
+    const btn = document.getElementById('submitBtn');
+    const errorBox = document.getElementById('submitError');
+    errorBox.textContent = '';
+    errorBox.classList.remove('visible');
+    btn.disabled = true;
+    const originalLabel = btn.innerHTML;
+    btn.textContent = '送信中...';
+
+    const email = document.getElementById('emailInput').value.trim();
+    const password = document.getElementById('pwInput').value;
+    const businessType = document.getElementById('entityCorporate').classList.contains('active') ? 'corporate' : 'individual';
+    const shopName = document.getElementById('shopNameInput').value.trim();
+    const repName = document.getElementById('repNameInput').value.trim();
+    const zip = document.getElementById('zipInput').value.trim();
+    const address = document.getElementById('addressInput').value.trim();
+    const tel = document.getElementById('telInput').value.trim();
+
+    const pendingReview = licenseRequired || oemRequired;
+
+    // ① 出店者アカウントを作成
+    const { data: signUpData, error: signUpError } = await supabaseClient.auth.signUp({
+      email: email,
+      password: password,
+      options: { data: { role: 'seller', shop_name: shopName } }
+    });
+
+    if (signUpError) {
+      let msg = '登録に失敗しました。時間をおいて再度お試しください。';
+      if (signUpError.message.includes('already registered') || signUpError.message.includes('already been registered')) {
+        msg = 'このメールアドレスは既に登録されています。';
+      }
+      errorBox.textContent = msg;
+      errorBox.classList.add('visible');
+      btn.disabled = false;
+      btn.innerHTML = originalLabel;
+      return;
+    }
+
+    // ② 店舗情報を保存
+    const { error: shopError } = await supabaseClient.from('shops').insert({
+      owner_id: signUpData.user.id,
+      business_type: businessType,
+      shop_name: shopName,
+      representative_name: repName,
+      postal_code: zip,
+      address: address,
+      phone: tel,
+      email: email,
+      categories: selectedCategories,
+      status: pendingReview ? 'pending' : 'active'
+    });
+
+    if (shopError) {
+      errorBox.textContent = '店舗情報の保存に失敗しました。お手数ですが運営までお問い合わせください。';
+      errorBox.classList.add('visible');
+      btn.disabled = false;
+      btn.innerHTML = originalLabel;
+      return;
+    }
+
     document.getElementById('formScreen').style.display = 'none';
     document.getElementById('successScreen').classList.add('visible');
 
-    const pendingReview = licenseRequired || oemRequired;
     const titleEl = document.getElementById('successTitle');
     const subEl = document.getElementById('successSub');
     const statusEl = document.getElementById('successStatus');

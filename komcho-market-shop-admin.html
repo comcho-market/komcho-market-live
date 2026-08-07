@@ -398,11 +398,11 @@
   <div class="block-title">基本情報</div>
   <div class="field">
     <label class="field-label">ショップ名</label>
-    <input class="field-input" type="text" value="〇〇農園" placeholder="ショップ名を入力">
+    <input class="field-input" type="text" id="shopNameField" placeholder="ショップ名を入力">
   </div>
   <div class="field">
     <label class="field-label">所在地</label>
-    <input class="field-input" type="text" value="京都府京丹後市" placeholder="都道府県・市区町村">
+    <input class="field-input" type="text" id="shopAddressField" placeholder="都道府県・市区町村">
   </div>
 </div>
 
@@ -411,7 +411,7 @@
 <!-- ③ わたしたちについて -->
 <div class="section-block">
   <div class="block-title">わたしたちについて</div>
-  <textarea class="field-textarea">京都の北、海と山に囲まれた京丹後市で、自然の恵みとともに野菜や果物を育てています。農薬や化学肥料を使わず、土の力を信じて、種から大切に育てた在来種の野菜たちをお届けします。日々の食卓に、自然本来の味わいと安心をお届けできれば幸いです。</textarea>
+  <textarea class="field-textarea" id="shopAboutField"></textarea>
 </div>
 
 <div class="gap"></div>
@@ -420,18 +420,6 @@
 <div class="section-block">
   <div class="block-title">大切にしていること</div>
   <div class="kodawari-list" id="kodawariList">
-    <div class="kodawari-item">
-      <input type="text" value="農薬・化学肥料を使わない土づくり">
-      <button class="delete-btn" onclick="deleteKodawari(this)">×</button>
-    </div>
-    <div class="kodawari-item">
-      <input type="text" value="種から育てる在来種野菜">
-      <button class="delete-btn" onclick="deleteKodawari(this)">×</button>
-    </div>
-    <div class="kodawari-item">
-      <input type="text" value="季節と向き合う手仕事">
-      <button class="delete-btn" onclick="deleteKodawari(this)">×</button>
-    </div>
   </div>
   <button class="add-btn" onclick="addKodawari()">
     <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -524,21 +512,21 @@
     <label class="field-label">通常便（全国一律）</label>
     <div class="price-input-wrap">
       <span class="price-yen">¥</span>
-      <input class="field-input" type="number" value="800" inputmode="numeric">
+      <input class="field-input" type="number" value="800" id="shipNormalInput" inputmode="numeric">
     </div>
   </div>
   <div class="field">
     <label class="field-label">クール便・冷蔵（全国一律）</label>
     <div class="price-input-wrap">
       <span class="price-yen">¥</span>
-      <input class="field-input" type="number" value="1000" inputmode="numeric">
+      <input class="field-input" type="number" value="1000" id="shipColdInput" inputmode="numeric">
     </div>
   </div>
   <div class="field">
     <label class="field-label">クール便・冷凍（全国一律）</label>
     <div class="price-input-wrap">
       <span class="price-yen">¥</span>
-      <input class="field-input" type="number" value="1200" inputmode="numeric">
+      <input class="field-input" type="number" value="1200" id="shipFrozenInput" inputmode="numeric">
     </div>
   </div>
 
@@ -572,12 +560,90 @@
     </div>
     <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:var(--text-sub);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;"><polyline points="9 18 15 12 9 6"/></svg>
   </a>
+  <button onclick="sellerLogout()" style="width:100%;margin-top:10px;background:none;border:none;font-size:12px;color:#CC4444;padding:8px;cursor:pointer;">ログアウト</button>
 </div>
 
 <!-- TOAST -->
 <div class="toast" id="toast">保存しました ✓</div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
+  const SUPABASE_URL = 'https://uawhrpizzlchkvmzrjzo.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_FaOqUE1PDbo-fpT9KhkWaw__BShLngI';
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  let currentShopId = null;
+
+  function renderKodawariList(values) {
+    const list = document.getElementById('kodawariList');
+    list.innerHTML = (values || []).map(v => `
+      <div class="kodawari-item">
+        <input type="text" value="${v.replace(/"/g, '&quot;')}">
+        <button class="delete-btn" onclick="deleteKodawari(this)">×</button>
+      </div>
+    `).join('');
+  }
+
+  (async function initShopAdmin() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) {
+      window.location.href = 'komcho-market-seller-login.html';
+      return;
+    }
+
+    const { data: shop, error } = await supabaseClient
+      .from('shops')
+      .select('*')
+      .eq('owner_id', session.user.id)
+      .single();
+
+    if (error || !shop) {
+      window.location.href = 'komcho-market-seller-login.html';
+      return;
+    }
+
+    currentShopId = shop.id;
+    document.getElementById('shopNameField').value = shop.shop_name || '';
+    document.getElementById('shopAddressField').value = shop.address || '';
+    document.getElementById('shopAboutField').value = shop.about || '';
+    renderKodawariList(shop.values);
+    document.getElementById('shipNormalInput').value = shop.shipping_normal ?? 800;
+    document.getElementById('shipColdInput').value = shop.shipping_cold ?? 1000;
+    document.getElementById('shipFrozenInput').value = shop.shipping_frozen ?? 1200;
+    document.getElementById('freeShippingInput').value = shop.free_shipping_threshold ?? '';
+  })();
+
+  // 保存処理（実際にデータベースへ保存する）
+  async function saveShop() {
+    if (!currentShopId) return;
+
+    const values = Array.from(document.querySelectorAll('#kodawariList .kodawari-item input'))
+      .map(el => el.value.trim())
+      .filter(v => v.length > 0);
+
+    const freeShippingVal = document.getElementById('freeShippingInput').value;
+
+    const { error } = await supabaseClient.from('shops').update({
+      shop_name: document.getElementById('shopNameField').value.trim(),
+      address: document.getElementById('shopAddressField').value.trim(),
+      about: document.getElementById('shopAboutField').value.trim(),
+      values: values,
+      shipping_normal: parseInt(document.getElementById('shipNormalInput').value) || 0,
+      shipping_cold: parseInt(document.getElementById('shipColdInput').value) || 0,
+      shipping_frozen: parseInt(document.getElementById('shipFrozenInput').value) || 0,
+      free_shipping_threshold: freeShippingVal ? parseInt(freeShippingVal) : null
+    }).eq('id', currentShopId);
+
+    const toast = document.getElementById('toast');
+    if (error) {
+      toast.textContent = '保存に失敗しました';
+    } else {
+      toast.textContent = '保存しました ✓';
+    }
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2000);
+  }
+
   // こだわり追加
   function addKodawari() {
     const list = document.getElementById('kodawariList');
@@ -629,12 +695,13 @@
     });
   }
 
-  // 保存トースト
-  document.getElementById('saveBtn').addEventListener('click', () => {
-    const toast = document.getElementById('toast');
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 2000);
-  });
+  // 保存ボタン
+  document.getElementById('saveBtn').addEventListener('click', saveShop);
+
+  async function sellerLogout() {
+    await supabaseClient.auth.signOut();
+    window.location.href = 'komcho-market-seller-login.html';
+  }
 </script>
 </body>
 </html>
