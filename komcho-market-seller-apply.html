@@ -682,11 +682,23 @@
 
     const pendingReview = licenseRequired || oemRequired;
 
-    // ① 出店者アカウントを作成
+    // ① 出店者アカウントを作成（店舗情報も一緒に送り、裏側で自動的にshopsテーブルへ保存される）
     const { data: signUpData, error: signUpError } = await supabaseClient.auth.signUp({
       email: email,
       password: password,
-      options: { data: { role: 'seller', shop_name: shopName } }
+      options: {
+        data: {
+          role: 'seller',
+          business_type: businessType,
+          shop_name: shopName,
+          representative_name: repName,
+          postal_code: zip,
+          address: address,
+          phone: tel,
+          categories: selectedCategories,
+          status: pendingReview ? 'pending' : 'active'
+        }
+      }
     });
 
     if (signUpError) {
@@ -695,28 +707,6 @@
         msg = 'このメールアドレスは既に登録されています。';
       }
       errorBox.textContent = msg;
-      errorBox.classList.add('visible');
-      btn.disabled = false;
-      btn.innerHTML = originalLabel;
-      return;
-    }
-
-    // ② 店舗情報を保存
-    const { error: shopError } = await supabaseClient.from('shops').insert({
-      owner_id: signUpData.user.id,
-      business_type: businessType,
-      shop_name: shopName,
-      representative_name: repName,
-      postal_code: zip,
-      address: address,
-      phone: tel,
-      email: email,
-      categories: selectedCategories,
-      status: pendingReview ? 'pending' : 'active'
-    });
-
-    if (shopError) {
-      errorBox.textContent = '店舗情報の保存に失敗しました。お手数ですが運営までお問い合わせください。';
       errorBox.classList.add('visible');
       btn.disabled = false;
       btn.innerHTML = originalLabel;
