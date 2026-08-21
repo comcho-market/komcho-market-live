@@ -655,7 +655,7 @@
 <div class="toast" id="toast">保存しました ✓</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/heic-to@1.5.2/dist/iife/heic-to.js"></script>
 <script>
   const SUPABASE_URL = 'https://uawhrpizzlchkvmzrjzo.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_FaOqUE1PDbo-fpT9KhkWaw__BShLngI';
@@ -827,13 +827,13 @@
 
     if (isHeic) {
       try {
-        const convertedBlob = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.85 });
+        const convertedBlob = await HeicTo({ blob: file, type: 'image/jpeg', quality: 0.85 });
         uploadFile = new File([convertedBlob], 'photo.jpg', { type: 'image/jpeg' });
         ext = 'jpg';
       } catch (e) {
-        mainSlot.innerHTML = originalContent;
-        showToast('この写真を変換できませんでした。別の写真をお試しください');
-        return;
+        console.error('HEIC変換エラー:', e);
+        showToast('写真の変換に失敗したため、そのままアップロードします');
+        // 変換できなくても、元のファイルはそのままアップロードする（データを失わないため）
       }
     }
 
