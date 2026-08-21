@@ -535,6 +535,7 @@
 <div class="toast" id="toast">保存しました ✓</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
 <script>
   const SUPABASE_URL = 'https://uawhrpizzlchkvmzrjzo.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_FaOqUE1PDbo-fpT9KhkWaw__BShLngI';
@@ -637,12 +638,28 @@
     const originalContent = preview.innerHTML;
     preview.innerHTML = '<span style="font-size:11px;">アップロード中...</span>';
 
-    const ext = file.name.split('.').pop();
+    // iPhoneのHEIC形式はブラウザで表示できないため、JPEGに変換してからアップロードする
+    const isHeic = /\.(heic|heif)$/i.test(file.name) || file.type === 'image/heic' || file.type === 'image/heif';
+    let uploadFile = file;
+    let ext = file.name.split('.').pop().toLowerCase();
+
+    if (isHeic) {
+      try {
+        const convertedBlob = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.85 });
+        uploadFile = new File([convertedBlob], 'logo.jpg', { type: 'image/jpeg' });
+        ext = 'jpg';
+      } catch (e) {
+        preview.innerHTML = originalContent;
+        showToast('この写真を変換できませんでした。別の写真をお試しください');
+        return;
+      }
+    }
+
     const filePath = `logos/${currentShopId}.${ext}`;
 
     const { error: uploadError } = await supabaseClient.storage
       .from('shop-images')
-      .upload(filePath, file, { upsert: true });
+      .upload(filePath, uploadFile, { upsert: true });
 
     if (uploadError) {
       preview.innerHTML = originalContent;
