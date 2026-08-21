@@ -168,6 +168,13 @@
     font-size: 9px; font-weight: 700;
     text-align: center; padding: 3px 0;
   }
+  .photo-remove-btn {
+    position: absolute; top: 4px; right: 4px;
+    width: 20px; height: 20px; border-radius: 50%;
+    background: rgba(0,0,0,0.55); color: #fff;
+    font-size: 13px; line-height: 20px; text-align: center;
+    z-index: 2;
+  }
 
   /* PRICE ROW */
   .price-input-wrap {
@@ -394,34 +401,34 @@
 <!-- ① 商品写真 -->
 <div class="section-block">
   <div class="block-title">商品写真</div>
-  <div class="photo-upload-grid">
-    <div class="photo-slot">
+  <div class="photo-upload-grid" id="photoUploadGrid">
+    <div class="photo-slot" id="mainPhotoSlot">
       <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       <span>メイン写真</span>
       <div class="main-label">メイン</div>
     </div>
-    <div class="photo-slot">
+    <div class="photo-slot sub-photo-slot" data-index="0">
       <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       <span>追加</span>
     </div>
-    <div class="photo-slot">
+    <div class="photo-slot sub-photo-slot" data-index="1">
       <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       <span>追加</span>
     </div>
-    <div class="photo-slot">
+    <div class="photo-slot sub-photo-slot" data-index="2">
       <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       <span>追加</span>
     </div>
-    <div class="photo-slot">
+    <div class="photo-slot sub-photo-slot" data-index="3">
       <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       <span>追加</span>
     </div>
-    <div class="photo-slot">
+    <div class="photo-slot sub-photo-slot" data-index="4">
       <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       <span>追加</span>
     </div>
   </div>
-  <p class="field-hint" style="margin-top:10px;">最大5枚まで。1枚目がメイン表示になります。</p>
+  <p class="field-hint" style="margin-top:10px;">最大6枚まで（メイン1枚＋追加5枚）。写真をタップして追加、写真をタップして×印で削除できます。</p>
 </div>
 
 <div class="gap"></div>
@@ -665,6 +672,7 @@
   const productId = urlParams.get('id'); // nullなら新規追加
   let currentShopId = null;
   let mainImageUrl = null; // アップロード済みのメイン画像URL
+  let subImages = [null, null, null, null, null]; // 追加写真5枚分
 
   // 在庫数
   let stock = 0;
@@ -792,11 +800,17 @@
     const noteInput = document.querySelector('.section-block .field-input[placeholder*="発送します"]');
     if (noteInput) noteInput.value = p.shipping_note || '';
 
-    // メイン写真プレビュー
+    // 写真プレビュー
     if (p.image_url) {
       mainImageUrl = p.image_url;
-      const mainSlot = document.querySelector('.photo-slot:first-child');
-      mainSlot.innerHTML = `<img src="${p.image_url}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;"><div class="main-label">メイン</div>`;
+      renderPhotoSlot(document.getElementById('mainPhotoSlot'), p.image_url, true);
+    }
+    if (Array.isArray(p.images)) {
+      p.images.slice(0, 5).forEach((url, i) => {
+        subImages[i] = url;
+        const slot = document.querySelector(`.sub-photo-slot[data-index="${i}"]`);
+        if (slot) renderPhotoSlot(slot, url, false);
+      });
     }
 
     // 削除ボタンを有効化（新規時は削除不要）
@@ -805,20 +819,59 @@
     delBtn.setAttribute('onclick', `deleteProduct('${p.id}')`);
   }
 
-  // メイン写真クリックでファイル選択→アップロード
-  document.querySelector('.photo-slot:first-child').addEventListener('click', () => {
+  // 写真スロットに画像＋削除ボタンを表示する共通関数
+  function renderPhotoSlot(slotEl, url, isMain) {
+    const label = isMain ? '<div class="main-label">メイン</div>' : '';
+    slotEl.innerHTML = `
+      <img src="${url}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;">
+      <div class="photo-remove-btn" data-remove="${isMain ? 'main' : slotEl.dataset.index}">×</div>
+      ${label}
+    `;
+  }
+
+  // 写真スロットを空の状態（+追加）に戻す共通関数
+  function renderEmptySlot(slotEl, isMain) {
+    slotEl.innerHTML = `
+      <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <span>${isMain ? 'メイン写真' : '追加'}</span>
+      ${isMain ? '<div class="main-label">メイン</div>' : ''}
+    `;
+  }
+
+  // メイン写真・追加写真、共通のクリック処理（削除ボタンなら削除、それ以外なら追加）
+  document.getElementById('photoUploadGrid').addEventListener('click', (e) => {
+    const removeBtn = e.target.closest('.photo-remove-btn');
+    if (removeBtn) {
+      e.stopPropagation();
+      const key = removeBtn.dataset.remove;
+      if (key === 'main') {
+        mainImageUrl = null;
+        renderEmptySlot(document.getElementById('mainPhotoSlot'), true);
+      } else {
+        subImages[parseInt(key)] = null;
+        const slot = document.querySelector(`.sub-photo-slot[data-index="${key}"]`);
+        if (slot) renderEmptySlot(slot, false);
+      }
+      return;
+    }
+
+    const slot = e.target.closest('.photo-slot');
+    if (!slot) return;
+    const isMain = slot.id === 'mainPhotoSlot';
+    const index = isMain ? null : parseInt(slot.dataset.index);
+
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
-    input.onchange = (e) => uploadMainPhoto(e.target.files[0]);
+    input.onchange = (ev) => uploadPhoto(ev.target.files[0], slot, isMain, index);
     input.click();
   });
 
-  async function uploadMainPhoto(file) {
+  // 写真アップロード共通処理（メイン・追加どちらも使う）
+  async function uploadPhoto(file, slotEl, isMain, index) {
     if (!file || !currentShopId) return;
-    const mainSlot = document.querySelector('.photo-slot:first-child');
-    const originalContent = mainSlot.innerHTML;
-    mainSlot.innerHTML = '<span style="font-size:10px;">アップロード中...</span>';
+    const originalContent = slotEl.innerHTML;
+    slotEl.innerHTML = '<span style="font-size:10px;">アップロード中...</span>';
 
     // iPhoneのHEIC形式はブラウザで表示できないため、JPEGに変換してからアップロードする
     const isHeic = /\.(heic|heif)$/i.test(file.name) || file.type === 'image/heic' || file.type === 'image/heif';
@@ -837,22 +890,27 @@
       }
     }
 
-    const filePath = `${currentShopId}/${Date.now()}.${ext}`;
+    const filePath = `${currentShopId}/${Date.now()}_${isMain ? 'main' : index}.${ext}`;
 
     const { error: uploadError } = await supabaseClient.storage
       .from('product-images')
       .upload(filePath, uploadFile, { upsert: true });
 
     if (uploadError) {
-      mainSlot.innerHTML = originalContent;
+      slotEl.innerHTML = originalContent;
       showToast('画像のアップロードに失敗しました');
       return;
     }
 
     const { data: urlData } = supabaseClient.storage.from('product-images').getPublicUrl(filePath);
-    mainImageUrl = urlData.publicUrl + '?t=' + Date.now();
+    const publicUrl = urlData.publicUrl + '?t=' + Date.now();
 
-    mainSlot.innerHTML = `<img src="${mainImageUrl}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;"><div class="main-label">メイン</div>`;
+    if (isMain) {
+      mainImageUrl = publicUrl;
+    } else {
+      subImages[index] = publicUrl;
+    }
+    renderPhotoSlot(slotEl, publicUrl, isMain);
   }
 
   // 保存（新規作成 or 更新）
@@ -895,6 +953,7 @@
       tags,
       allergies,
       image_url: mainImageUrl,
+      images: subImages.filter(Boolean),
       volume: infoInputs[0]?.value.trim() || null,
       ingredients: infoInputs[1]?.value.trim() || null,
       expiry: infoInputs[2]?.value.trim() || null,
