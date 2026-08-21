@@ -347,12 +347,6 @@
     transition: opacity 0.2s; white-space: nowrap;
   }
   .toast.show { opacity: 1; }
-  /* ============ DESKTOP (≥900px) ============ */
-  @media (min-width: 900px) {
-    body { max-width: 720px; padding-bottom: 40px; }
-    .header { padding: 16px 32px; }
-    .bottom-nav { display: none; }
-  }
 </style>
 </head>
 <body>
@@ -362,12 +356,12 @@
   <button class="header-back" onclick="history.back()">
     <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
   </button>
-  <a class="header-logo" href="komcho-market-top.html">
+  <div class="header-logo">
     <svg class="logo-icon" viewBox="0 0 60 48">
       <path transform="translate(30,24)" d="M -26 7 C -17 -17 5 -24 24 -10 C 12 5 -2 19 -21 24"/>
     </svg>
     <span class="logo-text">こむちょマーケット</span>
-  </a>
+  </div>
   <div class="header-spacer"></div>
 </header>
 
@@ -559,7 +553,7 @@
 
 <!-- 再注文 -->
 <div class="reorder-block">
-  <button class="reorder-btn" onclick="showToast('カゴに追加しました'); setTimeout(() => { window.location.href='komcho-market-cart.html'; }, 800)">
+  <button class="reorder-btn" onclick="showToast('カゴに追加しました')">
     同じ商品を再注文する
   </button>
 </div>
@@ -569,7 +563,7 @@
   <div class="contact-note">
     商品や配送について、ご不明な点がございましたらお気軽にお問い合わせください。
   </div>
-  <button class="contact-btn" onclick="window.location.href='komcho-market-shop-contact.html'">
+  <button class="contact-btn">
     <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
     〇〇農園にお問い合わせ
   </button>
@@ -577,26 +571,26 @@
 
 <!-- BOTTOM NAV -->
 <nav class="bottom-nav">
-  <a class="nav-item" href="komcho-market-top.html">
+  <div class="nav-item">
     <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
     <span>ホーム</span>
-  </a>
-  <a class="nav-item" href="komcho-market-search.html">
+  </div>
+  <div class="nav-item">
     <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
     <span>探す</span>
-  </a>
-  <a class="nav-item" href="komcho-market-mypage.html">
+  </div>
+  <div class="nav-item">
     <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
     <span>お気に入り</span>
-  </a>
-  <a class="nav-item" href="komcho-market-cart.html">
+  </div>
+  <div class="nav-item">
     <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
     <span>カゴ</span>
-  </a>
-  <a class="nav-item active" href="komcho-market-top.html">
+  </div>
+  <div class="nav-item active">
     <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
     <span>マイページ</span>
-  </a>
+  </div>
 </nav>
 
 <!-- TOAST -->

@@ -335,36 +335,21 @@
   .nav-item.active .nav-home-icon {
     fill: var(--green-dark); stroke: var(--green-dark);
   }
-
-  /* ============ DESKTOP (≥900px) ============ */
-  @media (min-width: 900px) {
-    body { max-width: 1160px; padding-bottom: 40px; }
-    .header { padding: 12px 40px; }
-
-    .shop-top { padding: 36px 40px 28px; }
-    .section-block { padding: 28px 40px; border-radius: 16px; margin-bottom: 12px; border-bottom: none; box-shadow: var(--shadow-card); }
-    .shop-info-row { padding: 16px 40px; border-radius: 16px; margin-bottom: 12px; border-bottom: none; box-shadow: var(--shadow-card); }
-    .contact-wrap { padding-left: 40px; padding-right: 40px; }
-
-    .products-grid { grid-template-columns: repeat(4, 1fr); gap: 18px; }
-
-    .bottom-nav { display: none; }
-  }
 </style>
 </head>
 <body>
 
 <!-- HEADER -->
 <header class="header">
-  <button class="header-back" onclick="history.back()">
+  <button class="header-back">
     <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
   </button>
-  <a class="header-logo" href="komcho-market-top.html">
+  <div class="header-logo">
     <svg class="logo-icon" viewBox="0 0 60 48">
       <path transform="translate(30,24)" d="M -26 7 C -17 -17 5 -24 24 -10 C 12 5 -2 19 -21 24"/>
     </svg>
     <span class="logo-text">こむちょマーケット</span>
-  </a>
+  </div>
   <div class="header-icons">
     <svg viewBox="0 0 24 24"><path class="heart-active" d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
     <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
@@ -452,7 +437,7 @@
   </div>
 
   <div class="products-grid">
-    <a class="product-card" href="komcho-market-product.html" style="text-decoration:none;color:inherit;display:block;">
+    <div class="product-card">
       <div class="new-badge">NEW</div>
       <div class="product-img g1">🍯
         <button class="wish-btn">
@@ -461,9 +446,11 @@
       </div>
       <div class="product-info">
         <div class="product-name-sm">完熟梅の無添加シロップ</div>
-        <div class="product-price-sm">¥1,800</div></div></a>
+        <div class="product-price-sm">¥1,800</div>
+      </div>
+    </div>
 
-    <a class="product-card" href="komcho-market-product.html" style="text-decoration:none;color:inherit;display:block;">
+    <div class="product-card">
       <div class="product-img g2">🥕
         <button class="wish-btn active">
           <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
@@ -471,9 +458,11 @@
       </div>
       <div class="product-info">
         <div class="product-name-sm">季節の野菜セット（S）</div>
-        <div class="product-price-sm">¥3,200</div></div></a>
+        <div class="product-price-sm">¥3,200</div>
+      </div>
+    </div>
 
-    <a class="product-card" href="komcho-market-product.html" style="text-decoration:none;color:inherit;display:block;">
+    <div class="product-card">
       <div class="product-img g3">🌾
         <button class="wish-btn">
           <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
@@ -481,9 +470,11 @@
       </div>
       <div class="product-info">
         <div class="product-name-sm">無農薬コシヒカリ玄米 2kg</div>
-        <div class="product-price-sm">¥2,100</div></div></a>
+        <div class="product-price-sm">¥2,100</div>
+      </div>
+    </div>
 
-    <a class="product-card" href="komcho-market-product.html" style="text-decoration:none;color:inherit;display:block;">
+    <div class="product-card">
       <div class="product-img g4">🫙
         <button class="wish-btn active">
           <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
@@ -491,7 +482,9 @@
       </div>
       <div class="product-info">
         <div class="product-name-sm">手作り干し柿（5個入り）</div>
-        <div class="product-price-sm">¥1,500</div></div></a>
+        <div class="product-price-sm">¥1,500</div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -499,7 +492,7 @@
 
 <!-- CONTACT -->
 <div class="contact-wrap">
-  <button class="contact-btn" onclick="window.location.href='komcho-market-shop-contact.html'">
+  <button class="contact-btn">
     <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
     この店舗にお問い合わせ
   </button>
@@ -507,26 +500,26 @@
 
 <!-- BOTTOM NAV -->
 <nav class="bottom-nav">
-  <a class="nav-item" href="komcho-market-top.html">
+  <div class="nav-item">
     <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
     <span>ホーム</span>
-  </a>
-  <a class="nav-item" href="komcho-market-search.html">
+  </div>
+  <div class="nav-item">
     <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
     <span>探す</span>
-  </a>
-  <a class="nav-item" href="komcho-market-mypage.html">
+  </div>
+  <div class="nav-item">
     <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
     <span>お気に入り</span>
-  </a>
-  <a class="nav-item" href="komcho-market-cart.html">
+  </div>
+  <div class="nav-item">
     <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
     <span>カゴ</span>
-  </a>
-  <a class="nav-item" href="komcho-market-orders.html">
+  </div>
+  <div class="nav-item">
     <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
     <span>履歴</span>
-  </a>
+  </div>
 </nav>
 
 <script>

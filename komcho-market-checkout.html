@@ -456,19 +456,6 @@
     background: var(--green-dark); color: #fff;
     font-size: 13px; font-weight: 700; cursor: pointer; border: none;
   }
-  /* ============ DESKTOP (≥900px) ============ */
-  @media (min-width: 900px) {
-    body { max-width: 720px; padding-bottom: 40px; }
-    .header { padding: 16px 32px; }
-
-    .bottom-cta {
-      left: auto; right: 32px; transform: none;
-      width: 300px; max-width: 300px;
-      border-top: none; border-radius: 16px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.14);
-      bottom: 24px; padding: 18px 20px 20px;
-    }
-  }
 </style>
 </head>
 <body>
@@ -478,12 +465,12 @@
   <button class="header-back" onclick="history.back()">
     <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
   </button>
-  <a class="header-logo" href="komcho-market-top.html">
+  <div class="header-logo">
     <svg class="logo-icon" viewBox="0 0 60 48">
       <path transform="translate(30,24)" d="M -26 7 C -17 -17 5 -24 24 -10 C 12 5 -2 19 -21 24"/>
     </svg>
     <span class="logo-text">こむちょマーケット</span>
-  </a>
+  </div>
   <div class="header-step">〇〇農園</div>
 </header>
 
@@ -519,7 +506,20 @@
 
     <!-- 登録済み住所（会員のみ表示） -->
     <div class="address-options" id="addressOptions">
-      <div style="padding:8px 0; font-size:12px; color:var(--text-sub);">読み込み中...</div>
+      <div class="address-option selected" onclick="selectAddress(this)">
+        <div class="radio-circle"></div>
+        <div class="address-option-body">
+          <div class="address-option-name">山田 花子 <span class="address-default-badge">デフォルト</span></div>
+          <div class="address-option-text">〒604-0000<br>京都府京都市中京区○○町1-2-3<br>090-0000-0000</div>
+        </div>
+      </div>
+      <div class="address-option" onclick="selectAddress(this)">
+        <div class="radio-circle"></div>
+        <div class="address-option-body">
+          <div class="address-option-name">山田 太郎（実家）</div>
+          <div class="address-option-text">〒615-0000<br>京都府京都市西京区△△町4-5<br>075-000-0000</div>
+        </div>
+      </div>
     </div>
 
     <!-- 新しい住所を追加 -->
@@ -532,32 +532,32 @@
       <div class="form-row">
         <div class="form-field">
           <label class="form-label form-label-req">姓</label>
-          <input class="form-input" type="text" placeholder="山田" id="newAddrLastName">
+          <input class="form-input" type="text" placeholder="山田">
         </div>
         <div class="form-field">
           <label class="form-label form-label-req">名</label>
-          <input class="form-input" type="text" placeholder="花子" id="newAddrFirstName">
+          <input class="form-input" type="text" placeholder="花子">
         </div>
       </div>
       <div class="form-field">
         <label class="form-label form-label-req">郵便番号</label>
-        <input class="form-input" type="text" placeholder="000-0000" inputmode="numeric" maxlength="8" id="newAddrPostal">
+        <input class="form-input" type="text" placeholder="000-0000" inputmode="numeric" maxlength="8">
       </div>
       <div class="form-field">
         <label class="form-label form-label-req">都道府県</label>
-        <input class="form-input" type="text" placeholder="京都府" id="newAddrPrefecture">
+        <input class="form-input" type="text" placeholder="京都府">
       </div>
       <div class="form-field">
         <label class="form-label form-label-req">市区町村・番地</label>
-        <input class="form-input" type="text" placeholder="京都市中京区○○町1-2-3" id="newAddrLine">
+        <input class="form-input" type="text" placeholder="京都市中京区○○町1-2-3">
       </div>
       <div class="form-field">
         <label class="form-label">建物名・部屋番号（任意）</label>
-        <input class="form-input" type="text" placeholder="○○マンション 101号室" id="newAddrBuilding">
+        <input class="form-input" type="text" placeholder="○○マンション 101号室">
       </div>
       <div class="form-field">
         <label class="form-label form-label-req">電話番号</label>
-        <input class="form-input" type="tel" placeholder="090-0000-0000" inputmode="tel" id="newAddrPhone">
+        <input class="form-input" type="tel" placeholder="090-0000-0000" inputmode="tel">
       </div>
       <!-- 住所保存チェック -->
       <label class="save-check-wrap">
@@ -773,7 +773,7 @@
       今回の購入で<strong>30pt</strong>が発生しています。<br>
       会員登録すると次回のお買い物に使えます。登録は無料・1分で完了！
     </div>
-    <button class="guest-prompt-btn" onclick="window.location.href='komcho-market-terms.html'">無料で会員登録する</button>
+    <button class="guest-prompt-btn">無料で会員登録する</button>
   </div>
 
   <button class="complete-btn" onclick="goHome()">ショッピングを続ける</button>
@@ -795,82 +795,6 @@
   </button>
   <div class="order-note">「注文を確定する」を押すと購入が確定します</div>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script>
-  const SUPABASE_URL = 'https://uawhrpizzlchkvmzrjzo.supabase.co';
-  const SUPABASE_KEY = 'sb_publishable_FaOqUE1PDbo-fpT9KhkWaw__BShLngI';
-  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-  let savedAddresses = [];
-
-  // 登録済み住所の読み込み（ログイン中の場合のみ）
-  async function loadSavedAddresses() {
-    const { data: { session } } = await supabaseClient.auth.getSession();
-    const wrap = document.getElementById('addressOptions');
-
-    if (!session) {
-      // ゲストの場合は新規入力フォームを開いて表示
-      wrap.innerHTML = '';
-      document.getElementById('newAddressForm').classList.add('open');
-      document.getElementById('saveAddress').checked = false;
-      document.getElementById('saveAddress').closest('.save-check-wrap').style.display = 'none';
-      return;
-    }
-
-    const { data: addresses } = await supabaseClient
-      .from('addresses')
-      .select('*')
-      .eq('user_id', session.user.id)
-      .order('is_default', { ascending: false })
-      .order('created_at', { ascending: true });
-
-    savedAddresses = addresses || [];
-
-    if (savedAddresses.length === 0) {
-      wrap.innerHTML = '';
-      document.getElementById('newAddressForm').classList.add('open');
-      return;
-    }
-
-    wrap.innerHTML = savedAddresses.map((addr, i) => `
-      <div class="address-option ${i === 0 ? 'selected' : ''}" onclick="selectAddress(this)" data-address-id="${addr.id}">
-        <div class="radio-circle"></div>
-        <div class="address-option-body">
-          <div class="address-option-name">${addr.name} ${addr.is_default ? '<span class="address-default-badge">デフォルト</span>' : ''}</div>
-          <div class="address-option-text">〒${addr.postal_code || ''}<br>${addr.prefecture || ''}${addr.address_line || ''}${addr.building ? '<br>' + addr.building : ''}<br>${addr.phone || ''}</div>
-        </div>
-      </div>
-    `).join('');
-  }
-  loadSavedAddresses();
-
-  // 新しい住所をデータベースに保存（会員かつチェック済みの場合）
-  async function saveNewAddressIfNeeded() {
-    const form = document.getElementById('newAddressForm');
-    if (!form.classList.contains('open')) return;
-    if (!document.getElementById('saveAddress').checked) return;
-
-    const { data: { session } } = await supabaseClient.auth.getSession();
-    if (!session) return;
-
-    const lastName = document.getElementById('newAddrLastName').value.trim();
-    const firstName = document.getElementById('newAddrFirstName').value.trim();
-    const addressLine = document.getElementById('newAddrLine').value.trim();
-    if (!lastName || !addressLine) return;
-
-    await supabaseClient.from('addresses').insert({
-      user_id: session.user.id,
-      name: (lastName + ' ' + firstName).trim(),
-      postal_code: document.getElementById('newAddrPostal').value.trim(),
-      prefecture: document.getElementById('newAddrPrefecture').value.trim(),
-      address_line: addressLine,
-      building: document.getElementById('newAddrBuilding').value.trim(),
-      phone: document.getElementById('newAddrPhone').value.trim(),
-      is_default: savedAddresses.length === 0
-    });
-  }
-</script>
 
 <script>
   const POINT_BALANCE = 1240;
@@ -966,9 +890,7 @@
   }
 
   // 注文確定
-  async function placeOrder() {
-    await saveNewAddressIfNeeded();
-
+  function placeOrder() {
     // ステップバー更新
     document.querySelectorAll('.step-circle').forEach((el, i) => {
       el.className = 'step-circle ' + (i < 2 ? 'done' : 'active');
@@ -984,8 +906,8 @@
     window.scrollTo({ top: 0 });
   }
 
-  function goHome() { window.location.href = 'komcho-market-top.html'; }
-  function goOrders() { window.location.href = 'komcho-market-orders.html'; }
+  function goHome() { alert('TOPページへ移動します'); }
+  function goOrders() { alert('注文履歴へ移動します'); }
 </script>
 </body>
 </html>

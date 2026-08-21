@@ -369,28 +369,18 @@
     transition: opacity 0.2s; white-space: nowrap;
   }
   .toast.show { opacity: 1; }
-
-  /* ============ DESKTOP (≥900px) ============ */
-  @media (min-width: 900px) {
-    body { max-width: 720px; padding-bottom: 40px; }
-    .header { padding: 16px 32px; }
-    .shop-cart-block { border-radius: 16px; margin-bottom: 16px; border-bottom: none; box-shadow: var(--shadow-card); overflow: hidden; }
-    .guest-notice { margin-left: 32px; margin-right: 32px; }
-    .continue-wrap { padding-left: 32px; padding-right: 32px; }
-    .bottom-nav { display: none; }
-  }
 </style>
 </head>
 <body>
 
 <!-- HEADER -->
 <header class="header">
-  <a class="header-logo" href="komcho-market-top.html">
+  <div class="header-logo">
     <svg class="logo-icon" viewBox="0 0 60 48">
       <path transform="translate(30,24)" d="M -26 7 C -17 -17 5 -24 24 -10 C 12 5 -2 19 -21 24"/>
     </svg>
     <span class="logo-text">こむちょマーケット</span>
-  </a>
+  </div>
   <div class="header-title">カゴ</div>
   <div class="header-spacer"></div>
 </header>
@@ -398,21 +388,22 @@
 <!-- ===== 店舗①：〇〇農園 ===== -->
 <div class="shop-cart-block" id="shop1">
   <div class="shop-cart-header">
-    <a href="komcho-market-shop.html" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;"><div class="shop-cart-logo">SHOP<br>LOGO</div><div class="shop-cart-name">〇〇農園</div></a>
+    <div class="shop-cart-logo">SHOP<br>LOGO</div>
+    <div class="shop-cart-name">〇〇農園</div>
     <div class="shop-cart-count" id="shop1Count">2点</div>
   </div>
 
   <div class="cart-items" id="shop1Items">
 
     <div class="cart-item" data-id="s1-1" data-price="1800" data-shop="1">
-      <a href="komcho-market-product.html" class="cart-item-img g1" style="display:flex;align-items:center;justify-content:center;text-decoration:none;">🫙</a>
+      <div class="cart-item-img g1">🫙</div>
       <div class="cart-item-info">
-        <a href="komcho-market-product.html" style="text-decoration:none;color:inherit;display:block;"><div class="cart-item-name">無添加 自家製味噌 500g</div>
+        <div class="cart-item-name">無添加 自家製味噌 500g</div>
         <div class="cart-item-tags">
           <span class="cart-item-tag">砂糖不使用</span>
           <span class="cart-item-tag">国産100%</span>
         </div>
-        <div class="cart-item-price" id="price-s1-1">¥1,800</div></a>
+        <div class="cart-item-price" id="price-s1-1">¥1,800</div>
         <div class="cart-item-controls">
           <button class="qty-btn" onclick="changeQty('s1-1', -1)">－</button>
           <div class="qty-num" id="qty-s1-1">1</div>
@@ -425,13 +416,13 @@
     </div>
 
     <div class="cart-item" data-id="s1-2" data-price="3200" data-shop="1">
-      <a href="komcho-market-product.html" class="cart-item-img g2" style="display:flex;align-items:center;justify-content:center;text-decoration:none;">🥕</a>
+      <div class="cart-item-img g2">🥕</div>
       <div class="cart-item-info">
-        <a href="komcho-market-product.html" style="text-decoration:none;color:inherit;display:block;"><div class="cart-item-name">季節の野菜セット（S）</div>
+        <div class="cart-item-name">季節の野菜セット（S）</div>
         <div class="cart-item-tags">
           <span class="cart-item-tag">無農薬</span>
         </div>
-        <div class="cart-item-price" id="price-s1-2">¥3,200</div></a>
+        <div class="cart-item-price" id="price-s1-2">¥3,200</div>
         <div class="cart-item-controls">
           <button class="qty-btn" onclick="changeQty('s1-2', -1)">－</button>
           <div class="qty-num" id="qty-s1-2">1</div>
@@ -482,20 +473,21 @@
 <!-- ===== 店舗②：京の茶屋 ===== -->
 <div class="shop-cart-block" id="shop2">
   <div class="shop-cart-header">
-    <a href="komcho-market-shop.html" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;"><div class="shop-cart-logo">SHOP<br>LOGO</div><div class="shop-cart-name">京の茶屋</div></a>
+    <div class="shop-cart-logo">SHOP<br>LOGO</div>
+    <div class="shop-cart-name">京の茶屋</div>
     <div class="shop-cart-count" id="shop2Count">1点</div>
   </div>
 
   <div class="cart-items" id="shop2Items">
 
     <div class="cart-item" data-id="s2-1" data-price="1080" data-shop="2">
-      <a href="komcho-market-product.html" class="cart-item-img g3" style="display:flex;align-items:center;justify-content:center;text-decoration:none;">🍵</a>
+      <div class="cart-item-img g3">🍵</div>
       <div class="cart-item-info">
-        <a href="komcho-market-product.html" style="text-decoration:none;color:inherit;display:block;"><div class="cart-item-name">無農薬ほうじ茶 100g</div>
+        <div class="cart-item-name">無農薬ほうじ茶 100g</div>
         <div class="cart-item-tags">
           <span class="cart-item-tag">無農薬</span>
         </div>
-        <div class="cart-item-price" id="price-s2-1">¥1,080</div></a>
+        <div class="cart-item-price" id="price-s2-1">¥1,080</div>
         <div class="cart-item-controls">
           <button class="qty-btn" onclick="changeQty('s2-1', -1)">－</button>
           <div class="qty-num" id="qty-s2-1">1</div>
@@ -549,15 +541,15 @@
   <div class="guest-notice-text">
     今回の購入でポイントを貯めるには会員登録が必要です。登録は無料・1分で完了します。
   </div>
-  <a class="guest-notice-btn" href="komcho-market-terms.html" style="text-decoration:none;">無料で会員登録する</a>
+  <span class="guest-notice-btn">無料で会員登録する</span>
 </div>
 
 <!-- 買い物を続ける -->
 <div class="continue-wrap">
-  <a class="continue-link" href="komcho-market-search.html" onclick="if(document.referrer && document.referrer.includes('komcho-market')){history.back(); return false;}" style="text-decoration:none;">
+  <div class="continue-link">
     <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
     買い物を続ける
-  </a>
+  </div>
 </div>
 
 <!-- カラの状態（初期は非表示） -->
@@ -565,34 +557,34 @@
   <div class="empty-icon">🛒</div>
   <div class="empty-title">カゴに商品がありません</div>
   <div class="empty-sub">気になる商品を見つけて<br>カゴに入れてみましょう</div>
-  <button class="empty-btn" onclick="window.location.href='komcho-market-search.html'">商品を探す</button>
+  <button class="empty-btn">商品を探す</button>
 </div>
 
 <!-- BOTTOM NAV -->
 <nav class="bottom-nav">
-  <a class="nav-item" href="komcho-market-top.html">
+  <div class="nav-item">
     <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
     <span>ホーム</span>
-  </a>
-  <a class="nav-item" href="komcho-market-search.html">
+  </div>
+  <div class="nav-item">
     <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
     <span>探す</span>
-  </a>
-  <a class="nav-item" href="komcho-market-mypage.html">
+  </div>
+  <div class="nav-item">
     <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
     <span>お気に入り</span>
-  </a>
-  <a class="nav-item active" href="komcho-market-top.html">
+  </div>
+  <div class="nav-item active">
     <div class="cart-wrap">
       <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-      <div class="cart-badge" id="cartBadge">3</a>
+      <div class="cart-badge" id="cartBadge">3</div>
     </div>
     <span>カゴ</span>
   </div>
-  <a class="nav-item" href="komcho-market-top.html">
+  <div class="nav-item">
     <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
     <span>マイページ</span>
-  </a>
+  </div>
 </nav>
 
 <!-- TOAST -->
@@ -677,7 +669,7 @@
   }
 
   function goCheckout(shopNum) {
-    window.location.href = 'komcho-market-checkout.html';
+    showToast(shopConfig[shopNum].name + 'の注文手続きへ進みます');
   }
 
   function showToast(msg) {

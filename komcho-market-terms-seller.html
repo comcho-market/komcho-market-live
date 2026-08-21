@@ -154,22 +154,17 @@
   .agree-btn.active:active { opacity: 0.85; }
 
   /* BOTTOM NAV なし（管理・出店者向けページ） */
-  /* ============ DESKTOP (≥900px) ============ */
-  @media (min-width: 900px) {
-    body { max-width: 720px; padding-bottom: 40px; }
-    .header { padding: 16px 32px; }
-  }
 </style>
 </head>
 <body>
 
 <header class="header">
-  <a class="header-logo" href="komcho-market-top.html">
+  <div class="header-logo">
     <svg class="logo-icon" viewBox="0 0 60 48">
       <path transform="translate(30,24)" d="M -26 7 C -17 -17 5 -24 24 -10 C 12 5 -2 19 -21 24"/>
     </svg>
     <span class="logo-text">こむちょマーケット</span>
-  </a>
+  </div>
   <div class="header-title">出店者規約</div>
   <div class="header-spacer"></div>
 </header>
@@ -379,7 +374,7 @@ function toggleBtn() {
   btn.disabled = !checked;
 }
 function handleAgree() {
-  window.location.href = 'komcho-market-seller-apply.html';
+  alert('ご同意ありがとうございます。出店申請フォームへ進みます。');
 }
 </script>
 </body>
