@@ -460,42 +460,9 @@
 <!-- ⑥ 商品管理 -->
 <div class="section-block">
   <div class="block-title">商品管理</div>
-  <div class="products-admin-list">
-    <a class="product-admin-item" href="komcho-market-product-admin.html" style="text-decoration:none;color:inherit;display:flex;">
-      <div class="product-admin-thumb g1">🍯</div>
-      <div class="product-admin-info">
-        <div class="product-admin-name">完熟梅の無添加シロップ</div>
-        <div class="product-admin-price">¥1,800</div>
-        <div class="product-admin-badges"><span class="badge-new">NEW</span></div>
-      </div>
-      <div class="edit-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
-    </div>
-    <div class="product-admin-item">
-      <div class="product-admin-thumb g2">🥕</div>
-      <div class="product-admin-info">
-        <div class="product-admin-name">季節の野菜セット（S）</div>
-        <div class="product-admin-price">¥3,200</div>
-        <div class="product-admin-badges"></div>
-      </div>
-      <div class="edit-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
-    </div>
-    <div class="product-admin-item">
-      <div class="product-admin-thumb g3">🌾</div>
-      <div class="product-admin-info">
-        <div class="product-admin-name">無農薬コシヒカリ玄米 2kg</div>
-        <div class="product-admin-price">¥2,100</div>
-        <div class="product-admin-badges"><span class="badge-soldout">売り切れ</span></div>
-      </div>
-      <div class="edit-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
-    </div>
-    <div class="product-admin-item">
-      <div class="product-admin-thumb g4">🫙</div>
-      <div class="product-admin-info">
-        <div class="product-admin-name">手作り干し柿（5個入り）</div>
-        <div class="product-admin-price">¥1,500</div>
-        <div class="product-admin-badges"></div>
-      </div>
-      <div class="edit-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div></div></a>
+  <div class="products-admin-list" id="productsAdminList">
+    <p style="font-size:12px;color:var(--text-sub);padding:8px 0;">読み込み中...</p>
+  </div>
   <button class="add-product-btn" onclick="window.location.href='komcho-market-product-admin.html'">
     <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
     商品を追加する
@@ -616,7 +583,50 @@
     if (shop.logo_url) {
       document.getElementById('logoPreview').innerHTML = `<img src="${shop.logo_url}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">`;
     }
+
+    loadProducts();
   })();
+
+  // 商品一覧を読み込んで表示
+  const productThumbClasses = ['g1', 'g2', 'g3', 'g4'];
+  async function loadProducts() {
+    const listEl = document.getElementById('productsAdminList');
+    const { data: products, error } = await supabaseClient
+      .from('products')
+      .select('*')
+      .eq('shop_id', currentShopId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      listEl.innerHTML = '<p style="font-size:12px;color:var(--text-sub);padding:8px 0;">商品の読み込みに失敗しました</p>';
+      return;
+    }
+
+    if (!products || products.length === 0) {
+      listEl.innerHTML = '<p style="font-size:12px;color:var(--text-sub);padding:8px 0;">まだ商品が登録されていません</p>';
+      return;
+    }
+
+    listEl.innerHTML = products.map((p, i) => {
+      const thumbClass = productThumbClasses[i % productThumbClasses.length];
+      const thumbInner = p.image_url
+        ? `<img src="${p.image_url}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">`
+        : '🛍️';
+      const soldOutBadge = (p.stock ?? 0) <= 0
+        ? '<span class="badge-soldout">売り切れ</span>' : '';
+      return `
+        <a class="product-admin-item" href="komcho-market-product-admin.html?id=${p.id}" style="text-decoration:none;color:inherit;display:flex;">
+          <div class="product-admin-thumb ${thumbClass}">${thumbInner}</div>
+          <div class="product-admin-info">
+            <div class="product-admin-name">${p.name}</div>
+            <div class="product-admin-price">¥${Number(p.price || 0).toLocaleString()}</div>
+            <div class="product-admin-badges">${soldOutBadge}</div>
+          </div>
+          <div class="edit-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+        </a>
+      `;
+    }).join('');
+  }
 
   // ロゴ画像のアップロード
   async function uploadLogo(event) {

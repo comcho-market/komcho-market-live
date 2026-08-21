@@ -431,11 +431,11 @@
   <div class="block-title">基本情報</div>
   <div class="field">
     <label class="field-label field-required">商品名</label>
-    <input class="field-input" type="text" value="無添加 自家製味噌 500g" placeholder="商品名を入力">
+    <input class="field-input" type="text" value="" placeholder="商品名を入力">
   </div>
   <div class="field">
     <label class="field-label field-required">商品説明</label>
-    <textarea class="field-textarea">厳選された国産の大豆と米麹を使用し、伝統的な製法で丁寧に仕込んだ自家製味噌です。豊かな香りと深いコク、自然な甘みをお楽しみください。毎日の食卓に、体に優しい本物の味を。</textarea>
+    <textarea class="field-textarea" placeholder="商品の説明を入力"></textarea>
   </div>
 </div>
 
@@ -448,7 +448,7 @@
     <label class="field-label field-required">販売価格（税込）</label>
     <div class="price-input-wrap">
       <span class="price-yen">¥</span>
-      <input class="field-input" type="number" value="1800" placeholder="0" inputmode="numeric">
+      <input class="field-input" type="number" value="0" placeholder="0" inputmode="numeric">
     </div>
   </div>
 </div>
@@ -461,7 +461,7 @@
   <div class="stock-row">
     <div class="stock-input-wrap">
       <button class="stock-btn" id="stockMinus">－</button>
-      <input class="stock-num" type="number" value="10" id="stockNum" inputmode="numeric">
+      <input class="stock-num" type="number" value="0" id="stockNum" inputmode="numeric">
       <button class="stock-btn" id="stockPlus">＋</button>
     </div>
     <p class="stock-hint">在庫が<strong>0</strong>になると<br>お客様の画面に「売り切れ」と表示されます。</p>
@@ -480,14 +480,14 @@
     <input type="checkbox" class="tag-check" id="t1"><label class="tag-label" for="t1">着色料不使用</label>
     <input type="checkbox" class="tag-check" id="t2"><label class="tag-label" for="t2">保存料不使用</label>
     <input type="checkbox" class="tag-check" id="t3"><label class="tag-label" for="t3">人工甘味料不使用</label>
-    <input type="checkbox" class="tag-check" id="t4" checked><label class="tag-label" for="t4">化学調味料不使用</label>
+    <input type="checkbox" class="tag-check" id="t4"><label class="tag-label" for="t4">化学調味料不使用</label>
     <input type="checkbox" class="tag-check" id="t5"><label class="tag-label" for="t5">無農薬</label>
     <input type="checkbox" class="tag-check" id="t6"><label class="tag-label" for="t6">減農薬</label>
     <input type="checkbox" class="tag-check" id="t7"><label class="tag-label" for="t7">有機・オーガニック</label>
-    <input type="checkbox" class="tag-check" id="t8" checked><label class="tag-label" for="t8">国産100%</label>
-    <input type="checkbox" class="tag-check" id="t9" checked><label class="tag-label" for="t9">砂糖不使用</label>
+    <input type="checkbox" class="tag-check" id="t8"><label class="tag-label" for="t8">国産100%</label>
+    <input type="checkbox" class="tag-check" id="t9"><label class="tag-label" for="t9">砂糖不使用</label>
     <input type="checkbox" class="tag-check" id="t10"><label class="tag-label" for="t10">白砂糖不使用</label>
-    <input type="checkbox" class="tag-check" id="t11" checked><label class="tag-label" for="t11">グルテンフリー</label>
+    <input type="checkbox" class="tag-check" id="t11"><label class="tag-label" for="t11">グルテンフリー</label>
     <input type="checkbox" class="tag-check" id="t12"><label class="tag-label" for="t12">卵不使用</label>
     <input type="checkbox" class="tag-check" id="t13"><label class="tag-label" for="t13">乳製品不使用</label>
     <input type="checkbox" class="tag-check" id="t14"><label class="tag-label" for="t14">ビーガン</label>
@@ -524,7 +524,7 @@
     <select class="category-select">
       <option value="">選択してください</option>
       <option value="1">生鮮食品</option>
-      <option value="2" selected>惣菜</option>
+      <option value="2">惣菜</option>
       <option value="3">調味料</option>
       <option value="4">お菓子</option>
       <option value="5">飲み物</option>
@@ -541,7 +541,7 @@
   <p class="field-hint" style="margin-bottom:12px;">この商品に含まれるアレルゲンをすべて選んでください。</p>
   <div class="allergy-grid">
     <div class="allergy-item">
-      <input type="checkbox" id="a1" checked>
+      <input type="checkbox" id="a1">
       <label for="a1">卵</label>
     </div>
     <div class="allergy-item">
@@ -584,23 +584,23 @@
   <table class="info-edit-table">
     <tr>
       <th>内容量</th>
-      <td><input type="text" value="500g" placeholder="例：500g"></td>
+      <td><input type="text" value="" placeholder="例：500g"></td>
     </tr>
     <tr>
       <th>原材料</th>
-      <td><input type="text" value="大豆（国産）、米麹、塩" placeholder="原材料を入力"></td>
+      <td><input type="text" value="" placeholder="原材料を入力"></td>
     </tr>
     <tr>
       <th>賞味期限</th>
-      <td><input type="text" value="製造から6ヶ月" placeholder="例：製造から〇ヶ月"></td>
+      <td><input type="text" value="" placeholder="例：製造から〇ヶ月"></td>
     </tr>
     <tr>
       <th>保存方法</th>
-      <td><input type="text" value="冷蔵" placeholder="例：冷蔵・常温など"></td>
+      <td><input type="text" value="" placeholder="例：冷蔵・常温など"></td>
     </tr>
     <tr>
       <th>製造者</th>
-      <td><input type="text" value="〇〇農園（京都府△△市）" placeholder="製造者名・所在地"></td>
+      <td><input type="text" value="" placeholder="製造者名・所在地"></td>
     </tr>
   </table>
 </div>
@@ -648,15 +648,25 @@
 
 <!-- 商品削除 -->
 <div class="delete-product-wrap">
-  <button class="delete-product-btn" onclick="if(confirm('この商品を削除しますか？')){ window.location.href='komcho-market-shop-admin.html'; }">この商品を削除する</button>
+  <button class="delete-product-btn" style="display:none;">この商品を削除する</button>
 </div>
 
 <!-- TOAST -->
 <div class="toast" id="toast">保存しました ✓</div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
+  const SUPABASE_URL = 'https://uawhrpizzlchkvmzrjzo.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_FaOqUE1PDbo-fpT9KhkWaw__BShLngI';
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const productId = urlParams.get('id'); // nullなら新規追加
+  let currentShopId = null;
+  let mainImageUrl = null; // アップロード済みのメイン画像URL
+
   // 在庫数
-  let stock = 10;
+  let stock = 0;
   document.getElementById('stockPlus').addEventListener('click', () => {
     stock = Math.min(stock + 1, 9999);
     document.getElementById('stockNum').value = stock;
@@ -685,12 +695,225 @@
     });
   });
 
-  // 保存トースト
-  document.getElementById('saveBtn').addEventListener('click', () => {
+  function showToast(msg) {
     const toast = document.getElementById('toast');
+    toast.textContent = msg;
     toast.classList.add('show');
     setTimeout(() => toast.classList.remove('show'), 2000);
+  }
+
+  // ===== 初期化：ログイン確認 → 自分のショップ取得 → （編集時）商品データ読み込み =====
+  (async function initProductAdmin() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) {
+      window.location.href = 'komcho-market-seller-login.html';
+      return;
+    }
+
+    const { data: shop, error: shopError } = await supabaseClient
+      .from('shops')
+      .select('id')
+      .eq('owner_id', session.user.id)
+      .single();
+
+    if (shopError || !shop) {
+      window.location.href = 'komcho-market-seller-login.html';
+      return;
+    }
+    currentShopId = shop.id;
+
+    if (productId) {
+      // 編集モード：既存の商品データを読み込んでフォームに反映
+      document.querySelector('.header-title').textContent = '商品編集';
+      const { data: p, error } = await supabaseClient
+        .from('products')
+        .select('*')
+        .eq('id', productId)
+        .eq('shop_id', currentShopId)
+        .single();
+
+      if (error || !p) {
+        alert('商品が見つかりませんでした');
+        window.location.href = 'komcho-market-shop-admin.html';
+        return;
+      }
+
+      fillForm(p);
+    } else {
+      // 新規追加モード
+      document.querySelector('.header-title').textContent = '商品を追加';
+    }
+  })();
+
+  // フォームに既存データを反映
+  function fillForm(p) {
+    document.querySelector('.section-block .field-input[type="text"]').value = p.name || '';
+    document.querySelector('.field-textarea').value = p.description || '';
+    document.querySelector('.price-input-wrap .field-input').value = p.price ?? 0;
+    stock = p.stock ?? 0;
+    document.getElementById('stockNum').value = stock;
+
+    // カテゴリー
+    const catMap = { '生鮮食品': '1', '惣菜': '2', '調味料': '3', 'お菓子': '4', '飲み物': '5', '日用品': '6' };
+    if (p.category && catMap[p.category]) {
+      document.querySelector('.category-select').value = catMap[p.category];
+    }
+
+    // こだわりタグ（表示テキストとlabelを突き合わせてチェックを入れる）
+    if (Array.isArray(p.tags)) {
+      document.querySelectorAll('.tag-check').forEach(chk => {
+        const label = document.querySelector(`label[for="${chk.id}"]`);
+        chk.checked = !!(label && p.tags.includes(label.textContent.trim()));
+      });
+    }
+
+    // アレルギー
+    if (Array.isArray(p.allergies)) {
+      document.querySelectorAll('.allergy-item input[type="checkbox"]').forEach(chk => {
+        const label = document.querySelector(`label[for="${chk.id}"]`);
+        chk.checked = !!(label && p.allergies.includes(label.textContent.trim()));
+      });
+    }
+
+    // 商品情報テーブル
+    const infoInputs = document.querySelectorAll('.info-edit-table input');
+    if (infoInputs[0]) infoInputs[0].value = p.volume || '';
+    if (infoInputs[1]) infoInputs[1].value = p.ingredients || '';
+    if (infoInputs[2]) infoInputs[2].value = p.expiry || '';
+    if (infoInputs[3]) infoInputs[3].value = p.storage_method || '';
+    if (infoInputs[4]) infoInputs[4].value = p.manufacturer || '';
+
+    // 配送
+    document.getElementById('alwaysFree').checked = !!p.shipping_free;
+    if (p.shipping_free) alwaysFree.dispatchEvent(new Event('change'));
+    const deliveryRadio = document.querySelector(`input[name="delivery"][value="${p.shipping_method || 'normal'}"]`);
+    if (deliveryRadio) deliveryRadio.checked = true;
+    const noteInput = document.querySelector('.section-block .field-input[placeholder*="発送します"]');
+    if (noteInput) noteInput.value = p.shipping_note || '';
+
+    // メイン写真プレビュー
+    if (p.image_url) {
+      mainImageUrl = p.image_url;
+      const mainSlot = document.querySelector('.photo-slot:first-child');
+      mainSlot.innerHTML = `<img src="${p.image_url}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;"><div class="main-label">メイン</div>`;
+    }
+
+    // 削除ボタンを有効化（新規時は削除不要）
+    const delBtn = document.querySelector('.delete-product-btn');
+    delBtn.style.display = 'inline';
+    delBtn.setAttribute('onclick', `deleteProduct('${p.id}')`);
+  }
+
+  // メイン写真クリックでファイル選択→アップロード
+  document.querySelector('.photo-slot:first-child').addEventListener('click', () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = (e) => uploadMainPhoto(e.target.files[0]);
+    input.click();
   });
+
+  async function uploadMainPhoto(file) {
+    if (!file || !currentShopId) return;
+    const mainSlot = document.querySelector('.photo-slot:first-child');
+    const originalContent = mainSlot.innerHTML;
+    mainSlot.innerHTML = '<span style="font-size:10px;">アップロード中...</span>';
+
+    const ext = file.name.split('.').pop();
+    const filePath = `${currentShopId}/${Date.now()}.${ext}`;
+
+    const { error: uploadError } = await supabaseClient.storage
+      .from('product-images')
+      .upload(filePath, file, { upsert: true });
+
+    if (uploadError) {
+      mainSlot.innerHTML = originalContent;
+      showToast('画像のアップロードに失敗しました');
+      return;
+    }
+
+    const { data: urlData } = supabaseClient.storage.from('product-images').getPublicUrl(filePath);
+    mainImageUrl = urlData.publicUrl + '?t=' + Date.now();
+
+    mainSlot.innerHTML = `<img src="${mainImageUrl}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;"><div class="main-label">メイン</div>`;
+  }
+
+  // 保存（新規作成 or 更新）
+  document.getElementById('saveBtn').addEventListener('click', async () => {
+    if (!currentShopId) return;
+
+    const name = document.querySelector('.section-block .field-input[type="text"]').value.trim();
+    const price = parseInt(document.querySelector('.price-input-wrap .field-input').value) || 0;
+    const categorySelect = document.querySelector('.category-select');
+    const category = categorySelect.options[categorySelect.selectedIndex]?.text || '';
+
+    if (!name) {
+      showToast('商品名を入力してください');
+      return;
+    }
+    if (!categorySelect.value) {
+      showToast('カテゴリーを選択してください');
+      return;
+    }
+
+    const tags = Array.from(document.querySelectorAll('.tag-check:checked'))
+      .map(chk => document.querySelector(`label[for="${chk.id}"]`)?.textContent.trim())
+      .filter(Boolean);
+
+    const allergies = Array.from(document.querySelectorAll('.allergy-item input[type="checkbox"]:checked'))
+      .map(chk => document.querySelector(`label[for="${chk.id}"]`)?.textContent.trim())
+      .filter(Boolean);
+
+    const infoInputs = document.querySelectorAll('.info-edit-table input');
+    const deliveryChecked = document.querySelector('input[name="delivery"]:checked');
+    const noteInput = document.querySelector('.section-block .field-input[placeholder*="発送します"]');
+
+    const payload = {
+      shop_id: currentShopId,
+      name,
+      description: document.querySelector('.field-textarea').value.trim(),
+      price,
+      stock,
+      category,
+      tags,
+      allergies,
+      image_url: mainImageUrl,
+      volume: infoInputs[0]?.value.trim() || null,
+      ingredients: infoInputs[1]?.value.trim() || null,
+      expiry: infoInputs[2]?.value.trim() || null,
+      storage_method: infoInputs[3]?.value.trim() || null,
+      manufacturer: infoInputs[4]?.value.trim() || null,
+      shipping_free: document.getElementById('alwaysFree').checked,
+      shipping_method: deliveryChecked ? deliveryChecked.value : 'normal',
+      shipping_note: noteInput ? noteInput.value.trim() : null
+    };
+
+    let error;
+    if (productId) {
+      ({ error } = await supabaseClient.from('products').update(payload).eq('id', productId));
+    } else {
+      ({ error } = await supabaseClient.from('products').insert(payload));
+    }
+
+    if (error) {
+      showToast('保存に失敗しました');
+      return;
+    }
+
+    showToast('保存しました ✓');
+    setTimeout(() => { window.location.href = 'komcho-market-shop-admin.html'; }, 900);
+  });
+
+  // 商品削除
+  async function deleteProduct(id) {
+    if (!confirm('この商品を削除しますか？')) return;
+    const { error } = await supabaseClient.from('products').delete().eq('id', id);
+    if (error) {
+      showToast('削除に失敗しました');
+      return;
+    }
+    window.location.href = 'komcho-market-shop-admin.html';
+  }
 </script>
 </body>
 </html>
