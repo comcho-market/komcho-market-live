@@ -373,8 +373,8 @@
 
 <!-- SHOP TOP -->
 <div class="shop-top">
-  <div class="shop-logo-circle">SHOP<br>LOGO</div>
-  <div class="shop-name">「〇〇農園」</div>
+  <div class="shop-logo-circle" id="shopLogoCircle">SHOP<br>LOGO</div>
+  <div class="shop-name" id="shopNameDisplay">「〇〇農園」</div>
   <div class="shop-tagline">土と暮らす、京丹後の小さな農園</div>
   <button class="follow-btn" id="followBtn">
     <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
@@ -385,17 +385,17 @@
 <div class="gap"></div>
 
 <!-- STORY -->
-<div class="section-block">
+<div class="section-block" id="storyBlock">
   <div class="section-heading">わたしたちについて</div>
-  <p class="story-text">京都の北、海と山に囲まれた京丹後市で、自然の恵みとともに野菜や果物を育てています。農薬や化学肥料を使わず、土の力を信じて、種から大切に育てた在来種の野菜たちをお届けします。日々の食卓に、自然本来の味わいと安心をお届けできれば幸いです。</p>
+  <p class="story-text" id="shopAboutDisplay">京都の北、海と山に囲まれた京丹後市で、自然の恵みとともに野菜や果物を育てています。農薬や化学肥料を使わず、土の力を信じて、種から大切に育てた在来種の野菜たちをお届けします。日々の食卓に、自然本来の味わいと安心をお届けできれば幸いです。</p>
 </div>
 
 <div class="gap"></div>
 
 <!-- VALUES -->
-<div class="section-block">
+<div class="section-block" id="valuesBlock">
   <div class="values-heading">大切にしていること</div>
-  <ul class="values-list">
+  <ul class="values-list" id="valuesListDisplay">
     <li>農薬・化学肥料を使わない土づくり</li>
     <li>種から育てる在来種野菜</li>
     <li>季節と向き合う手仕事</li>
@@ -408,20 +408,20 @@
 <div class="shop-info-row">
   <div class="info-item">
     <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-    <span>京都府京丹後市</span>
+    <span id="shopAddressDisplay">京都府京丹後市</span>
   </div>
-  <span class="info-divider">｜</span>
-  <span style="font-size:12px; color:var(--text-sub);">リンク</span>
-  <div class="info-links">
-    <div class="info-link-icon">
+  <span class="info-divider" id="infoDivider">｜</span>
+  <span style="font-size:12px; color:var(--text-sub);" id="linksLabel">リンク</span>
+  <div class="info-links" id="infoLinks">
+    <a class="info-link-icon" id="linkWebsite" href="#" target="_blank" rel="noopener" style="display:none;">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+    </a>
+    <a class="info-link-icon" id="linkInstagram" href="#" target="_blank" rel="noopener" style="display:none;">
       <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-    </div>
-    <div class="info-link-icon">
+    </a>
+    <a class="info-link-icon" id="linkSnsOther" href="#" target="_blank" rel="noopener" style="display:none;">
       <svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-    </div>
-    <div class="info-link-icon">
-      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-    </div>
+    </a>
   </div>
 </div>
 
@@ -529,6 +529,60 @@
   </a>
 </nav>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+  const SUPABASE_URL = 'https://uawhrpizzlchkvmzrjzo.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_FaOqUE1PDbo-fpT9KhkWaw__BShLngI';
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  // URLの ?id=ショップID で表示するショップを指定する。
+  // 指定がない場合は、暫定的に一番新しいショップを表示する（各ページからのリンクにIDを付ける対応は別タスク）。
+  (async function loadShopInfo() {
+    const shopId = new URLSearchParams(window.location.search).get('id');
+
+    let query = supabaseClient.from('shops').select('*');
+    query = shopId ? query.eq('id', shopId) : query.order('created_at', { ascending: false }).limit(1);
+    const { data, error } = shopId ? await query.single() : await query;
+    const shop = shopId ? data : (data && data[0]);
+
+    if (error || !shop) return; // 取得できない場合は、これまで通りサンプル表示のまま
+
+    document.getElementById('shopNameDisplay').textContent = `「${shop.shop_name || ''}」`;
+    document.getElementById('shopAddressDisplay').textContent = shop.address || '';
+
+    if (shop.about) {
+      document.getElementById('shopAboutDisplay').textContent = shop.about;
+    }
+
+    if (Array.isArray(shop.values) && shop.values.length > 0) {
+      document.getElementById('valuesListDisplay').innerHTML = shop.values.map(v => `<li>${v}</li>`).join('');
+    }
+
+    if (shop.logo_url) {
+      document.getElementById('shopLogoCircle').innerHTML = `<img src="${shop.logo_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+    }
+
+    // 外部リンクアイコンの表示
+    const linkMap = [
+      ['linkWebsite', shop.website_url],
+      ['linkInstagram', shop.instagram_url],
+      ['linkSnsOther', shop.sns_other_url]
+    ];
+    let hasAnyLink = false;
+    linkMap.forEach(([id, url]) => {
+      if (url) {
+        const el = document.getElementById(id);
+        el.href = url;
+        el.style.display = 'flex';
+        hasAnyLink = true;
+      }
+    });
+    if (!hasAnyLink) {
+      document.getElementById('infoDivider').style.display = 'none';
+      document.getElementById('linksLabel').style.display = 'none';
+    }
+  })();
+</script>
 <script>
   // Follow toggle
   const followBtn = document.getElementById('followBtn');

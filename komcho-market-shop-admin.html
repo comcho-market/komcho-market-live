@@ -409,6 +409,26 @@
 
 <div class="gap"></div>
 
+<!-- ②-2 外部リンク -->
+<div class="section-block">
+  <div class="block-title">外部リンク</div>
+  <p class="field-hint" style="margin-bottom:12px;">お持ちのものだけで大丈夫です。店舗ページにアイコンで表示されます。</p>
+  <div class="field">
+    <label class="field-label">ホームページ</label>
+    <input class="field-input" type="text" id="shopWebsiteField" placeholder="https://example.com">
+  </div>
+  <div class="field">
+    <label class="field-label">Instagram</label>
+    <input class="field-input" type="text" id="shopInstagramField" placeholder="https://instagram.com/ユーザー名">
+  </div>
+  <div class="field">
+    <label class="field-label">その他SNS</label>
+    <input class="field-input" type="text" id="shopSnsOtherField" placeholder="https://...">
+  </div>
+</div>
+
+<div class="gap"></div>
+
 <!-- ③ わたしたちについて -->
 <div class="section-block">
   <div class="block-title">わたしたちについて</div>
@@ -575,6 +595,9 @@
     document.getElementById('shopNameField').value = shop.shop_name || '';
     document.getElementById('shopAddressField').value = shop.address || '';
     document.getElementById('shopAboutField').value = shop.about || '';
+    document.getElementById('shopWebsiteField').value = shop.website_url || '';
+    document.getElementById('shopInstagramField').value = shop.instagram_url || '';
+    document.getElementById('shopSnsOtherField').value = shop.sns_other_url || '';
     renderKodawariList(shop.values);
     document.getElementById('shipNormalInput').value = shop.shipping_normal ?? 800;
     document.getElementById('shipColdInput').value = shop.shipping_cold ?? 1000;
@@ -683,6 +706,13 @@
     setTimeout(() => toast.classList.remove('show'), 2000);
   }
 
+  // 入力されたURLの先頭にhttps://が無ければ補う（空欄ならnullを返す）
+  function normalizeUrl(raw) {
+    const v = (raw || '').trim();
+    if (!v) return null;
+    return /^https?:\/\//i.test(v) ? v : `https://${v}`;
+  }
+
   // 保存処理（実際にデータベースへ保存する）
   async function saveShop() {
     if (!currentShopId) return;
@@ -697,6 +727,9 @@
       shop_name: document.getElementById('shopNameField').value.trim(),
       address: document.getElementById('shopAddressField').value.trim(),
       about: document.getElementById('shopAboutField').value.trim(),
+      website_url: normalizeUrl(document.getElementById('shopWebsiteField').value),
+      instagram_url: normalizeUrl(document.getElementById('shopInstagramField').value),
+      sns_other_url: normalizeUrl(document.getElementById('shopSnsOtherField').value),
       values: values,
       shipping_normal: parseInt(document.getElementById('shipNormalInput').value) || 0,
       shipping_cold: parseInt(document.getElementById('shipColdInput').value) || 0,
