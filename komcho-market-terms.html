@@ -142,17 +142,23 @@
   .nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; }
   .nav-icon { width: 22px; height: 22px; stroke: var(--text-sub); fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
   .nav-label { font-size: 10px; color: var(--text-sub); }
+  /* ============ DESKTOP (≥900px) ============ */
+  @media (min-width: 900px) {
+    body { max-width: 720px; padding-bottom: 40px; }
+    .header { padding: 16px 32px; }
+    .bottom-nav { display: none; }
+  }
 </style>
 </head>
 <body>
 
 <header class="header">
-  <div class="header-logo">
+  <a class="header-logo" href="komcho-market-top.html">
     <svg class="logo-icon" viewBox="0 0 60 48">
       <path transform="translate(30,24)" d="M -26 7 C -17 -17 5 -24 24 -10 C 12 5 -2 19 -21 24"/>
     </svg>
     <span class="logo-text">こむちょマーケット</span>
-  </div>
+  </a>
   <div class="header-title">利用規約</div>
   <div class="header-spacer"></div>
 </header>
@@ -308,26 +314,26 @@
 
 <!-- BOTTOM NAV -->
 <nav class="bottom-nav">
-  <div class="nav-item">
+  <a class="nav-item" href="komcho-market-top.html">
     <svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 0-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
     <span class="nav-label">ホーム</span>
-  </div>
-  <div class="nav-item">
+  </a>
+  <a class="nav-item" href="komcho-market-top.html">
     <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
     <span class="nav-label">さがす</span>
-  </div>
-  <div class="nav-item">
+  </a>
+  <a class="nav-item" href="komcho-market-top.html">
     <svg class="nav-icon" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
     <span class="nav-label">お気に入り</span>
-  </div>
-  <div class="nav-item">
+  </a>
+  <a class="nav-item" href="komcho-market-top.html">
     <svg class="nav-icon" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
     <span class="nav-label">カゴ</span>
-  </div>
-  <div class="nav-item">
+  </a>
+  <a class="nav-item" href="komcho-market-top.html">
     <svg class="nav-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
     <span class="nav-label">マイページ</span>
-  </div>
+  </a>
 </nav>
 
 <script>
@@ -338,8 +344,7 @@ function toggleBtn() {
   btn.disabled = !checked;
 }
 function handleAgree() {
-  // 実際はアカウント作成処理へ遷移
-  alert('ご同意ありがとうございます。アカウントを作成します。');
+  window.location.href = 'komcho-market-register.html';
 }
 </script>
 </body>

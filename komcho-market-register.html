@@ -331,6 +331,11 @@
     font-size: 16px; font-weight: 700;
     cursor: pointer; border: none;
   }
+  /* ============ DESKTOP (≥900px) ============ */
+  @media (min-width: 900px) {
+    body { max-width: 720px; padding-bottom: 40px; }
+    .header { padding: 16px 32px; }
+  }
 </style>
 </head>
 <body>
@@ -340,12 +345,12 @@
   <button class="header-back" onclick="history.back()">
     <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
   </button>
-  <div class="header-logo">
+  <a class="header-logo" href="komcho-market-top.html">
     <svg class="logo-icon" viewBox="0 0 60 48">
       <path transform="translate(30,24)" d="M -26 7 C -17 -17 5 -24 24 -10 C 12 5 -2 19 -21 24"/>
     </svg>
     <span class="logo-text">こむちょマーケット</span>
-  </div>
+  </a>
   <div class="header-spacer"></div>
 </header>
 
@@ -461,6 +466,9 @@
     </label>
   </div>
 
+  <!-- 登録エラー -->
+  <div class="field-error" id="signupError" style="text-align:center; padding: 0 16px 8px;"></div>
+
   <!-- 登録ボタン -->
   <div class="submit-wrap">
     <button class="submit-btn" id="submitBtn" disabled onclick="register()">
@@ -477,7 +485,7 @@
   </div>
 
   <div class="guest-wrap">
-    <button class="guest-btn">
+    <button class="guest-btn" onclick="window.location.href='komcho-market-top.html'">
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 8 12 12 14 14"/></svg>
       登録せずにゲスト購入へ
     </button>
@@ -511,6 +519,14 @@
   </div>
   <button class="success-btn" onclick="goHome()">ショッピングをはじめる</button>
 </div>
+
+<!-- Supabase接続 -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+  const SUPABASE_URL = 'https://uawhrpizzlchkvmzrjzo.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_FaOqUE1PDbo-fpT9KhkWaw__BShLngI';
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+</script>
 
 <script>
   // バリデーション状態
@@ -592,16 +608,49 @@
       : '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
   }
 
-  // 登録処理（デモ）
-  function register() {
+  // 登録処理（Supabaseに実際に登録する）
+  async function register() {
+    const name = document.getElementById('nameInput').value.trim();
+    const email = document.getElementById('emailInput').value.trim();
+    const password = document.getElementById('pwInput').value;
+    const btn = document.getElementById('submitBtn');
+    const errorBox = document.getElementById('signupError');
+
+    errorBox.classList.remove('visible');
+    errorBox.textContent = '';
+    btn.disabled = true;
+    const originalLabel = btn.innerHTML;
+    btn.innerHTML = '登録中...';
+
+    const { data, error } = await supabaseClient.auth.signUp({
+      email: email,
+      password: password,
+      options: {
+        data: { name: name }
+      }
+    });
+
+    if (error) {
+      let msg = '登録に失敗しました。時間をおいて再度お試しください。';
+      if (error.message.includes('already registered') || error.message.includes('already been registered')) {
+        msg = 'このメールアドレスは既に登録されています。ログイン画面をご利用ください。';
+      } else if (error.message.includes('Password')) {
+        msg = 'パスワードは6文字以上で設定してください。';
+      }
+      errorBox.textContent = msg;
+      errorBox.classList.add('visible');
+      btn.disabled = false;
+      btn.innerHTML = originalLabel;
+      return;
+    }
+
     document.getElementById('formScreen').style.display = 'none';
     document.getElementById('successScreen').classList.add('visible');
     window.scrollTo({ top: 0 });
   }
 
   function goHome() {
-    // 実装時はTOPページへ遷移
-    alert('TOPページへ移動します');
+    window.location.href = 'komcho-market-top.html';
   }
 </script>
 </body>

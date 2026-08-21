@@ -280,6 +280,11 @@
     font-size: 13px; color: var(--green-mid);
     cursor: pointer; text-decoration: underline;
   }
+  /* ============ DESKTOP (≥900px) ============ */
+  @media (min-width: 900px) {
+    body { max-width: 720px; padding-bottom: 40px; }
+    .header { padding: 16px 32px; }
+  }
 </style>
 </head>
 <body>
@@ -289,12 +294,12 @@
   <button class="header-back" onclick="history.back()">
     <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
   </button>
-  <div class="header-logo">
+  <a class="header-logo" href="komcho-market-top.html">
     <svg class="logo-icon" viewBox="0 0 60 48">
       <path transform="translate(30,24)" d="M -26 7 C -17 -17 5 -24 24 -10 C 12 5 -2 19 -21 24"/>
     </svg>
     <span class="logo-text">こむちょマーケット</span>
-  </div>
+  </a>
   <div class="header-spacer"></div>
 </header>
 
@@ -377,13 +382,14 @@
   <div class="terms-wrap">
     <input type="checkbox" class="terms-checkbox" id="termsCheck" onchange="validate()">
     <label class="terms-text" for="termsCheck">
-      <span class="terms-link">プライバシーポリシー</span>に同意のうえ送信します
+      <a class="terms-link" href="komcho-market-privacy.html" style="text-decoration:underline;">プライバシーポリシー</a>に同意のうえ送信します
     </label>
   </div>
+  <div class="field-error" id="termsError" style="margin:6px 16px 0;">プライバシーポリシーへの同意が必要です</div>
 
   <!-- 送信ボタン -->
   <div class="submit-wrap">
-    <button class="submit-btn" id="submitBtn" disabled onclick="submitForm()">
+    <button class="submit-btn" id="submitBtn" onclick="submitForm()">
       <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
       送信する
     </button>
@@ -443,7 +449,7 @@
     el.classList.toggle('over', len >= 900);
   }
 
-  // バリデーション
+  // バリデーション（入力中はエラー表示だけリアルタイムで消す）
   function validate() {
     const cat   = document.getElementById('categorySelect').value;
     const name  = document.getElementById('nameInput').value.trim();
@@ -452,8 +458,11 @@
     const terms = document.getElementById('termsCheck').checked;
     const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-    document.getElementById('submitBtn').disabled =
-      !(cat && name && emailOk && msg.length >= 10 && terms);
+    if (cat) { document.getElementById('categorySelect').classList.remove('error'); document.getElementById('categoryError').classList.remove('visible'); }
+    if (name) { document.getElementById('nameInput').classList.remove('error'); document.getElementById('nameError').classList.remove('visible'); }
+    if (emailOk) { document.getElementById('emailInput').classList.remove('error'); document.getElementById('emailError').classList.remove('visible'); }
+    if (msg.length >= 10) { document.getElementById('messageInput').classList.remove('error'); document.getElementById('messageError').classList.remove('visible'); }
+    if (terms) { document.getElementById('termsError').classList.remove('visible'); }
   }
 
   // 送信処理
@@ -486,7 +495,33 @@
       document.getElementById('messageError').classList.add('visible');
       hasError = true;
     }
+    if (!document.getElementById('termsCheck').checked) {
+      document.getElementById('termsError').classList.add('visible');
+      hasError = true;
+    }
     if (hasError) return;
+
+    // 送信ボタンを一時的に無効化（連打防止）
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = '送信中...';
+
+    // Web3Forms へ送信（実際にメールが届く処理）
+    const orderNum = document.getElementById('orderNumInput').value.trim();
+    fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        access_key: 'e409be80-f2b3-4f06-9216-34a0cde7132e',
+        subject: 'こむちょマーケット お問い合わせ：' + catText,
+        from_name: 'こむちょマーケット お問い合わせフォーム',
+        category: catText,
+        order_number: orderNum,
+        name: name,
+        email: email,
+        message: msg
+      })
+    }).catch(() => {});
 
     // 完了画面へ
     document.getElementById('successCategory').textContent = catText;
@@ -501,7 +536,7 @@
   }
 
   function goHome() {
-    alert('TOPページへ移動します');
+    window.location.href = 'komcho-market-top.html';
   }
 </script>
 </body>

@@ -462,33 +462,40 @@
     transition: opacity 0.2s; white-space: nowrap;
   }
   .toast.show { opacity: 1; }
+  /* ============ DESKTOP (≥900px) ============ */
+  @media (min-width: 900px) {
+    body { max-width: 720px; padding-bottom: 40px; }
+    .header { padding: 16px 32px; }
+    .bottom-nav { display: none; }
+  }
 </style>
 </head>
 <body>
 
 <!-- HEADER -->
 <header class="header">
-  <div class="header-logo">
+  <a class="header-logo" href="komcho-market-top.html">
     <svg class="logo-icon" viewBox="0 0 60 48">
       <path transform="translate(30,24)" d="M -26 7 C -17 -17 5 -24 24 -10 C 12 5 -2 19 -21 24"/>
     </svg>
     <span class="logo-text">こむちょマーケット</span>
-  </div>
+  </a>
   <div class="header-title">マイページ</div>
   <div class="header-icons">
-    <div class="cart-wrap">
+    <a href="komcho-market-cart.html" style="display:flex;"><div class="cart-wrap">
       <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
       <div class="cart-badge">1</div>
-    </div>
+    </div></a>
   </div>
 </header>
 
 <!-- POINT CARD -->
 <div class="point-card-wrap">
+  <div style="font-size:14px; font-weight:700; color:var(--text-main); margin-bottom:10px;" id="welcomeName">ようこそ</div>
   <div class="point-card">
     <div class="point-label">🌿 保有ポイント</div>
     <div class="point-value">
-      <span class="point-num">1,240</span>
+      <span class="point-num" id="pointNum">0</span>
       <span class="point-unit">pt</span>
     </div>
     <div class="point-sub">1pt = 1円　／　200円のお買い物で1pt貯まります</div>
@@ -515,13 +522,13 @@
       <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
       注文履歴
     </div>
-    <div class="section-more">
+    <a class="section-more" href="komcho-market-orders.html" style="text-decoration:none;">
       もっと見る
       <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-    </div>
+    </a>
   </div>
   <div class="order-list">
-    <div class="order-item">
+    <a class="order-item" href="komcho-market-order-detail.html" style="text-decoration:none;color:inherit;display:block;">
       <div class="order-item-header">
         <div class="order-date">2026年6月15日　注文 #2310</div>
         <div class="order-status delivered">お届け済み</div>
@@ -530,15 +537,13 @@
         <div class="order-thumb g2">🌾</div>
         <div class="order-info">
           <div class="order-shop">〇〇農園</div>
-          <div class="order-name">無農薬コシヒカリ玄米 2kg</div>
-        </div>
-      </div>
+          <div class="order-name">無農薬コシヒカリ玄米 2kg</div></div></a>
       <div class="order-footer">
         <div class="order-total">¥2,100</div>
         <div class="order-point-pill">🌿 +10pt 獲得</div>
       </div>
     </div>
-    <div class="order-item">
+    <a class="order-item" href="komcho-market-order-detail.html" style="text-decoration:none;color:inherit;display:block;">
       <div class="order-item-header">
         <div class="order-date">2026年6月8日　注文 #2305</div>
         <div class="order-status shipping">配送中</div>
@@ -547,15 +552,13 @@
         <div class="order-thumb g1">🍯</div>
         <div class="order-info">
           <div class="order-shop">〇〇農園</div>
-          <div class="order-name">完熟梅の無添加シロップ ほか2点</div>
-        </div>
-      </div>
+          <div class="order-name">完熟梅の無添加シロップ ほか2点</div></div></a>
       <div class="order-footer">
         <div class="order-total">¥5,600</div>
         <div class="order-point-pill">🌿 +28pt 獲得</div>
       </div>
     </div>
-    <div class="order-item">
+    <a class="order-item" href="komcho-market-order-detail.html" style="text-decoration:none;color:inherit;display:block;">
       <div class="order-item-header">
         <div class="order-date">2026年5月10日　注文 #2298</div>
         <div class="order-status delivered">お届け済み</div>
@@ -564,9 +567,7 @@
         <div class="order-thumb g3">🫙</div>
         <div class="order-info">
           <div class="order-shop">〇〇農園</div>
-          <div class="order-name">無添加 自家製味噌 500g</div>
-        </div>
-      </div>
+          <div class="order-name">無添加 自家製味噌 500g</div></div></a>
       <div class="order-footer">
         <div class="order-total">¥1,800</div>
         <div class="order-point-pill">🌿 +9pt 獲得</div>
@@ -595,44 +596,40 @@
       <button class="wishlist-remove" onclick="removeWish(this)">
         <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
       </button>
-      <div class="wishlist-info">
+      <a class="wishlist-info" href="komcho-market-product.html" style="text-decoration:none;color:inherit;">
         <div class="wishlist-shop">〇〇農園</div>
         <div class="wishlist-name">季節の野菜セット（S）</div>
-        <div class="wishlist-price">¥3,200</div>
-      </div>
+        <div class="wishlist-price">¥3,200</div></a>
     </div>
     <div class="wishlist-card">
       <div class="wishlist-img g1">🍵</div>
       <button class="wishlist-remove" onclick="removeWish(this)">
         <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
       </button>
-      <div class="wishlist-info">
+      <a class="wishlist-info" href="komcho-market-product.html" style="text-decoration:none;color:inherit;">
         <div class="wishlist-shop">京の茶屋</div>
         <div class="wishlist-name">無農薬ほうじ茶 100g</div>
-        <div class="wishlist-price">¥1,080</div>
-      </div>
+        <div class="wishlist-price">¥1,080</div></a>
     </div>
     <div class="wishlist-card">
       <div class="wishlist-img g3">🧼</div>
       <button class="wishlist-remove" onclick="removeWish(this)">
         <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
       </button>
-      <div class="wishlist-info">
+      <a class="wishlist-info" href="komcho-market-product.html" style="text-decoration:none;color:inherit;">
         <div class="wishlist-shop">草木屋</div>
         <div class="wishlist-name">無添加石鹸 ひのき</div>
-        <div class="wishlist-price">¥680</div>
-      </div>
+        <div class="wishlist-price">¥680</div></a>
     </div>
     <div class="wishlist-card">
       <div class="wishlist-img g4">🍪</div>
       <button class="wishlist-remove" onclick="removeWish(this)">
         <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
       </button>
-      <div class="wishlist-info">
+      <a class="wishlist-info" href="komcho-market-product.html" style="text-decoration:none;color:inherit;">
         <div class="wishlist-shop">てとてベーカリー</div>
         <div class="wishlist-name">グルテンフリー クッキー</div>
-        <div class="wishlist-price">¥840</div>
-      </div>
+        <div class="wishlist-price">¥840</div></a>
     </div>
   </div>
 </div>
@@ -646,13 +643,13 @@
       <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" fill="var(--green-dark)" stroke="var(--green-dark)"/></svg>
       フォロー中のショップ
     </div>
-    <div class="section-more">
+    <a class="section-more" href="komcho-market-shop.html" style="text-decoration:none;">
       もっと見る
       <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-    </div>
+    </a>
   </div>
   <div class="shop-follow-list">
-    <div class="shop-follow-item">
+    <a class="shop-follow-item" href="komcho-market-shop.html" style="text-decoration:none;color:inherit;display:block;">
       <div class="shop-follow-logo">SHOP<br>LOGO</div>
       <div class="shop-follow-info">
         <div class="shop-follow-name">〇〇農園</div>
@@ -661,8 +658,8 @@
       <div class="shop-follow-arrow">
         <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
-    </div>
-    <div class="shop-follow-item">
+    </a>
+    <a class="shop-follow-item" href="komcho-market-shop.html" style="text-decoration:none;color:inherit;display:block;">
       <div class="shop-follow-logo">SHOP<br>LOGO</div>
       <div class="shop-follow-info">
         <div class="shop-follow-name">京の茶屋</div>
@@ -671,8 +668,8 @@
       <div class="shop-follow-arrow">
         <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
-    </div>
-  </div>
+    </a>
+</div>
 </div>
 
 <div class="gap"></div>
@@ -719,25 +716,10 @@
       配送先住所
     </div>
   </div>
-  <div class="address-list">
-    <div class="address-item default-addr">
-      <div class="address-default-badge">デフォルト</div>
-      <div class="address-name">山田 花子</div>
-      <div class="address-text">〒604-0000<br>京都府京都市中京区○○町1-2-3<br>090-0000-0000</div>
-      <div class="address-actions">
-        <button class="address-action-btn">編集</button>
-      </div>
-    </div>
-    <div class="address-item">
-      <div class="address-name">山田 太郎（実家）</div>
-      <div class="address-text">〒615-0000<br>京都府京都市西京区△△町4-5<br>075-000-0000</div>
-      <div class="address-actions">
-        <button class="address-action-btn">編集</button>
-        <button class="address-action-btn" style="color:#CC4444; border-color:#FFCCCC;" onclick="deleteAddress(this)">削除</button>
-      </div>
-    </div>
+  <div class="address-list" id="addressList">
+    <div style="padding:8px 16px; font-size:12px; color:var(--text-sub);">読み込み中...</div>
   </div>
-  <button class="add-btn-sub">
+  <button class="add-btn-sub" onclick="openAddressModal()">
     <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
     住所を追加する
   </button>
@@ -747,7 +729,7 @@
 
 <!-- SETTINGS -->
 <div class="settings-list">
-  <div class="settings-item">
+  <div class="settings-item" onclick="showToast('準備中です。近日公開予定です 🌿')" style="cursor:pointer;">
     <div class="settings-item-left">
       <svg viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
       お知らせ・メール設定
@@ -757,7 +739,7 @@
       <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
     </div>
   </div>
-  <div class="settings-item">
+  <div class="settings-item" onclick="showToast('準備中です。近日公開予定です 🌿')" style="cursor:pointer;">
     <div class="settings-item-left">
       <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
       パスワード変更
@@ -766,7 +748,7 @@
       <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
     </div>
   </div>
-  <div class="settings-item">
+  <a class="settings-item" href="komcho-market-about.html" style="text-decoration:none;color:inherit;">
     <div class="settings-item-left">
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
       こむちょマーケットについて
@@ -774,36 +756,36 @@
     <div class="settings-item-right">
       <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
     </div>
-  </div>
+  </a>
 </div>
 
 <!-- LOGOUT -->
 <div class="logout-wrap">
-  <button class="logout-btn" onclick="showToast('ログアウトしました')">ログアウト</button>
+  <button class="logout-btn" onclick="logout()">ログアウト</button>
 </div>
 
 <!-- BOTTOM NAV -->
 <nav class="bottom-nav">
-  <div class="nav-item">
+  <a class="nav-item" href="komcho-market-top.html">
     <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
     <span>ホーム</span>
-  </div>
-  <div class="nav-item">
+  </a>
+  <a class="nav-item" href="komcho-market-search.html">
     <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
     <span>探す</span>
-  </div>
-  <div class="nav-item">
+  </a>
+  <a class="nav-item" href="komcho-market-mypage.html">
     <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
     <span>お気に入り</span>
-  </div>
-  <div class="nav-item">
+  </a>
+  <a class="nav-item" href="komcho-market-cart.html">
     <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
     <span>カゴ</span>
-  </div>
-  <div class="nav-item active">
+  </a>
+  <a class="nav-item active" href="komcho-market-top.html">
     <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
     <span>マイページ</span>
-  </div>
+  </a>
 </nav>
 
 <!-- CARD MODAL -->
@@ -844,8 +826,191 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="addressModal" onclick="closeModalOutside2(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="addressModalTitle">住所を追加する</div>
+    <div class="modal-body">
+      <div class="form-field">
+        <label class="form-label">お名前</label>
+        <input class="form-input" type="text" placeholder="山田 花子" id="addrName">
+      </div>
+      <div class="form-field">
+        <label class="form-label">郵便番号</label>
+        <input class="form-input" type="text" placeholder="000-0000" id="addrPostal">
+      </div>
+      <div class="form-field">
+        <label class="form-label">都道府県</label>
+        <input class="form-input" type="text" placeholder="京都府" id="addrPrefecture">
+      </div>
+      <div class="form-field">
+        <label class="form-label">市区町村・番地</label>
+        <input class="form-input" type="text" placeholder="京都市中京区○○町1-2-3" id="addrLine">
+      </div>
+      <div class="form-field">
+        <label class="form-label">建物名・部屋番号（任意）</label>
+        <input class="form-input" type="text" placeholder="○○マンション 101号室" id="addrBuilding">
+      </div>
+      <div class="form-field">
+        <label class="form-label">電話番号</label>
+        <input class="form-input" type="tel" placeholder="090-0000-0000" id="addrPhone">
+      </div>
+      <label class="save-check-wrap" style="display:flex;align-items:center;gap:8px;margin-top:4px;">
+        <input type="checkbox" id="addrIsDefault">
+        <span class="save-check-label">この住所をデフォルトに設定する</span>
+      </label>
+      <button class="modal-submit-btn" onclick="saveAddressModal()">この住所を保存する</button>
+    </div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
+
+<!-- Supabase接続 -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+  const SUPABASE_URL = 'https://uawhrpizzlchkvmzrjzo.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_FaOqUE1PDbo-fpT9KhkWaw__BShLngI';
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  // ログインチェック＆プロフィール読み込み
+  (async function initMypage() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) {
+      window.location.href = 'komcho-market-login.html';
+      return;
+    }
+
+    const { data: profile, error } = await supabaseClient
+      .from('profiles')
+      .select('name, points')
+      .eq('id', session.user.id)
+      .single();
+
+    if (profile) {
+      document.getElementById('welcomeName').textContent = 'ようこそ、' + profile.name + ' 様';
+      document.getElementById('pointNum').textContent = profile.points.toLocaleString();
+    }
+
+    await loadAddresses();
+  })();
+
+  // ログアウト処理
+  async function logout() {
+    await supabaseClient.auth.signOut();
+    window.location.href = 'komcho-market-login.html';
+  }
+
+  // ===== 住所まわり =====
+  let editingAddressId = null;
+
+  async function loadAddresses() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) return;
+
+    const { data: addresses, error } = await supabaseClient
+      .from('addresses')
+      .select('*')
+      .eq('user_id', session.user.id)
+      .order('is_default', { ascending: false })
+      .order('created_at', { ascending: true });
+
+    const list = document.getElementById('addressList');
+    if (error || !addresses || addresses.length === 0) {
+      list.innerHTML = '<div style="padding:8px 16px; font-size:12px; color:var(--text-sub);">登録済みの住所はまだありません</div>';
+      return;
+    }
+
+    list.innerHTML = addresses.map(addr => `
+      <div class="address-item ${addr.is_default ? 'default-addr' : ''}">
+        ${addr.is_default ? '<div class="address-default-badge">デフォルト</div>' : ''}
+        <div class="address-name">${addr.name}</div>
+        <div class="address-text">〒${addr.postal_code || ''}<br>${addr.prefecture || ''}${addr.address_line || ''}${addr.building ? '<br>' + addr.building : ''}<br>${addr.phone || ''}</div>
+        <div class="address-actions">
+          <button class="address-action-btn" onclick="openAddressModal('${addr.id}')">編集</button>
+          <button class="address-action-btn" style="color:#CC4444; border-color:#FFCCCC;" onclick="deleteAddressReal('${addr.id}')">削除</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  async function openAddressModal(id) {
+    editingAddressId = id || null;
+    document.getElementById('addressModalTitle').textContent = id ? '住所を編集する' : '住所を追加する';
+
+    if (id) {
+      const { data: addr } = await supabaseClient.from('addresses').select('*').eq('id', id).single();
+      if (addr) {
+        document.getElementById('addrName').value = addr.name || '';
+        document.getElementById('addrPostal').value = addr.postal_code || '';
+        document.getElementById('addrPrefecture').value = addr.prefecture || '';
+        document.getElementById('addrLine').value = addr.address_line || '';
+        document.getElementById('addrBuilding').value = addr.building || '';
+        document.getElementById('addrPhone').value = addr.phone || '';
+        document.getElementById('addrIsDefault').checked = addr.is_default;
+      }
+    } else {
+      ['addrName','addrPostal','addrPrefecture','addrLine','addrBuilding','addrPhone'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('addrIsDefault').checked = false;
+    }
+
+    document.getElementById('addressModal').classList.add('open');
+  }
+
+  function closeAddressModal() {
+    document.getElementById('addressModal').classList.remove('open');
+  }
+
+  function closeModalOutside2(e) {
+    if (e.target === document.getElementById('addressModal')) closeAddressModal();
+  }
+
+  async function saveAddressModal() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) { window.location.href = 'komcho-market-login.html'; return; }
+
+    const name = document.getElementById('addrName').value.trim();
+    const addressLine = document.getElementById('addrLine').value.trim();
+    if (!name || !addressLine) {
+      showToast('お名前と住所は必須です');
+      return;
+    }
+
+    const payload = {
+      user_id: session.user.id,
+      name: name,
+      postal_code: document.getElementById('addrPostal').value.trim(),
+      prefecture: document.getElementById('addrPrefecture').value.trim(),
+      address_line: addressLine,
+      building: document.getElementById('addrBuilding').value.trim(),
+      phone: document.getElementById('addrPhone').value.trim(),
+      is_default: document.getElementById('addrIsDefault').checked
+    };
+
+    // デフォルトに設定する場合、他の住所のデフォルトを解除
+    if (payload.is_default) {
+      await supabaseClient.from('addresses').update({ is_default: false }).eq('user_id', session.user.id);
+    }
+
+    if (editingAddressId) {
+      await supabaseClient.from('addresses').update(payload).eq('id', editingAddressId);
+    } else {
+      await supabaseClient.from('addresses').insert(payload);
+    }
+
+    closeAddressModal();
+    showToast('住所を保存しました ✓');
+    await loadAddresses();
+  }
+
+  async function deleteAddressReal(id) {
+    if (!confirm('この住所を削除しますか？')) return;
+    await supabaseClient.from('addresses').delete().eq('id', id);
+    showToast('住所を削除しました');
+    await loadAddresses();
+  }
+</script>
 
 <script>
   function removeWish(btn) {
@@ -859,12 +1024,6 @@
     if (confirm('このカードを削除しますか？')) {
       btn.closest('.payment-item').remove();
       showToast('カードを削除しました');
-    }
-  }
-  function deleteAddress(btn) {
-    if (confirm('この住所を削除しますか？')) {
-      btn.closest('.address-item').remove();
-      showToast('住所を削除しました');
     }
   }
   function openCardModal() {

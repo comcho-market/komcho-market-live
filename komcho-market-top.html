@@ -293,40 +293,81 @@
     stroke: currentColor; fill: none;
     stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
   }
+
+  /* ============ DESKTOP (≥900px) ============ */
+  @media (min-width: 900px) {
+    body { max-width: 1160px; padding-bottom: 60px; }
+
+    .header { padding: 20px 40px; }
+    .header-logo .logo-icon { width: 30px; height: 24px; }
+    .header-logo .logo-text { font-size: 18px; }
+    .header-icons { gap: 28px; }
+    .header-icons svg { width: 23px; height: 23px; }
+
+    .hero-wrap { margin: 24px 40px 0; aspect-ratio: 21 / 6; border-radius: 20px; }
+    .hero-photo-placeholder svg { width: 52px; height: 52px; }
+    .hero-photo-placeholder span { font-size: 14px; }
+    .hero-photo-placeholder span + span { font-size: 12px; }
+
+    .tagline { margin: 22px 40px 0; font-size: 13px; }
+
+    .section { margin: 40px 0; }
+    .categories-scroll {
+      padding: 4px 40px; overflow: visible;
+      justify-content: center; gap: 18px;
+    }
+    .cat-item { width: 96px; padding: 8px; }
+    .cat-icon { width: 66px; height: 66px; }
+    .cat-icon svg { width: 48px; height: 48px; }
+    .cat-label { font-size: 13px; }
+
+    .section-title h2 { font-size: 27px; }
+    .section-title .eyebrow { font-size: 12px; }
+
+    .products-grid {
+      grid-template-columns: repeat(4, 1fr);
+      gap: 22px; padding: 4px 40px 16px;
+    }
+    .product-img-grid { font-size: 52px; }
+    .product-name-grid { font-size: 13.5px; }
+    .product-price { font-size: 14.5px; }
+
+    .about-section { max-width: 760px; margin: 8px auto 36px; padding: 48px 60px; }
+    .about-lead { font-size: 21px; }
+
+    .banner { margin: 8px 40px 0; padding: 30px 44px; }
+    .banner-text h3 { font-size: 16px; }
+    .banner-text p { font-size: 13px; }
+    .banner-btn { font-size: 13px; padding: 11px 22px; }
+
+    .bottom-nav { display: none; }
+  }
 </style>
 </head>
 <body>
 
 <!-- HEADER -->
 <header class="header">
-  <div class="header-logo">
+  <a class="header-logo" href="komcho-market-top.html">
     <svg class="logo-icon" viewBox="0 0 60 48">
       <path transform="translate(30,24)" d="M -26 7 C -17 -17 5 -24 24 -10 C 12 5 -2 19 -21 24"/>
     </svg>
     <span class="logo-text">こむちょマーケット</span>
-  </div>
+  </a>
   <div class="header-icons">
-    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-    <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-    <div class="cart-wrap">
+    <a href="komcho-market-search.html" style="display:flex;"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></a>
+    <a href="komcho-market-mypage.html" style="display:flex;"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></a>
+    <a href="komcho-market-cart.html" style="display:flex;"><div class="cart-wrap">
       <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
       <div class="cart-badge">1</div>
-    </div>
-    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    </div></a>
+    <a href="komcho-market-mypage.html" style="display:flex;"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></a>
   </div>
 </header>
 
-<!-- HERO: 写真プレースホルダー -->
+<!-- HERO -->
 <div class="hero-wrap">
-  <div class="hero-photo-placeholder">
-    <svg viewBox="0 0 24 24">
-      <rect x="3" y="3" width="18" height="18" rx="2"/>
-      <circle cx="8.5" cy="8.5" r="1.5"/>
-      <polyline points="21 15 16 10 5 21"/>
-    </svg>
-    <span>ここに写真を挿入してください</span>
-    <span style="font-size:10px; color:#B8A888;">推奨サイズ：横長・オーガニック系</span>
-  </div>
+  <img src="images/hero.jpg" alt="こむちょマーケット" style="width:100%;height:100%;object-fit:cover;object-position:center 75%;display:block;">
 </div>
 
 <div class="tagline">こだわり・無添加・ちょいす</div>
@@ -335,54 +376,117 @@
 <div class="section" style="margin-top:20px;">
   <div class="categories-scroll">
 
-    <div class="cat-item">
+    <a class="cat-item" href="komcho-market-search.html?category=生鮮食品" style="text-decoration:none;">
       <div class="cat-icon">
         <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#EAF0E8"/><g transform="translate(50,50)" fill="none" stroke="#3D5A3E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M -13 -16 C -13 -21 13 -21 13 -16 L 4 22 L 0 30 L -4 22 Z"/><path d="M 0 -21 L -4 -35"/><path d="M 0 -21 L 4 -37"/><path d="M 0 -21 L -9 -32"/></g></svg>
       </div>
       <span class="cat-label">生鮮食品</span>
-    </div>
+    </a>
 
-    <div class="cat-item">
+    <a class="cat-item" href="komcho-market-search.html?category=惣菜" style="text-decoration:none;">
       <div class="cat-icon">
         <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#EAF0E8"/><g transform="translate(50,50)" fill="none" stroke="#3D5A3E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M -22 10 C -22 -12 22 -12 22 10 L 18 18 L -18 18 Z"/><path d="M -6 -18 C -6 -24 -10 -28 -8 -34"/><path d="M 6 -18 C 6 -24 10 -28 8 -34"/></g></svg>
       </div>
       <span class="cat-label">惣菜</span>
-    </div>
+    </a>
 
-    <div class="cat-item">
+    <a class="cat-item" href="komcho-market-search.html?category=調味料" style="text-decoration:none;">
       <div class="cat-icon">
         <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#EAF0E8"/><g transform="translate(50,50)" fill="none" stroke="#3D5A3E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M -8 -28 L -8 -20 L -16 -8 L -16 28 L 16 28 L 16 -8 L 8 -20 L 8 -28 Z"/><path d="M -8 -28 L 8 -28"/></g></svg>
       </div>
       <span class="cat-label">調味料</span>
-    </div>
+    </a>
 
-    <div class="cat-item">
+    <a class="cat-item" href="komcho-market-search.html?category=お菓子" style="text-decoration:none;">
       <div class="cat-icon">
         <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#EAF0E8"/><g transform="translate(50,50)" fill="none" stroke="#3D5A3E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="0" cy="0" r="28"/><path d="M 0 0 L 0 -20"/><path d="M 0 0 L 16 0"/></g></svg>
       </div>
       <span class="cat-label">お菓子</span>
-    </div>
+    </a>
 
-    <div class="cat-item">
+    <a class="cat-item" href="komcho-market-search.html?category=飲み物" style="text-decoration:none;">
       <div class="cat-icon">
         <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#EAF0E8"/><g transform="translate(50,50)" fill="none" stroke="#3D5A3E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M -12 -22 L 12 -22 L 10 20 C 10 26 -10 26 -10 20 Z"/><path d="M 0 -22 L 0 -35"/><path d="M -8 -35 C -4 -42 4 -42 8 -35"/></g></svg>
       </div>
       <span class="cat-label">飲み物</span>
-    </div>
+    </a>
 
-    <div class="cat-item">
+    <a class="cat-item" href="komcho-market-search.html?category=日用品" style="text-decoration:none;">
       <div class="cat-icon">
         <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#EAF0E8"/><g transform="translate(50,50)" fill="none" stroke="#3D5A3E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M -22 -18 L 22 -18 L 18 22 L -18 22 Z"/><path d="M -22 -18 L 0 -30 L 22 -18"/></g></svg>
       </div>
       <span class="cat-label">日用品</span>
-    </div>
+    </a>
 
-    <div class="cat-item">
+    <a class="cat-item" href="komcho-market-search.html?category=ギフト" style="text-decoration:none;">
       <div class="cat-icon">
         <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#EAF0E8"/><g transform="translate(50,50)" fill="none" stroke="#3D5A3E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M -22 -8 L -22 22 L 22 22 L 22 -8 Z"/><path d="M -26 -14 L 26 -14 L 22 -8 L -22 -8 Z"/><path d="M 0 -14 L 0 22"/><path d="M 0 -14 C 0 -14 -6 -26 -12 -22 C -16 -19 -16 -14 -12 -14 C -6 -14 -2 -18 0 -14"/><path d="M 0 -14 C 0 -14 6 -26 12 -22 C 16 -19 16 -14 12 -14 C 6 -14 2 -18 0 -14"/></g></svg>
       </div>
       <span class="cat-label">ギフト</span>
-    </div>
+    </a>
+
+  </div>
+</div>
+
+<!-- NEW ARRIVALS -->
+<div class="section">
+  <div class="section-title">
+    <div class="eyebrow">New Arrivals</div>
+    <h2>新着商品</h2>
+  </div>
+  <div class="products-grid">
+
+    <a class="product-card-grid" href="komcho-market-product.html" style="text-decoration:none;color:inherit;display:block;">
+      <div class="new-badge">NEW</div>
+      <div class="product-img-grid g1">🧼
+        <button class="wish-btn">
+          <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </button>
+      </div>
+      <div class="product-info-grid">
+        <div class="product-shop-grid">草木屋</div>
+        <div class="product-name-grid">無添加石鹸 ひのき</div>
+        <div class="tag-pills"><span class="tag-pill">天然素材100%</span></div>
+        <div class="product-price">¥680</div></div></a>
+
+    <a class="product-card-grid" href="komcho-market-product.html" style="text-decoration:none;color:inherit;display:block;">
+      <div class="new-badge">NEW</div>
+      <div class="product-img-grid g2">🍵
+        <button class="wish-btn">
+          <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </button>
+      </div>
+      <div class="product-info-grid">
+        <div class="product-shop-grid">京の茶屋</div>
+        <div class="product-name-grid">無農薬ほうじ茶 100g</div>
+        <div class="tag-pills"><span class="tag-pill">無農薬</span></div>
+        <div class="product-price">¥1,080</div></div></a>
+
+    <a class="product-card-grid" href="komcho-market-product.html" style="text-decoration:none;color:inherit;display:block;">
+      <div class="new-badge">NEW</div>
+      <div class="product-img-grid g3">💧
+        <button class="wish-btn">
+          <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </button>
+      </div>
+      <div class="product-info-grid">
+        <div class="product-shop-grid">ナチュラルケア</div>
+        <div class="product-name-grid">有機オリーブオイル</div>
+        <div class="tag-pills"><span class="tag-pill">有機・オーガニック</span></div>
+        <div class="product-price">¥1,480</div></div></a>
+
+    <a class="product-card-grid" href="komcho-market-product.html" style="text-decoration:none;color:inherit;display:block;">
+      <div class="new-badge">NEW</div>
+      <div class="product-img-grid g4">🍪
+        <button class="wish-btn">
+          <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </button>
+      </div>
+      <div class="product-info-grid">
+        <div class="product-shop-grid">てとてベーカリー</div>
+        <div class="product-name-grid">グルテンフリー クッキー</div>
+        <div class="tag-pills"><span class="tag-pill">グルテンフリー</span></div>
+        <div class="product-price">¥840</div></div></a>
 
   </div>
 </div>
@@ -398,159 +502,55 @@
 
     <div class="about-lead">なぜ、こむちょマーケットを<br>つくったのか。</div>
 
-    <div class="about-body">
+    <div class="about-body" style="margin-bottom:0;">
       スーパーの棚には、たくさんの商品が並んでいます。でも「本当に自分に合うもの」を探そうとすると、原材料を調べて、産地を確認して、気づけば何十分も経っている。<br><br>
       そんな経験、ありませんか？<br><br>
-      こむちょマーケットは、<strong>こだわりたい人が、迷わず選べる場所</strong>です。
+      「こむちょ」という名前には、<strong>こ</strong>だわりたい人が、<strong>む</strong>添加やオーガニックといった基準の中から、自分にとって<strong>ちょ</strong>うどいいものを見つけられるように、という想いを込めました。<br><br>
+      こむちょマーケットは、こだわりたい人が、迷わず選べる場所です。
     </div>
 
-    <div class="about-block">
-      <div class="about-block-title">🌿 絶対に扱わないもの</div>
-      <p>どんな商品であっても、以下は出店をお断りしています。</p>
-      <ul class="ng-list">
-        <li>タール色素・合成着色料</li>
-        <li>アスパルテームなどの人工甘味料</li>
-        <li>亜硝酸ナトリウム・硝酸塩</li>
-        <li>ポストハーベスト農薬</li>
-      </ul>
-    </div>
-
-    <div class="about-block">
-      <div class="about-block-title">🏷️ あなたの「ちょうどいい」が見つかる</div>
-      <p>
-        こだわりに、正解はありません。<br><br>
-        「添加物は気になるけど、全部は無理」「オーガニックにしたいけど、予算もある」——自分の中にある<strong>ちょうどいいライン</strong>は、人それぞれ違う。<br><br>
-        こむちょマーケットは、そのラインに合う商品がサッと見つかるように、詳細なタグとフィルターを用意しています。<br><em>無農薬</em>・<em>オーガニック</em>・<em>グルテンフリー</em>・<em>砂糖不使用</em>など。アレルギー8品目の除外フィルターも使えます。<br><br>
-        何が正しいかより、<strong>あなたに合うかどうか。</strong> それだけを基準に選べる場所でありたいと思っています。
-      </p>
-    </div>
-
-    <div class="about-block">
-      <div class="about-block-title">🏪 小さなお店が、集まる場所</div>
-      <p>
-        モール系のECサイトは手数料が高く、小さなお店にとって出店のハードルが高いのが現実です。<br><br>
-        こむちょマーケットは、AIを活用してコストを抑えることで、個人店や小さなこだわりのお店が出店しやすい場所を目指しています。<br><br>
-        今まではなかなか出会えなかった、<strong>こだわりの強い小さなお店</strong>が集まる場所を目指しています。
-      </p>
-    </div>
-
-    <div class="about-block" style="margin-bottom:0;">
-      <div class="about-block-title">📋 全商品に開示を求めています</div>
-      <p>
-        他のショッピングサイトで商品を探していると、「原材料、どこに書いてあるの？」と思うことはありませんか？<br><br>
-        こむちょマーケットでは、全商品の商品ページに<strong>バックラベルと同じ情報</strong>（原材料・アレルギー情報・製造者情報など）を必ず掲載しています。小さな文字でまとめてあるのではなく、すぐ目につく場所に。<br><br>
-        買う前に、ちゃんと確認できる。それがわたしたちの約束です。
-      </p>
-    </div>
-
-  </div>
-</div>
-
-<!-- NEW ARRIVALS -->
-<div class="section">
-  <div class="section-title">
-    <div class="eyebrow">New Arrivals</div>
-    <h2>新着商品</h2>
-  </div>
-  <div class="products-grid">
-
-    <div class="product-card-grid">
-      <div class="new-badge">NEW</div>
-      <div class="product-img-grid g1">🧼
-        <button class="wish-btn">
-          <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-        </button>
-      </div>
-      <div class="product-info-grid">
-        <div class="product-shop-grid">草木屋</div>
-        <div class="product-name-grid">無添加石鹸 ひのき</div>
-        <div class="tag-pills"><span class="tag-pill">天然素材100%</span></div>
-        <div class="product-price">¥680</div>
-      </div>
-    </div>
-
-    <div class="product-card-grid">
-      <div class="new-badge">NEW</div>
-      <div class="product-img-grid g2">🍵
-        <button class="wish-btn">
-          <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-        </button>
-      </div>
-      <div class="product-info-grid">
-        <div class="product-shop-grid">京の茶屋</div>
-        <div class="product-name-grid">無農薬ほうじ茶 100g</div>
-        <div class="tag-pills"><span class="tag-pill">無農薬</span></div>
-        <div class="product-price">¥1,080</div>
-      </div>
-    </div>
-
-    <div class="product-card-grid">
-      <div class="new-badge">NEW</div>
-      <div class="product-img-grid g3">💧
-        <button class="wish-btn">
-          <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-        </button>
-      </div>
-      <div class="product-info-grid">
-        <div class="product-shop-grid">ナチュラルケア</div>
-        <div class="product-name-grid">有機オリーブオイル</div>
-        <div class="tag-pills"><span class="tag-pill">有機・オーガニック</span></div>
-        <div class="product-price">¥1,480</div>
-      </div>
-    </div>
-
-    <div class="product-card-grid">
-      <div class="new-badge">NEW</div>
-      <div class="product-img-grid g4">🍪
-        <button class="wish-btn">
-          <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-        </button>
-      </div>
-      <div class="product-info-grid">
-        <div class="product-shop-grid">てとてベーカリー</div>
-        <div class="product-name-grid">グルテンフリー クッキー</div>
-        <div class="tag-pills"><span class="tag-pill">グルテンフリー</span></div>
-        <div class="product-price">¥840</div>
-      </div>
-    </div>
+    <a href="komcho-market-about.html" style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:20px;padding-top:20px;border-top:1px solid var(--border);font-size:13px;font-weight:700;color:var(--green-dark);">
+      わたしたちのこだわりをもっと見る
+      <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:var(--green-dark);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><polyline points="9 18 15 12 9 6"/></svg>
+    </a>
 
   </div>
 </div>
 
 <!-- BANNER -->
-<div class="banner">
+<a href="komcho-market-seller-apply.html" class="banner" style="text-decoration:none;">
   <div class="banner-text">
     <h3>🌿 出店をご検討の方へ</h3>
     <p>こだわりの食品・日用品を<br>販売しませんか？</p>
   </div>
   <div class="banner-btn">詳しく見る</div>
-</div>
+</a>
 
 <!-- BOTTOM NAV -->
 <nav class="bottom-nav">
-  <div class="nav-item active">
+  <a class="nav-item active" href="komcho-market-top.html">
     <svg viewBox="0 0 24 24" style="fill:var(--green-dark);stroke:var(--green-dark);stroke-width:1.6;">
       <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
       <polyline points="9 22 9 12 15 12 15 22" style="stroke:#fff;fill:none;stroke-width:1.6;"/>
     </svg>
     <span>ホーム</span>
-  </div>
-  <div class="nav-item">
+  </a>
+  <a class="nav-item" href="komcho-market-search.html">
     <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
     <span>探す</span>
-  </div>
-  <div class="nav-item">
+  </a>
+  <a class="nav-item" href="komcho-market-mypage.html">
     <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
     <span>お気に入り</span>
-  </div>
-  <div class="nav-item">
+  </a>
+  <a class="nav-item" href="komcho-market-cart.html">
     <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
     <span>カゴ</span>
-  </div>
-  <div class="nav-item">
+  </a>
+  <a class="nav-item" href="komcho-market-orders.html">
     <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
     <span>履歴</span>
-  </div>
+  </a>
 </nav>
 
 </body>
