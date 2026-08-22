@@ -405,22 +405,6 @@
       <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
       <span>写真1</span>
     </div>
-    <div class="slide s2">
-      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-      <span>写真2</span>
-    </div>
-    <div class="slide s3">
-      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-      <span>写真3</span>
-    </div>
-    <div class="slide s4">
-      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-      <span>写真4</span>
-    </div>
-    <div class="slide s5">
-      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-      <span>写真5</span>
-    </div>
   </div>
   <button class="wish-float" id="wishBtn">
     <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
@@ -428,44 +412,33 @@
 </div>
 
 <!-- DOTS -->
-<div class="dots" id="dots">
-  <div class="dot active" onclick="goSlide(0)"></div>
-  <div class="dot" onclick="goSlide(1)"></div>
-  <div class="dot" onclick="goSlide(2)"></div>
-  <div class="dot" onclick="goSlide(3)"></div>
-  <div class="dot" onclick="goSlide(4)"></div>
-</div>
+<div class="dots" id="dots"></div>
 
 </div>
 <div class="pdp-info">
 
 <!-- PRODUCT INFO -->
 <div class="product-body">
-  <div class="shop-badge">〇〇農園</div>
-  <h1 class="product-name">無添加 自家製味噌 500g</h1>
-  <div class="rating-row">
+  <div class="shop-badge" id="shopBadge">〇〇農園</div>
+  <h1 class="product-name" id="productName">無添加 自家製味噌 500g</h1>
+  <div class="rating-row" id="ratingRow" style="display:none;">
     <span class="stars">★★★★★</span>
     <span class="rating-score">4.8</span>
     <span class="rating-count">（23件のレビュー）</span>
   </div>
   <div class="price-row">
-    <span class="price">¥1,800</span>
+    <span class="price" id="productPrice">¥1,800</span>
     <span class="price-tax">（税込）</span>
   </div>
-  <div class="tag-pills">
-    <span class="tag-pill">グルテンフリー</span>
-    <span class="tag-pill">砂糖不使用</span>
-    <span class="tag-pill">化学調味料不使用</span>
-    <span class="tag-pill">国産100%</span>
-  </div>
+  <div class="tag-pills" id="tagPills"></div>
 </div>
 
 <div class="gap"></div>
 
 <!-- DESCRIPTION -->
-<div class="section-block">
+<div class="section-block" id="descBlock" style="display:none;">
   <div class="block-title">商品説明</div>
-  <p class="desc-text">厳選された国産の大豆と米麹を使用し、伝統的な製法で丁寧に仕込んだ自家製味噌です。豊かな香りと深いコク、自然な甘みをお楽しみください。毎日の食卓に、体に優しい本物の味を。</p>
+  <p class="desc-text" id="descText"></p>
 </div>
 
 <div class="gap"></div>
@@ -473,32 +446,7 @@
 <!-- PRODUCT INFO TABLE -->
 <div class="section-block">
   <div class="block-title">商品情報</div>
-  <table class="info-table">
-    <tr>
-      <th>内容量</th>
-      <td>500g</td>
-    </tr>
-    <tr>
-      <th>原材料</th>
-      <td>大豆（国産）、米麹、塩</td>
-    </tr>
-    <tr>
-      <th>アレルギー</th>
-      <td>大豆</td>
-    </tr>
-    <tr>
-      <th>賞味期限</th>
-      <td>製造から6ヶ月</td>
-    </tr>
-    <tr>
-      <th>保存方法</th>
-      <td>冷蔵</td>
-    </tr>
-    <tr>
-      <th>製造者</th>
-      <td>〇〇農園（京都府△△市）</td>
-    </tr>
-  </table>
+  <table class="info-table" id="infoTable"></table>
 </div>
 
 <div class="gap"></div>
@@ -506,18 +454,18 @@
 <!-- DELIVERY -->
 <div class="section-block">
   <div class="block-title">配送について</div>
-  <p class="delivery-text">全国一律 <strong>¥800</strong>（クール便）</p>
-  <p class="delivery-note">※ご注文後3〜5営業日以内に発送します。</p>
+  <p class="delivery-text" id="deliveryText">全国一律 <strong>¥800</strong>（クール便）</p>
+  <p class="delivery-note" id="deliveryNote">※ご注文後3〜5営業日以内に発送します。</p>
 </div>
 
 <div class="gap"></div>
 
 <!-- SHOP CARD -->
 <div class="section-block">
-  <a class="shop-card" href="komcho-market-shop.html" style="text-decoration:none;color:inherit;">
-    <div class="shop-logo">SHOP<br>LOGO</div>
+  <a class="shop-card" href="komcho-market-shop.html" id="shopCardLink" style="text-decoration:none;color:inherit;">
+    <div class="shop-logo" id="shopCardLogo">SHOP<br>LOGO</div>
     <div class="shop-info">
-      <div class="shop-name">〇〇農園</div>
+      <div class="shop-name" id="shopCardName">〇〇農園</div>
       <div class="shop-link">→ 店舗ページを見る</div>
     </div>
     <div class="shop-arrow">
@@ -529,7 +477,7 @@
 <div class="gap"></div>
 
 <!-- REVIEWS -->
-<div class="section-block">
+<div class="section-block" id="reviewsBlock" style="display:none;">
   <div class="block-title">レビュー</div>
   <div class="review-header">
     <span class="review-score-big">4.8</span>
@@ -590,19 +538,95 @@
   </div>
 </nav>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
-  // Slider
+  const SUPABASE_URL = 'https://uawhrpizzlchkvmzrjzo.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_FaOqUE1PDbo-fpT9KhkWaw__BShLngI';
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
   let current = 0;
-  const total = 5;
+  let total = 1;
   const inner = document.getElementById('sliderInner');
-  const dotsEl = document.querySelectorAll('.dot');
 
   function goSlide(n) {
     current = n;
     inner.style.transform = `translateX(-${(100 / total) * n}%)`;
-    dotsEl.forEach((d, i) => d.classList.toggle('active', i === n));
+    document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === n));
   }
 
+  (async function loadProduct() {
+    const productId = new URLSearchParams(window.location.search).get('id');
+    if (!productId) return; // IDが無ければ、これまで通りサンプル表示のまま
+
+    const { data: p, error } = await supabaseClient
+      .from('products')
+      .select('*, shops(id, shop_name, logo_url)')
+      .eq('id', productId)
+      .single();
+
+    if (error || !p) return;
+
+    // 写真スライダー（メイン＋追加写真）
+    const photos = [p.image_url, ...(Array.isArray(p.images) ? p.images : [])].filter(Boolean);
+    if (photos.length > 0) {
+      total = photos.length;
+      inner.innerHTML = photos.map(url => `
+        <div class="slide" style="background:#f0ece2;">
+          <img src="${url}" style="width:100%;height:100%;object-fit:cover;">
+        </div>
+      `).join('');
+      document.getElementById('dots').innerHTML = photos.map((_, i) =>
+        `<div class="dot ${i === 0 ? 'active' : ''}" onclick="goSlide(${i})"></div>`
+      ).join('');
+    }
+
+    document.getElementById('productName').textContent = p.name || '';
+    document.getElementById('productPrice').textContent = `¥${Number(p.price || 0).toLocaleString()}`;
+    document.title = `${p.name || '商品'} - こむちょマーケット`;
+
+    if (p.description) {
+      document.getElementById('descText').textContent = p.description;
+      document.getElementById('descBlock').style.display = 'block';
+    }
+
+    // こだわりタグ
+    if (Array.isArray(p.tags) && p.tags.length > 0) {
+      document.getElementById('tagPills').innerHTML = p.tags.map(t => `<span class="tag-pill">${t}</span>`).join('');
+    }
+
+    // 商品情報テーブル（値がある項目だけ表示）
+    const infoRows = [
+      ['内容量', p.volume],
+      ['原材料', p.ingredients],
+      ['アレルギー', Array.isArray(p.allergies) && p.allergies.length > 0 ? p.allergies.join('、') : null],
+      ['賞味期限', p.expiry],
+      ['保存方法', p.storage_method],
+      ['製造者', p.manufacturer]
+    ].filter(([, v]) => v);
+    document.getElementById('infoTable').innerHTML = infoRows.length > 0
+      ? infoRows.map(([label, v]) => `<tr><th>${label}</th><td>${v}</td></tr>`).join('')
+      : '<tr><td style="color:var(--text-sub);font-size:12px;">情報は準備中です</td></tr>';
+
+    // 配送
+    const shippingLabels = { normal: '常温便', cold: 'クール便（冷蔵）', frozen: 'クール便（冷凍）' };
+    const shippingLabel = shippingLabels[p.shipping_method] || '通常配送';
+    document.getElementById('deliveryText').innerHTML = p.shipping_free
+      ? `<strong>送料無料</strong>（${shippingLabel}）`
+      : `${shippingLabel}`;
+    document.getElementById('deliveryNote').textContent = p.shipping_note || '※発送日の目安は店舗にお問い合わせください。';
+
+    // ショップ情報
+    if (p.shops) {
+      document.getElementById('shopBadge').textContent = p.shops.shop_name || '';
+      document.getElementById('shopCardName').textContent = p.shops.shop_name || '';
+      document.getElementById('shopCardLink').href = `komcho-market-shop.html?id=${p.shops.id}`;
+      if (p.shops.logo_url) {
+        document.getElementById('shopCardLogo').innerHTML = `<img src="${p.shops.logo_url}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">`;
+      }
+    }
+  })();
+</script>
+<script>
   // Touch swipe
   let startX = 0;
   const sliderEl = document.getElementById('slider');
