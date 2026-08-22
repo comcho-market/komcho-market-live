@@ -381,6 +381,12 @@
   <a href="komcho-market-terms.html" class="register-link" style="text-decoration:underline;">新規登録（無料）</a>
 </div>
 
+<!-- 出店者ログインリンク -->
+<div class="register-link-wrap" style="margin-top:4px;">
+  店舗運営者の方は
+  <a href="komcho-market-seller-login.html" class="register-link" style="text-decoration:underline;">こちらからログイン</a>
+</div>
+
 <!-- パスワードリセットモーダル -->
 <div class="modal-overlay" id="forgotModal" onclick="closeModalOutside(event)">
   <div class="modal">
@@ -458,6 +464,20 @@
       document.getElementById('loginError').classList.add('visible');
       document.getElementById('emailInput').classList.add('error');
       document.getElementById('pwInput').classList.add('error');
+      return;
+    }
+
+    // 出店者アカウント（shopsテーブルに紐づいている）の場合は、お客様側ログインを弾く
+    const { data: shop } = await supabaseClient
+      .from('shops')
+      .select('id')
+      .eq('owner_id', data.user.id)
+      .single();
+
+    if (shop) {
+      await supabaseClient.auth.signOut();
+      document.getElementById('loginError').textContent = 'このアカウントは出店者用です。出店者ログイン画面からログインしてください。';
+      document.getElementById('loginError').classList.add('visible');
       return;
     }
 
