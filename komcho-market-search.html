@@ -848,58 +848,42 @@
   </a>
 </nav>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
-// ===== サンプル商品データ =====
-const allProducts = [
-  {
-    id: 1, emoji: '🥕', grade: 'g2', isNew: true,
-    shop: '〇〇農園', name: '無農薬にんじん 1kg',
-    tags: ['無農薬', '国産100%'], allergy: [],
-    category: '生鮮食品', delivery: '通常便', price: 680, rating: 4.9, popular: 95
-  },
-  {
-    id: 2, emoji: '🫙', grade: 'g1', isNew: true,
-    shop: '〇〇農園', name: '無添加 自家製味噌 500g',
-    tags: ['化学調味料不使用', '砂糖不使用', 'グルテンフリー', '国産100%'], allergy: ['大豆'],
-    category: '調味料', delivery: 'クール便（冷蔵）', price: 1800, rating: 4.8, popular: 88
-  },
-  {
-    id: 3, emoji: '🍵', grade: 'g2', isNew: false,
-    shop: '京の茶屋', name: '無農薬ほうじ茶 100g',
-    tags: ['無農薬'], allergy: [],
-    category: '飲み物', delivery: '通常便', price: 1080, rating: 4.7, popular: 72
-  },
-  {
-    id: 4, emoji: '🧼', grade: 'g3', isNew: true,
-    shop: '草木屋', name: '無添加石鹸 ひのき',
-    tags: ['天然素材100%', '合成界面活性剤不使用'], allergy: [],
-    category: '日用品', delivery: '通常便', price: 680, rating: 4.6, popular: 65
-  },
-  {
-    id: 5, emoji: '🍪', grade: 'g4', isNew: false,
-    shop: 'てとてベーカリー', name: 'グルテンフリー クッキー',
-    tags: ['グルテンフリー', '卵不使用'], allergy: [],
-    category: 'お菓子', delivery: '通常便', price: 840, rating: 4.5, popular: 60
-  },
-  {
-    id: 6, emoji: '💧', grade: 'g3', isNew: false,
-    shop: 'ナチュラルケア', name: '有機オリーブオイル 200ml',
-    tags: ['有機・オーガニック', '国産100%'], allergy: [],
-    category: '調味料', delivery: '通常便', price: 1480, rating: 4.7, popular: 80
-  },
-  {
-    id: 7, emoji: '🍯', grade: 'g1', isNew: true,
-    shop: '〇〇農園', name: '完熟梅の無添加シロップ',
-    tags: ['砂糖不使用', '着色料不使用', '保存料不使用'], allergy: [],
-    category: '飲み物', delivery: '通常便', price: 1800, rating: 4.9, popular: 92
-  },
-  {
-    id: 8, emoji: '🌾', grade: 'g4', isNew: false,
-    shop: '〇〇農園', name: '無農薬コシヒカリ玄米 2kg',
-    tags: ['無農薬', '国産100%'], allergy: [],
-    category: '生鮮食品', delivery: '通常便', price: 2100, rating: 4.8, popular: 85
-  },
-];
+const SUPABASE_URL = 'https://uawhrpizzlchkvmzrjzo.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_FaOqUE1PDbo-fpT9KhkWaw__BShLngI';
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const shippingLabelMap = { normal: '通常便', cold: 'クール便（冷蔵）', frozen: 'クール便（冷凍）' };
+
+// ===== 商品データ（Supabaseから取得） =====
+let allProducts = [];
+
+async function fetchAllProducts() {
+  const { data, error } = await supabaseClient
+    .from('products')
+    .select('*, shops(shop_name)')
+    .eq('is_active', true)
+    .order('created_at', { ascending: false });
+
+  if (error || !data) return [];
+
+  return data.map(p => ({
+    id: p.id,
+    imageUrl: p.image_url,
+    isNew: (Date.now() - new Date(p.created_at).getTime()) < 1000 * 60 * 60 * 24 * 14,
+    shop: p.shops?.shop_name || '',
+    name: p.name,
+    tags: Array.isArray(p.tags) ? p.tags : [],
+    allergy: Array.isArray(p.allergies) ? p.allergies : [],
+    category: p.category || '',
+    delivery: shippingLabelMap[p.shipping_method] || '通常便',
+    price: p.price || 0,
+    rating: 0,
+    popular: 0,
+    createdAt: p.created_at
+  }));
+}
 
 // ===== 状態管理 =====
 let state = {
@@ -915,8 +899,10 @@ let accordionState = { cat: true, tag: true, allergy: false, delivery: false };
 let wishSet = new Set();
 
 // ===== 初期描画 =====
-renderProducts(allProducts);
-updateResultCount(allProducts.length);
+(async function initSearch() {
+  allProducts = await fetchAllProducts();
+  runSearch();
+})();
 
 // ===== 検索バー =====
 const searchInput = document.getElementById('searchInput');
@@ -1052,18 +1038,24 @@ function getFilteredProducts() {
   else if (state.sort === 'price_desc') list.sort((a, b) => b.price - a.price);
   else if (state.sort === 'popular') list.sort((a, b) => b.popular - a.popular);
   else if (state.sort === 'rating') list.sort((a, b) => b.rating - a.rating);
-  else list.sort((a, b) => b.id - a.id);
+  else list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   return list;
 }
 
 // ===== 商品カード描画 =====
+const searchThumbClasses = ['g1', 'g2', 'g3', 'g4', 'g5', 'g6', 'g7', 'g8'];
 function renderProducts(list) {
   const grid = document.getElementById('productsGrid');
-  grid.innerHTML = list.map(p => `
-    <div class="product-card-grid" onclick="openProduct(${p.id})">
+  grid.innerHTML = list.map((p, i) => {
+    const thumbClass = searchThumbClasses[i % searchThumbClasses.length];
+    const thumbInner = p.imageUrl
+      ? `<img src="${p.imageUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">`
+      : '🛍️';
+    return `
+    <div class="product-card-grid" onclick="openProduct('${p.id}')">
       ${p.isNew ? '<div class="new-badge">NEW</div>' : ''}
-      <div class="product-img-grid ${p.grade}">${p.emoji}
-        <button class="wish-btn ${wishSet.has(p.id) ? 'active' : ''}" onclick="toggleWish(event, ${p.id})">
+      <div class="product-img-grid ${thumbClass}">${thumbInner}
+        <button class="wish-btn ${wishSet.has(p.id) ? 'active' : ''}" onclick="toggleWish(event, '${p.id}')">
           <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
         </button>
       </div>
@@ -1076,7 +1068,8 @@ function renderProducts(list) {
         <div class="product-price">¥${p.price.toLocaleString()}</div>
       </div>
     </div>
-  `).join('');
+  `;
+  }).join('');
 }
 
 // ===== ウィッシュリスト =====
@@ -1090,7 +1083,7 @@ function toggleWish(e, id) {
 
 // ===== 商品ページへ =====
 function openProduct(id) {
-  window.location.href = 'komcho-market-product.html';
+  window.location.href = `komcho-market-product.html?id=${id}`;
 }
 
 // ===== ソート =====
