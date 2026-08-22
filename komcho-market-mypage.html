@@ -839,6 +839,20 @@
       return;
     }
 
+    // 出店者アカウント（shopsテーブルに紐づいている）の場合は、お客様側から締め出す
+    const { data: shop } = await supabaseClient
+      .from('shops')
+      .select('id')
+      .eq('owner_id', session.user.id)
+      .single();
+
+    if (shop) {
+      await supabaseClient.auth.signOut();
+      alert('このアカウントは出店者用です。お客様としてご利用の場合は、別のメールアドレスで会員登録・ログインしてください。');
+      window.location.href = 'komcho-market-login.html';
+      return;
+    }
+
     const { data: profile, error } = await supabaseClient
       .from('profiles')
       .select('name, points')
