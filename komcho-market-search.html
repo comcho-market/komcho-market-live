@@ -540,7 +540,16 @@
   }
 
   /* ============ DESKTOP (≥900px) ============ */
+  .header-icons-desktop { display: none; }
+  .header-icons-desktop a { display: flex; }
+  .header-icons-desktop svg {
+    width: 20px; height: 20px;
+    stroke: var(--text-main); fill: none;
+    stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
+  }
   @media (min-width: 900px) {
+    .header { justify-content: flex-start; gap: 20px; }
+    .header-icons-desktop { margin-left: auto; }
     .header-icons { display: none; }
     .header-icons-desktop { display: flex; align-items: center; gap: 16px; }
     .bottom-nav { display: none; }
@@ -554,13 +563,6 @@
       grid-template-columns: repeat(4, 1fr);
       gap: 20px; padding: 0 40px 16px;
     }
-  }
-  .header-icons-desktop { display: none; }
-  .header-icons-desktop a { display: flex; }
-  .header-icons-desktop svg {
-    width: 20px; height: 20px;
-    stroke: var(--text-main); fill: none;
-    stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
   }
 </style>
 </head>

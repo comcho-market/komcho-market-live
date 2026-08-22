@@ -172,7 +172,16 @@
   .nav-item.active svg { fill: var(--green-light); }
 
   /* ============ DESKTOP (≥900px) ============ */
+  .header-icons-desktop { display: none; }
+  .header-icons-desktop a { display: flex; }
+  .header-icons-desktop svg {
+    width: 20px; height: 20px;
+    stroke: var(--text-main); fill: none;
+    stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
+  }
   @media (min-width: 900px) {
+    .header { justify-content: flex-start; gap: 20px; }
+    .header-icons-desktop { margin-left: auto; }
     .header-spacer { display: none; }
     .header-icons-desktop { display: flex; align-items: center; gap: 16px; }
     .bottom-nav { display: none; }
@@ -181,13 +190,6 @@
     .tabs { padding: 0 16px; }
     .products-grid { grid-template-columns: repeat(3, 1fr); gap: 18px; padding: 20px 32px; }
     .shop-follow-list { padding: 20px 32px; }
-  }
-  .header-icons-desktop { display: none; }
-  .header-icons-desktop a { display: flex; }
-  .header-icons-desktop svg {
-    width: 20px; height: 20px;
-    stroke: var(--text-main); fill: none;
-    stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
   }
 </style>
 </head>
