@@ -846,7 +846,7 @@
       .single();
 
     if (profile) {
-      document.getElementById('welcomeName').textContent = 'ようこそ、' + profile.name + ' 様';
+      document.getElementById('welcomeName').textContent = profile.name + ' さん';
       document.getElementById('pointNum').textContent = profile.points.toLocaleString();
     }
 
@@ -983,6 +983,7 @@
       .order('created_at', { ascending: false });
 
     if (error) {
+      console.error('お気に入り取得エラー:', error);
       scroll.innerHTML = '<p style="font-size:12px;color:var(--text-sub);padding:8px 0;">読み込みに失敗しました</p>';
       return;
     }

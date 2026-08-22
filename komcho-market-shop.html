@@ -560,13 +560,15 @@
     }
     const btn = e.currentTarget;
     if (wishSet.has(id)) {
+      const { error } = await supabaseClient.from('favorites').delete().eq('user_id', currentUserId).eq('product_id', id);
+      if (error) { console.error('お気に入り削除エラー:', error); alert('削除に失敗しました：' + error.message); return; }
       wishSet.delete(id);
       btn.classList.remove('active');
-      await supabaseClient.from('favorites').delete().eq('user_id', currentUserId).eq('product_id', id);
     } else {
+      const { error } = await supabaseClient.from('favorites').insert({ user_id: currentUserId, product_id: id });
+      if (error) { console.error('お気に入り保存エラー:', error); alert('保存に失敗しました：' + error.message); return; }
       wishSet.add(id);
       btn.classList.add('active');
-      await supabaseClient.from('favorites').insert({ user_id: currentUserId, product_id: id });
     }
   }
 
