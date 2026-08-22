@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>お気に入り - こむちょマーケット</title>
+<style>
+  :root {
+    --bg:          #F8F5EF;
+    --bg-card:     #FFFFFF;
+    --green-dark:  #3D5A3E;
+    --green-mid:   #5A7A5B;
+    --green-light: #EAF0E8;
+    --gold:        #B8973A;
+    --text-main:   #2C2C2C;
+    --text-sub:    #6B6B6B;
+    --border:      #E2DDD5;
+    --radius-card: 12px;
+    --shadow-card: 0 2px 12px rgba(0,0,0,0.07);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Yu Gothic', 'Meiryo', sans-serif;
+    background: var(--bg);
+    color: var(--text-main);
+    max-width: 430px;
+    margin: 0 auto;
+    min-height: 100vh;
+    padding-bottom: 80px;
+  }
+  a { text-decoration: none; color: inherit; }
+  button { cursor: pointer; border: none; background: none; font-family: inherit; }
+
+  /* ===== HEADER ===== */
+  .header {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 16px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .header-logo { display: flex; align-items: center; gap: 7px; }
+  .header-logo .logo-icon { width: 24px; height: 19px; flex-shrink: 0; }
+  .header-logo .logo-icon path {
+    fill: none; stroke: var(--green-dark);
+    stroke-width: 3; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .header-logo .logo-text { font-size: 15px; font-weight: 700; letter-spacing: 0.04em; }
+  .header-title { font-size: 15px; font-weight: 700; }
+  .header-spacer { width: 24px; }
+
+  /* ===== TABS ===== */
+  .tabs {
+    display: flex; position: sticky; top: 53px; z-index: 90;
+    background: var(--bg-card); border-bottom: 1px solid var(--border);
+  }
+  .tab-btn {
+    flex: 1; text-align: center; padding: 13px 0;
+    font-size: 13px; font-weight: 700; color: var(--text-sub);
+    border-bottom: 2px solid transparent;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .tab-btn svg {
+    width: 15px; height: 15px;
+    stroke: currentColor; fill: none;
+    stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .tab-btn.active { color: var(--green-dark); border-bottom-color: var(--green-dark); }
+  .tab-btn.active svg { fill: var(--green-dark); }
+  .tab-count {
+    font-size: 10px; background: var(--green-light); color: var(--green-dark);
+    border-radius: 10px; padding: 1px 7px; font-weight: 700;
+  }
+  .tab-btn:not(.active) .tab-count { background: var(--bg); color: var(--text-sub); }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ===== PRODUCTS GRID ===== */
+  .products-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 12px; padding: 16px;
+  }
+  .product-card-grid {
+    background: var(--bg-card); border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card); overflow: hidden; position: relative;
+    cursor: pointer;
+  }
+  .product-img-grid {
+    width: 100%; aspect-ratio: 1;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 38px; position: relative;
+  }
+  .g1 { background: linear-gradient(135deg,#f0e8d8,#d4c4a8); }
+  .g2 { background: linear-gradient(135deg,#e0e8d0,#b8c890); }
+  .g3 { background: linear-gradient(135deg,#e8e8e8,#c0c0b8); }
+  .g4 { background: linear-gradient(135deg,#f4e8d0,#d4b880); }
+  .wish-btn {
+    position: absolute; bottom: 8px; right: 8px;
+    width: 26px; height: 26px;
+    background: rgba(255,255,255,0.9); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+  }
+  .wish-btn svg { width: 13px; height: 13px; stroke: #E05A5A; fill: #E05A5A; stroke-width: 1.8; }
+  .product-info-grid { padding: 8px 10px 10px; }
+  .product-shop-grid { font-size: 10px; color: var(--text-sub); margin-bottom: 2px; }
+  .product-name-grid { font-size: 12px; font-weight: 600; line-height: 1.4; color: var(--text-main); }
+  .product-price { font-size: 13px; font-weight: 700; margin-top: 5px; color: var(--text-main); }
+
+  /* ===== SHOP LIST ===== */
+  .shop-follow-list { padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+  .shop-follow-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px;
+    border: 1px solid var(--border); border-radius: var(--radius-card);
+    background: var(--bg-card); box-shadow: var(--shadow-card);
+  }
+  .shop-follow-logo {
+    width: 48px; height: 48px; border-radius: 10px;
+    background: var(--green-light); overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; color: var(--text-sub);
+    text-align: center; line-height: 1.3; padding: 2px; flex-shrink: 0;
+  }
+  .shop-follow-info { flex: 1; min-width: 0; }
+  .shop-follow-name { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
+  .shop-follow-tagline {
+    font-size: 11px; color: var(--text-sub);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .shop-follow-arrow svg {
+    width: 16px; height: 16px;
+    stroke: var(--text-sub); fill: none;
+    stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+    flex-shrink: 0;
+  }
+
+  /* ===== EMPTY STATE ===== */
+  .empty-state {
+    padding: 60px 16px 40px;
+    text-align: center;
+  }
+  .empty-state-icon { font-size: 44px; margin-bottom: 16px; }
+  .empty-state-title { font-size: 15px; font-weight: 700; margin-bottom: 8px; color: var(--text-main); }
+  .empty-state-sub { font-size: 12px; color: var(--text-sub); line-height: 1.8; }
+  .empty-state-btn {
+    display: inline-block; margin-top: 18px;
+    background: var(--green-dark); color: #fff;
+    font-size: 13px; font-weight: 700;
+    padding: 10px 22px; border-radius: 20px;
+  }
+
+  /* ===== BOTTOM NAV ===== */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 430px;
+    background: var(--bg-card); border-top: 1px solid var(--border);
+    display: flex; z-index: 200;
+  }
+  .nav-item {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+    padding: 10px 0 14px; color: var(--text-sub);
+    font-size: 10px; letter-spacing: 0.04em;
+  }
+  .nav-item.active { color: var(--green-dark); }
+  .nav-item svg {
+    width: 22px; height: 22px;
+    stroke: currentColor; fill: none;
+    stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .nav-item.active svg { fill: var(--green-light); }
+
+  /* ============ DESKTOP (≥900px) ============ */
+  @media (min-width: 900px) {
+    body { max-width: 720px; padding-bottom: 60px; }
+    .header { padding: 16px 32px; }
+    .tabs { padding: 0 16px; }
+    .products-grid { grid-template-columns: repeat(3, 1fr); gap: 18px; padding: 20px 32px; }
+    .shop-follow-list { padding: 20px 32px; }
+    .bottom-nav { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header class="header">
+  <a class="header-logo" href="komcho-market-top.html">
+    <svg class="logo-icon" viewBox="0 0 60 48">
+      <path transform="translate(30,24)" d="M -26 7 C -17 -17 5 -24 24 -10 C 12 5 -2 19 -21 24"/>
+    </svg>
+    <span class="logo-text">こむちょマーケット</span>
+  </a>
+  <div class="header-title">お気に入り</div>
+  <div class="header-spacer"></div>
+</header>
+
+<!-- ===== TABS ===== -->
+<div class="tabs">
+  <button class="tab-btn active" id="tabProductsBtn" onclick="switchTab('products')">
+    <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    商品 <span class="tab-count" id="productsCount">0</span>
+  </button>
+  <button class="tab-btn" id="tabShopsBtn" onclick="switchTab('shops')">
+    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+    ショップ <span class="tab-count" id="shopsCount">0</span>
+  </button>
+</div>
+
+<!-- ===== 商品タブ ===== -->
+<div class="tab-panel active" id="productsPanel">
+  <div class="products-grid" id="favoriteProductsGrid">
+    <p style="grid-column:1/-1;font-size:12px;color:var(--text-sub);padding:8px 0;">読み込み中...</p>
+  </div>
+</div>
+
+<!-- ===== ショップタブ ===== -->
+<div class="tab-panel" id="shopsPanel">
+  <div class="shop-follow-list" id="favoriteShopsList">
+    <p style="font-size:12px;color:var(--text-sub);padding:8px 0;">読み込み中...</p>
+  </div>
+</div>
+
+<!-- ===== BOTTOM NAV ===== -->
+<nav class="bottom-nav">
+  <a class="nav-item" href="komcho-market-top.html">
+    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <span>ホーム</span>
+  </a>
+  <a class="nav-item" href="komcho-market-search.html">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <span>探す</span>
+  </a>
+  <a class="nav-item active" href="komcho-market-favorites.html">
+    <svg viewBox="0 0 24 24" style="stroke:var(--green-dark);"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    <span>お気に入り</span>
+  </a>
+  <a class="nav-item" href="komcho-market-cart.html">
+    <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+    <span>カゴ</span>
+  </a>
+  <a class="nav-item" href="komcho-market-orders.html">
+    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    <span>履歴</span>
+  </a>
+</nav>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+  const SUPABASE_URL = 'https://uawhrpizzlchkvmzrjzo.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_FaOqUE1PDbo-fpT9KhkWaw__BShLngI';
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  function switchTab(name) {
+    document.getElementById('tabProductsBtn').classList.toggle('active', name === 'products');
+    document.getElementById('tabShopsBtn').classList.toggle('active', name === 'shops');
+    document.getElementById('productsPanel').classList.toggle('active', name === 'products');
+    document.getElementById('shopsPanel').classList.toggle('active', name === 'shops');
+  }
+
+  const favThumbClasses = ['g1', 'g2', 'g3', 'g4'];
+
+  (async function initFavorites() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) {
+      window.location.href = 'komcho-market-login.html';
+      return;
+    }
+    const userId = session.user.id;
+    await Promise.all([loadFavoriteProducts(userId), loadFavoriteShops(userId)]);
+  })();
+
+  async function loadFavoriteProducts(userId) {
+    const grid = document.getElementById('favoriteProductsGrid');
+    const { data, error } = await supabaseClient
+      .from('favorites')
+      .select('id, product_id, products(id, name, price, image_url, shops(shop_name))')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('お気に入り商品取得エラー:', error);
+      grid.innerHTML = '<p style="grid-column:1/-1;font-size:12px;color:var(--text-sub);padding:8px 0;">読み込みに失敗しました</p>';
+      return;
+    }
+
+    const items = (data || []).filter(f => f.products);
+    document.getElementById('productsCount').textContent = items.length;
+
+    if (items.length === 0) {
+      grid.innerHTML = `
+        <div style="grid-column:1/-1;">
+          <div class="empty-state">
+            <div class="empty-state-icon">🤍</div>
+            <div class="empty-state-title">お気に入り商品がありません</div>
+            <div class="empty-state-sub">気になる商品のハートを<br>タップすると、ここに表示されます</div>
+            <a class="empty-state-btn" href="komcho-market-search.html">商品を探す</a>
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    grid.innerHTML = items.map((fav, i) => {
+      const p = fav.products;
+      const thumbClass = favThumbClasses[i % favThumbClasses.length];
+      const thumbInner = p.image_url
+        ? `<img src="${p.image_url}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">`
+        : '🛍️';
+      return `
+        <a class="product-card-grid" href="komcho-market-product.html?id=${p.id}" style="text-decoration:none;color:inherit;display:block;">
+          <div class="product-img-grid ${thumbClass}">${thumbInner}
+            <button class="wish-btn" onclick="event.preventDefault();event.stopPropagation();removeFavoriteProduct('${fav.id}', this)">
+              <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            </button>
+          </div>
+          <div class="product-info-grid">
+            <div class="product-shop-grid">${p.shops?.shop_name || ''}</div>
+            <div class="product-name-grid">${p.name}</div>
+            <div class="product-price">¥${Number(p.price || 0).toLocaleString()}</div>
+          </div>
+        </a>
+      `;
+    }).join('');
+  }
+
+  async function removeFavoriteProduct(favoriteId, btn) {
+    const card = btn.closest('.product-card-grid');
+    const { error } = await supabaseClient.from('favorites').delete().eq('id', favoriteId);
+    if (error) { console.error('削除エラー:', error); alert('削除に失敗しました：' + error.message); return; }
+    card.style.transition = 'opacity 0.2s, transform 0.2s';
+    card.style.opacity = '0'; card.style.transform = 'scale(0.9)';
+    setTimeout(() => {
+      card.remove();
+      const remaining = document.querySelectorAll('#favoriteProductsGrid .product-card-grid').length;
+      document.getElementById('productsCount').textContent = remaining;
+      if (remaining === 0) {
+        document.getElementById('favoriteProductsGrid').innerHTML = `
+          <div style="grid-column:1/-1;">
+            <div class="empty-state">
+              <div class="empty-state-icon">🤍</div>
+              <div class="empty-state-title">お気に入り商品がありません</div>
+              <div class="empty-state-sub">気になる商品のハートを<br>タップすると、ここに表示されます</div>
+              <a class="empty-state-btn" href="komcho-market-search.html">商品を探す</a>
+            </div>
+          </div>
+        `;
+      }
+    }, 200);
+  }
+
+  async function loadFavoriteShops(userId) {
+    const list = document.getElementById('favoriteShopsList');
+    const { data, error } = await supabaseClient
+      .from('shop_follows')
+      .select('id, shops(id, shop_name, logo_url, about)')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('フォロー中ショップ取得エラー:', error);
+      list.innerHTML = '<p style="font-size:12px;color:var(--text-sub);padding:8px 0;">読み込みに失敗しました</p>';
+      return;
+    }
+
+    const items = (data || []).filter(f => f.shops);
+    document.getElementById('shopsCount').textContent = items.length;
+
+    if (items.length === 0) {
+      list.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon">🏪</div>
+          <div class="empty-state-title">フォロー中のショップがありません</div>
+          <div class="empty-state-sub">気になるショップの「フォローする」を<br>タップすると、ここに表示されます</div>
+          <a class="empty-state-btn" href="komcho-market-search.html">ショップを探す</a>
+        </div>
+      `;
+      return;
+    }
+
+    list.innerHTML = items.map(f => {
+      const s = f.shops;
+      const logoInner = s.logo_url
+        ? `<img src="${s.logo_url}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">`
+        : 'SHOP<br>LOGO';
+      return `
+        <a class="shop-follow-item" href="komcho-market-shop.html?id=${s.id}" style="text-decoration:none;color:inherit;display:flex;">
+          <div class="shop-follow-logo">${logoInner}</div>
+          <div class="shop-follow-info">
+            <div class="shop-follow-name">${s.shop_name || ''}</div>
+            <div class="shop-follow-tagline">${s.about || ''}</div>
+          </div>
+          <div class="shop-follow-arrow">
+            <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+        </a>
+      `;
+    }).join('');
+  }
+</script>
+</body>
+</html>
