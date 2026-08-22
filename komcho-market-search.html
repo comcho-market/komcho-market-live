@@ -914,7 +914,7 @@ searchInput.addEventListener('input', () => {
   if (!filterPanelOpen) {
     runSearch();
   } else {
-    updateResultCount(getFilteredProducts().length);
+    runSearch();
   }
 });
 searchInput.addEventListener('keydown', e => {
@@ -939,7 +939,7 @@ function toggleCat(el) {
   el.classList.toggle('selected');
   state.categories = Array.from(document.querySelectorAll('.cat-chip.selected')).map(e => e.dataset.val);
   updateBadge('catCount', state.categories.length);
-  updateResultCount(getFilteredProducts().length);
+  runSearch();
   updateFilterCountBadge();
 }
 
@@ -949,7 +949,7 @@ function toggleTag(el) {
   state.tags = Array.from(document.querySelectorAll('.tag-chip-filter.selected'))
     .map(e => e.textContent.replace('✓', '').trim());
   updateBadge('tagCount', state.tags.length);
-  updateResultCount(getFilteredProducts().length);
+  runSearch();
   updateFilterCountBadge();
 }
 
@@ -958,7 +958,7 @@ function toggleAllergy(el) {
   el.classList.toggle('excluded');
   state.allergyExcludes = Array.from(document.querySelectorAll('.allergy-chip.excluded')).map(e => e.dataset.val);
   updateBadge('allergyCount', state.allergyExcludes.length);
-  updateResultCount(getFilteredProducts().length);
+  runSearch();
   updateFilterCountBadge();
 }
 
@@ -973,7 +973,7 @@ function toggleDelivery(el, val) {
     state.delivery = null;
   }
   updateBadge('deliveryCount', state.delivery ? 1 : 0);
-  updateResultCount(getFilteredProducts().length);
+  runSearch();
   updateFilterCountBadge();
 }
 
@@ -992,7 +992,8 @@ function updateFilterCountBadge() {
 
 // ===== 結果件数更新 =====
 function updateResultCount(n) {
-  document.getElementById('resultCount').textContent = n;
+  const el = document.getElementById('resultCount');
+  if (el) el.textContent = n;
 }
 
 // ===== 絞り込み適用（ボタン押下） =====
@@ -1009,7 +1010,6 @@ function applyFilters() {
 function runSearch() {
   const filtered = getFilteredProducts();
   renderProducts(filtered);
-  updateResultCount(filtered.length);
   document.getElementById('resultsCountLabel').innerHTML = `<strong>${filtered.length}件</strong>の商品`;
   document.getElementById('emptyState').classList.toggle('visible', filtered.length === 0);
   document.getElementById('productsGrid').style.display = filtered.length === 0 ? 'none' : 'grid';
@@ -1152,7 +1152,7 @@ function resetFilters() {
   document.querySelectorAll('.delivery-opt.selected').forEach(el => el.classList.remove('selected'));
   ['catCount','tagCount','allergyCount','deliveryCount'].forEach(id => updateBadge(id, 0));
   updateFilterCountBadge();
-  updateResultCount(getFilteredProducts().length);
+  runSearch();
 }
 
 // ===== 季節の特集バナー =====
