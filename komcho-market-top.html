@@ -434,60 +434,8 @@
     <div class="eyebrow">New Arrivals</div>
     <h2>新着商品</h2>
   </div>
-  <div class="products-grid">
-
-    <a class="product-card-grid" href="komcho-market-product.html" style="text-decoration:none;color:inherit;display:block;">
-      <div class="new-badge">NEW</div>
-      <div class="product-img-grid g1">🧼
-        <button class="wish-btn">
-          <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-        </button>
-      </div>
-      <div class="product-info-grid">
-        <div class="product-shop-grid">草木屋</div>
-        <div class="product-name-grid">無添加石鹸 ひのき</div>
-        <div class="tag-pills"><span class="tag-pill">天然素材100%</span></div>
-        <div class="product-price">¥680</div></div></a>
-
-    <a class="product-card-grid" href="komcho-market-product.html" style="text-decoration:none;color:inherit;display:block;">
-      <div class="new-badge">NEW</div>
-      <div class="product-img-grid g2">🍵
-        <button class="wish-btn">
-          <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-        </button>
-      </div>
-      <div class="product-info-grid">
-        <div class="product-shop-grid">京の茶屋</div>
-        <div class="product-name-grid">無農薬ほうじ茶 100g</div>
-        <div class="tag-pills"><span class="tag-pill">無農薬</span></div>
-        <div class="product-price">¥1,080</div></div></a>
-
-    <a class="product-card-grid" href="komcho-market-product.html" style="text-decoration:none;color:inherit;display:block;">
-      <div class="new-badge">NEW</div>
-      <div class="product-img-grid g3">💧
-        <button class="wish-btn">
-          <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-        </button>
-      </div>
-      <div class="product-info-grid">
-        <div class="product-shop-grid">ナチュラルケア</div>
-        <div class="product-name-grid">有機オリーブオイル</div>
-        <div class="tag-pills"><span class="tag-pill">有機・オーガニック</span></div>
-        <div class="product-price">¥1,480</div></div></a>
-
-    <a class="product-card-grid" href="komcho-market-product.html" style="text-decoration:none;color:inherit;display:block;">
-      <div class="new-badge">NEW</div>
-      <div class="product-img-grid g4">🍪
-        <button class="wish-btn">
-          <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-        </button>
-      </div>
-      <div class="product-info-grid">
-        <div class="product-shop-grid">てとてベーカリー</div>
-        <div class="product-name-grid">グルテンフリー クッキー</div>
-        <div class="tag-pills"><span class="tag-pill">グルテンフリー</span></div>
-        <div class="product-price">¥840</div></div></a>
-
+  <div class="products-grid" id="newArrivalsGrid">
+    <p style="font-size:12px;color:var(--text-sub);padding:8px 0;">読み込み中...</p>
   </div>
 </div>
 
@@ -552,6 +500,56 @@
     <span>履歴</span>
   </a>
 </nav>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+  const SUPABASE_URL = 'https://uawhrpizzlchkvmzrjzo.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_FaOqUE1PDbo-fpT9KhkWaw__BShLngI';
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  const newArrivalsThumbClasses = ['g1', 'g2', 'g3', 'g4', 'g5', 'g6', 'g7', 'g8'];
+
+  (async function loadNewArrivals() {
+    const grid = document.getElementById('newArrivalsGrid');
+    const { data: products, error } = await supabaseClient
+      .from('products')
+      .select('*, shops(shop_name)')
+      .eq('is_active', true)
+      .order('created_at', { ascending: false })
+      .limit(8);
+
+    if (error || !products || products.length === 0) {
+      grid.innerHTML = '<p style="font-size:12px;color:var(--text-sub);padding:8px 0;">まだ商品がありません</p>';
+      return;
+    }
+
+    grid.innerHTML = products.map((p, i) => {
+      const thumbClass = newArrivalsThumbClasses[i % newArrivalsThumbClasses.length];
+      const thumbInner = p.image_url
+        ? `<img src="${p.image_url}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">`
+        : '🛍️';
+      const isNew = (Date.now() - new Date(p.created_at).getTime()) < 1000 * 60 * 60 * 24 * 14; // 14日以内はNEW表示
+      const tagPill = Array.isArray(p.tags) && p.tags.length > 0
+        ? `<div class="tag-pills"><span class="tag-pill">${p.tags[0]}</span></div>` : '';
+      return `
+        <a class="product-card-grid" href="komcho-market-product.html?id=${p.id}" style="text-decoration:none;color:inherit;display:block;">
+          ${isNew ? '<div class="new-badge">NEW</div>' : ''}
+          <div class="product-img-grid ${thumbClass}">${thumbInner}
+            <button class="wish-btn" onclick="event.preventDefault();event.stopPropagation();this.classList.toggle('active');">
+              <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            </button>
+          </div>
+          <div class="product-info-grid">
+            <div class="product-shop-grid">${p.shops?.shop_name || ''}</div>
+            <div class="product-name-grid">${p.name}</div>
+            ${tagPill}
+            <div class="product-price">¥${Number(p.price || 0).toLocaleString()}</div>
+          </div>
+        </a>
+      `;
+    }).join('');
+  })();
+</script>
 
 </body>
 </html>
