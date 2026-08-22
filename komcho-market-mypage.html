@@ -600,33 +600,10 @@
       <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" fill="var(--green-dark)" stroke="var(--green-dark)"/></svg>
       フォロー中のショップ
     </div>
-    <a class="section-more" href="komcho-market-shop.html" style="text-decoration:none;">
-      もっと見る
-      <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-    </a>
   </div>
-  <div class="shop-follow-list">
-    <a class="shop-follow-item" href="komcho-market-shop.html" style="text-decoration:none;color:inherit;display:block;">
-      <div class="shop-follow-logo">SHOP<br>LOGO</div>
-      <div class="shop-follow-info">
-        <div class="shop-follow-name">〇〇農園</div>
-        <div class="shop-follow-tagline">土と暮らす、京丹後の小さな農園</div>
-      </div>
-      <div class="shop-follow-arrow">
-        <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-      </div>
-    </a>
-    <a class="shop-follow-item" href="komcho-market-shop.html" style="text-decoration:none;color:inherit;display:block;">
-      <div class="shop-follow-logo">SHOP<br>LOGO</div>
-      <div class="shop-follow-info">
-        <div class="shop-follow-name">京の茶屋</div>
-        <div class="shop-follow-tagline">京都の山里から、無農薬茶を</div>
-      </div>
-      <div class="shop-follow-arrow">
-        <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-      </div>
-    </a>
-</div>
+  <div class="shop-follow-list" id="shopFollowList">
+    <p style="font-size:12px;color:var(--text-sub);padding:8px 0;">読み込み中...</p>
+  </div>
 </div>
 
 <div class="gap"></div>
@@ -866,6 +843,7 @@
 
     await loadAddresses();
     loadWishlist(session.user.id);
+    loadFollowedShops(session.user.id);
   })();
 
   // ログアウト処理
@@ -1025,6 +1003,46 @@
             <div class="wishlist-price">¥${Number(p.price || 0).toLocaleString()}</div>
           </a>
         </div>
+      `;
+    }).join('');
+  }
+
+  // フォロー中ショップの取得・描画
+  async function loadFollowedShops(userId) {
+    const list = document.getElementById('shopFollowList');
+    const { data, error } = await supabaseClient
+      .from('shop_follows')
+      .select('id, shops(id, shop_name, logo_url, about)')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('フォロー中ショップ取得エラー:', error);
+      list.innerHTML = '<p style="font-size:12px;color:var(--text-sub);padding:8px 0;">読み込みに失敗しました</p>';
+      return;
+    }
+    if (!data || data.length === 0) {
+      list.innerHTML = '<p style="font-size:12px;color:var(--text-sub);padding:8px 0;">まだフォロー中のショップがありません</p>';
+      return;
+    }
+
+    list.innerHTML = data.map(f => {
+      const s = f.shops;
+      if (!s) return '';
+      const logoInner = s.logo_url
+        ? `<img src="${s.logo_url}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">`
+        : 'SHOP<br>LOGO';
+      return `
+        <a class="shop-follow-item" href="komcho-market-shop.html?id=${s.id}" style="text-decoration:none;color:inherit;display:block;">
+          <div class="shop-follow-logo">${logoInner}</div>
+          <div class="shop-follow-info">
+            <div class="shop-follow-name">${s.shop_name || ''}</div>
+            <div class="shop-follow-tagline">${s.about || ''}</div>
+          </div>
+          <div class="shop-follow-arrow">
+            <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+        </a>
       `;
     }).join('');
   }

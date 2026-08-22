@@ -495,6 +495,7 @@
   const SUPABASE_URL = 'https://uawhrpizzlchkvmzrjzo.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_FaOqUE1PDbo-fpT9KhkWaw__BShLngI';
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  const followBtn = document.getElementById('followBtn');
 
   // URLの ?id=ショップID で表示するショップを指定する。
   // 指定がない場合は、暫定的に一番新しいショップを表示する（各ページからのリンクにIDを付ける対応は別タスク）。
@@ -544,7 +545,50 @@
     }
 
     loadShopProducts(shop.id);
+    initFollowButton(shop.id);
   })();
+
+  // フォローボタンの初期化・トグル処理
+  let currentFollowUserId = null;
+  async function initFollowButton(shopId) {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (session) currentFollowUserId = session.user.id;
+
+    if (currentFollowUserId) {
+      const { data: follow } = await supabaseClient
+        .from('shop_follows')
+        .select('id')
+        .eq('user_id', currentFollowUserId)
+        .eq('shop_id', shopId)
+        .maybeSingle();
+      setFollowBtnState(!!follow);
+    }
+
+    followBtn.addEventListener('click', async () => {
+      if (!currentFollowUserId) {
+        window.location.href = 'komcho-market-login.html';
+        return;
+      }
+      const isActive = followBtn.classList.contains('active');
+      if (isActive) {
+        const { error } = await supabaseClient.from('shop_follows').delete()
+          .eq('user_id', currentFollowUserId).eq('shop_id', shopId);
+        if (error) { console.error('フォロー解除エラー:', error); alert('解除に失敗しました：' + error.message); return; }
+        setFollowBtnState(false);
+      } else {
+        const { error } = await supabaseClient.from('shop_follows').insert({ user_id: currentFollowUserId, shop_id: shopId });
+        if (error) { console.error('フォロー保存エラー:', error); alert('保存に失敗しました：' + error.message); return; }
+        setFollowBtnState(true);
+      }
+    });
+  }
+
+  function setFollowBtnState(isActive) {
+    followBtn.classList.toggle('active', isActive);
+    followBtn.innerHTML = isActive
+      ? `<svg viewBox="0 0 24 24" width="14" height="14" stroke="#fff" fill="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>フォロー中`
+      : `<svg viewBox="0 0 24 24" width="14" height="14" stroke="var(--green-dark)" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>フォローする`;
+  }
 
   // 商品一覧の取得・描画
   const shopProductThumbClasses = ['g1', 'g2', 'g3', 'g4'];
@@ -622,15 +666,6 @@
   }
 </script>
 <script>
-  // Follow toggle
-  const followBtn = document.getElementById('followBtn');
-  followBtn.addEventListener('click', () => {
-    const isActive = followBtn.classList.toggle('active');
-    followBtn.innerHTML = isActive
-      ? `<svg viewBox="0 0 24 24" width="14" height="14" stroke="#fff" fill="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>フォロー中`
-      : `<svg viewBox="0 0 24 24" width="14" height="14" stroke="var(--green-dark)" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>フォローする`;
-  });
-
   // Sort tabs
   document.querySelectorAll('.sort-tab').forEach(tab => {
     tab.addEventListener('click', () => {
