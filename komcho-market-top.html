@@ -64,7 +64,7 @@
     font-weight: 500;
     margin: 14px 16px 0;
   }
-  .header-icons { display: flex; align-items: center; gap: 18px; }
+  .header-icons { display: none; align-items: center; gap: 18px; }
   .header-icons svg {
     width: 22px; height: 22px;
     stroke: var(--text-main); fill: none;
@@ -297,6 +297,7 @@
   /* ============ DESKTOP (≥900px) ============ */
   @media (min-width: 900px) {
     .bottom-nav { display: none; }
+    .header-icons { display: flex; }
     body { max-width: 1160px; padding-bottom: 60px; }
 
     .header { padding: 20px 40px; }
