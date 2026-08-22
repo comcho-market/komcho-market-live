@@ -554,9 +554,25 @@
     document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === n));
   }
 
+  let currentProductId = null;
+  let currentUserId = null;
+
   (async function loadProduct() {
     const productId = new URLSearchParams(window.location.search).get('id');
     if (!productId) return; // IDが無ければ、これまで通りサンプル表示のまま
+    currentProductId = productId;
+
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (session) {
+      currentUserId = session.user.id;
+      const { data: fav } = await supabaseClient
+        .from('favorites')
+        .select('id')
+        .eq('user_id', currentUserId)
+        .eq('product_id', productId)
+        .maybeSingle();
+      if (fav) document.getElementById('wishBtn').classList.add('active');
+    }
 
     const { data: p, error } = await supabaseClient
       .from('products')
@@ -641,7 +657,22 @@
 
   // Wishlist toggle
   const wishBtn = document.getElementById('wishBtn');
-  wishBtn.addEventListener('click', () => wishBtn.classList.toggle('active'));
+  wishBtn.addEventListener('click', async () => {
+    if (!currentProductId) return;
+    if (!currentUserId) {
+      window.location.href = 'komcho-market-login.html';
+      return;
+    }
+    const isActive = wishBtn.classList.contains('active');
+    if (isActive) {
+      await supabaseClient.from('favorites').delete()
+        .eq('user_id', currentUserId).eq('product_id', currentProductId);
+      wishBtn.classList.remove('active');
+    } else {
+      await supabaseClient.from('favorites').insert({ user_id: currentUserId, product_id: currentProductId });
+      wishBtn.classList.add('active');
+    }
+  });
 </script>
 </body>
 </html>

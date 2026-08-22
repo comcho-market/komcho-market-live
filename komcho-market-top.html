@@ -508,8 +508,36 @@
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   const newArrivalsThumbClasses = ['g1', 'g2', 'g3', 'g4', 'g5', 'g6', 'g7', 'g8'];
+  let currentUserId = null;
+  let wishSet = new Set();
+
+  async function toggleWish(e, id) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!currentUserId) {
+      window.location.href = 'komcho-market-login.html';
+      return;
+    }
+    const btn = e.currentTarget;
+    if (wishSet.has(id)) {
+      wishSet.delete(id);
+      btn.classList.remove('active');
+      await supabaseClient.from('favorites').delete().eq('user_id', currentUserId).eq('product_id', id);
+    } else {
+      wishSet.add(id);
+      btn.classList.add('active');
+      await supabaseClient.from('favorites').insert({ user_id: currentUserId, product_id: id });
+    }
+  }
 
   (async function loadNewArrivals() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (session) {
+      currentUserId = session.user.id;
+      const { data: favs } = await supabaseClient.from('favorites').select('product_id').eq('user_id', currentUserId);
+      if (favs) wishSet = new Set(favs.map(f => f.product_id));
+    }
+
     const grid = document.getElementById('newArrivalsGrid');
     const { data: products, error } = await supabaseClient
       .from('products')
@@ -531,11 +559,12 @@
       const isNew = (Date.now() - new Date(p.created_at).getTime()) < 1000 * 60 * 60 * 24 * 14; // 14日以内はNEW表示
       const tagPill = Array.isArray(p.tags) && p.tags.length > 0
         ? `<div class="tag-pills"><span class="tag-pill">${p.tags[0]}</span></div>` : '';
+      const isWished = wishSet.has(p.id);
       return `
         <a class="product-card-grid" href="komcho-market-product.html?id=${p.id}" style="text-decoration:none;color:inherit;display:block;">
           ${isNew ? '<div class="new-badge">NEW</div>' : ''}
           <div class="product-img-grid ${thumbClass}">${thumbInner}
-            <button class="wish-btn" onclick="event.preventDefault();event.stopPropagation();this.classList.toggle('active');">
+            <button class="wish-btn ${isWished ? 'active' : ''}" onclick="toggleWish(event, '${p.id}')">
               <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
             </button>
           </div>

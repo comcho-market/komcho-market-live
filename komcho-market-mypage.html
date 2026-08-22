@@ -585,52 +585,9 @@
       <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
       お気に入り商品
     </div>
-    <div class="section-more">
-      もっと見る
-      <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-    </div>
   </div>
-  <div class="wishlist-scroll">
-    <div class="wishlist-card">
-      <div class="wishlist-img g2">🥕</div>
-      <button class="wishlist-remove" onclick="removeWish(this)">
-        <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-      </button>
-      <a class="wishlist-info" href="komcho-market-product.html" style="text-decoration:none;color:inherit;">
-        <div class="wishlist-shop">〇〇農園</div>
-        <div class="wishlist-name">季節の野菜セット（S）</div>
-        <div class="wishlist-price">¥3,200</div></a>
-    </div>
-    <div class="wishlist-card">
-      <div class="wishlist-img g1">🍵</div>
-      <button class="wishlist-remove" onclick="removeWish(this)">
-        <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-      </button>
-      <a class="wishlist-info" href="komcho-market-product.html" style="text-decoration:none;color:inherit;">
-        <div class="wishlist-shop">京の茶屋</div>
-        <div class="wishlist-name">無農薬ほうじ茶 100g</div>
-        <div class="wishlist-price">¥1,080</div></a>
-    </div>
-    <div class="wishlist-card">
-      <div class="wishlist-img g3">🧼</div>
-      <button class="wishlist-remove" onclick="removeWish(this)">
-        <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-      </button>
-      <a class="wishlist-info" href="komcho-market-product.html" style="text-decoration:none;color:inherit;">
-        <div class="wishlist-shop">草木屋</div>
-        <div class="wishlist-name">無添加石鹸 ひのき</div>
-        <div class="wishlist-price">¥680</div></a>
-    </div>
-    <div class="wishlist-card">
-      <div class="wishlist-img g4">🍪</div>
-      <button class="wishlist-remove" onclick="removeWish(this)">
-        <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-      </button>
-      <a class="wishlist-info" href="komcho-market-product.html" style="text-decoration:none;color:inherit;">
-        <div class="wishlist-shop">てとてベーカリー</div>
-        <div class="wishlist-name">グルテンフリー クッキー</div>
-        <div class="wishlist-price">¥840</div></a>
-    </div>
+  <div class="wishlist-scroll" id="wishlistScroll">
+    <p style="font-size:12px;color:var(--text-sub);padding:8px 0;">読み込み中...</p>
   </div>
 </div>
 
@@ -894,6 +851,7 @@
     }
 
     await loadAddresses();
+    loadWishlist(session.user.id);
   })();
 
   // ログアウト処理
@@ -1013,8 +971,56 @@
 </script>
 
 <script>
-  function removeWish(btn) {
+  const wishlistThumbClasses = ['g1', 'g2', 'g3', 'g4'];
+
+  // お気に入り一覧の取得・描画
+  async function loadWishlist(userId) {
+    const scroll = document.getElementById('wishlistScroll');
+    const { data, error } = await supabaseClient
+      .from('favorites')
+      .select('id, product_id, products(id, name, price, image_url, shops(shop_name))')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      scroll.innerHTML = '<p style="font-size:12px;color:var(--text-sub);padding:8px 0;">読み込みに失敗しました</p>';
+      return;
+    }
+    if (!data || data.length === 0) {
+      scroll.innerHTML = '<p style="font-size:12px;color:var(--text-sub);padding:8px 0;">まだお気に入り商品がありません</p>';
+      return;
+    }
+
+    scroll.innerHTML = data.map((fav, i) => {
+      const p = fav.products;
+      if (!p) return '';
+      const thumbClass = wishlistThumbClasses[i % wishlistThumbClasses.length];
+      const thumbInner = p.image_url
+        ? `<img src="${p.image_url}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">`
+        : '🛍️';
+      return `
+        <div class="wishlist-card" data-favorite-id="${fav.id}">
+          <div class="wishlist-img ${thumbClass}">${thumbInner}</div>
+          <button class="wishlist-remove" onclick="removeWish(this, '${fav.id}')">
+            <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </button>
+          <a class="wishlist-info" href="komcho-market-product.html?id=${p.id}" style="text-decoration:none;color:inherit;">
+            <div class="wishlist-shop">${p.shops?.shop_name || ''}</div>
+            <div class="wishlist-name">${p.name}</div>
+            <div class="wishlist-price">¥${Number(p.price || 0).toLocaleString()}</div>
+          </a>
+        </div>
+      `;
+    }).join('');
+  }
+
+  async function removeWish(btn, favoriteId) {
     const card = btn.closest('.wishlist-card');
+    const { error } = await supabaseClient.from('favorites').delete().eq('id', favoriteId);
+    if (error) {
+      showToast('削除に失敗しました');
+      return;
+    }
     card.style.transition = 'opacity 0.2s, transform 0.2s';
     card.style.opacity = '0'; card.style.transform = 'scale(0.9)';
     setTimeout(() => card.remove(), 200);

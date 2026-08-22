@@ -897,9 +897,19 @@ let state = {
 let filterPanelOpen = false;
 let accordionState = { cat: true, tag: true, allergy: false, delivery: false };
 let wishSet = new Set();
+let currentUserId = null;
+
+async function loadWishSet() {
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (!session) return;
+  currentUserId = session.user.id;
+  const { data } = await supabaseClient.from('favorites').select('product_id').eq('user_id', currentUserId);
+  if (data) wishSet = new Set(data.map(f => f.product_id));
+}
 
 // ===== 初期描画 =====
 (async function initSearch() {
+  await loadWishSet();
   allProducts = await fetchAllProducts();
   runSearch();
 })();
@@ -1073,12 +1083,22 @@ function renderProducts(list) {
 }
 
 // ===== ウィッシュリスト =====
-function toggleWish(e, id) {
+async function toggleWish(e, id) {
   e.stopPropagation();
-  if (wishSet.has(id)) wishSet.delete(id);
-  else wishSet.add(id);
+  if (!currentUserId) {
+    window.location.href = 'komcho-market-login.html';
+    return;
+  }
   const btn = e.currentTarget;
-  btn.classList.toggle('active', wishSet.has(id));
+  if (wishSet.has(id)) {
+    wishSet.delete(id);
+    btn.classList.remove('active');
+    await supabaseClient.from('favorites').delete().eq('user_id', currentUserId).eq('product_id', id);
+  } else {
+    wishSet.add(id);
+    btn.classList.add('active');
+    await supabaseClient.from('favorites').insert({ user_id: currentUserId, product_id: id });
+  }
 }
 
 // ===== 商品ページへ =====
