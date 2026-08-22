@@ -398,6 +398,13 @@
   <button class="header-save" id="saveBtn">保存する</button>
 </header>
 
+<div style="padding:12px 16px 0;">
+  <button id="previewProductBtn" style="display:none;width:100%;background:var(--bg-card);border:1.5px solid var(--green-dark);color:var(--green-dark);font-size:13px;font-weight:700;padding:10px;border-radius:10px;align-items:center;justify-content:center;gap:6px;">
+    <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:var(--green-dark);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+    プレビュー
+  </button>
+</div>
+
 <!-- ① 商品写真 -->
 <div class="section-block">
   <div class="block-title">商品写真</div>
@@ -748,6 +755,12 @@
       }
 
       fillForm(p);
+
+      const previewBtn = document.getElementById('previewProductBtn');
+      previewBtn.style.display = 'flex';
+      previewBtn.addEventListener('click', () => {
+        window.open(`komcho-market-product.html?id=${productId}`, '_blank');
+      });
     } else {
       // 新規追加モード
       document.querySelector('.header-title').textContent = '商品を追加';
