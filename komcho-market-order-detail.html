@@ -393,32 +393,27 @@
 <div class="status-hero">
   <div class="status-hero-top">
     <div class="order-meta">
-      <div class="order-number-lg">注文 #2311</div>
-      <div class="order-date-lg">2026年6月20日</div>
+      <div class="order-number-lg" id="orderNumberLg">注文 #----</div>
+      <div class="order-date-lg" id="orderDateLg">-</div>
     </div>
-    <div class="order-status-lg shipping">配送中</div>
+    <div class="order-status-lg shipping" id="orderStatusLg">準備中</div>
   </div>
 
   <!-- ステータスタイムライン -->
-  <div class="status-timeline">
+  <div class="status-timeline" id="statusTimeline">
     <div class="timeline-step">
       <div class="timeline-dot done"></div>
       <div class="timeline-label done">注文確定</div>
     </div>
-    <div class="timeline-line done"></div>
+    <div class="timeline-line" id="timelineLine1"></div>
     <div class="timeline-step">
-      <div class="timeline-dot done"></div>
-      <div class="timeline-label done">発送済み</div>
+      <div class="timeline-dot" id="timelineDot2"></div>
+      <div class="timeline-label" id="timelineLabel2">発送済み</div>
     </div>
-    <div class="timeline-line done"></div>
+    <div class="timeline-line" id="timelineLine2"></div>
     <div class="timeline-step">
-      <div class="timeline-dot current"></div>
-      <div class="timeline-label current">配送中</div>
-    </div>
-    <div class="timeline-line"></div>
-    <div class="timeline-step">
-      <div class="timeline-dot"></div>
-      <div class="timeline-label">お届け済み</div>
+      <div class="timeline-dot" id="timelineDot3"></div>
+      <div class="timeline-label" id="timelineLabel3">お届け済み</div>
     </div>
   </div>
 </div>
@@ -434,34 +429,11 @@
 
   <!-- 店舗情報 -->
   <div class="shop-row">
-    <div class="shop-logo-sm">SHOP<br>LOGO</div>
-    <div class="shop-name-sm">〇〇農園</div>
+    <div class="shop-logo-sm" id="shopLogoSm" style="overflow:hidden;">SHOP<br>LOGO</div>
+    <div class="shop-name-sm" id="shopNameSm">-</div>
   </div>
 
-  <div class="product-list">
-    <div class="product-row">
-      <div class="product-thumb g1">🫙</div>
-      <div class="product-info">
-        <div class="product-name">無添加 自家製味噌 500g</div>
-        <div class="product-tags">
-          <span class="product-tag">砂糖不使用</span>
-          <span class="product-tag">国産100%</span>
-        </div>
-        <div class="product-meta">数量：1</div>
-      </div>
-      <div class="product-price">¥1,800</div>
-    </div>
-    <div class="product-row">
-      <div class="product-thumb g2">🥕</div>
-      <div class="product-info">
-        <div class="product-name">季節の野菜セット（S）</div>
-        <div class="product-tags">
-          <span class="product-tag">無農薬</span>
-        </div>
-        <div class="product-meta">数量：1</div>
-      </div>
-      <div class="product-price">¥3,200</div>
-    </div>
+  <div class="product-list" id="productList">
   </div>
 </div>
 
@@ -476,22 +448,22 @@
   <div class="price-table">
     <div class="price-row">
       <span>商品合計</span>
-      <span>¥5,000</span>
+      <span id="priceSubtotal">¥0</span>
     </div>
     <div class="price-row">
-      <span>送料（クール便・冷蔵）</span>
-      <span>¥1,000</span>
+      <span id="priceShippingLabel">送料</span>
+      <span id="priceShipping">¥0</span>
     </div>
-    <div class="price-row discount">
+    <div class="price-row discount" id="priceDiscountRow" style="display:none;">
       <span>ポイント利用</span>
-      <span>−¥200</span>
+      <span id="priceDiscount">−¥0</span>
     </div>
     <div class="price-row total">
       <span>合計</span>
-      <span>¥5,800</span>
+      <span id="priceTotal">¥0</span>
     </div>
     <div class="price-row point-earn">
-      🌿 この注文で <strong>+29pt</strong> 獲得予定
+      🌿 この注文で <strong id="priceEarnPt">+0pt</strong> 獲得予定
     </div>
   </div>
 </div>
@@ -499,36 +471,19 @@
 <div class="gap"></div>
 
 <!-- 配送情報 -->
-<div class="section-block">
+<div class="section-block" id="deliveryInfoBlock" style="display:none;">
   <div class="block-title">
     <svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
     配送情報
   </div>
   <div class="delivery-info-block">
     <div class="delivery-info-row">
-      <div class="delivery-info-label">配送業者</div>
-      <div class="delivery-info-value">ヤマト運輸</div>
-    </div>
-    <div class="delivery-info-row">
-      <div class="delivery-info-label">お荷物番号</div>
-      <div class="delivery-info-value">
-        <div class="tracking-number">
-          <span class="tracking-number-text">1234-5678-9012</span>
-          <button class="copy-btn" onclick="copyTracking()">番号をコピー</button>
-        </div>
-      </div>
-    </div>
-    <div class="delivery-info-row">
       <div class="delivery-info-label">配送方法</div>
-      <div class="delivery-info-value">クール便（冷蔵）</div>
-    </div>
-    <div class="delivery-info-row">
-      <div class="delivery-info-label">発送日</div>
-      <div class="delivery-info-value">2026年6月21日</div>
+      <div class="delivery-info-value" id="deliveryMethodValue">-</div>
     </div>
   </div>
   <div class="delivery-note" style="margin-top:12px;">
-    📦 お荷物番号をコピーして、配送業者のサイトで配送状況を確認できます。
+    📦 発送状況の詳細は店舗にお問い合わせください。
   </div>
 </div>
 
@@ -543,15 +498,15 @@
   <table class="info-table">
     <tr>
       <th>お名前</th>
-      <td>山田 花子</td>
+      <td id="addrName">-</td>
     </tr>
     <tr>
       <th>住所</th>
-      <td>〒604-0000<br>京都府京都市中京区○○町1-2-3</td>
+      <td id="addrLine">-</td>
     </tr>
     <tr>
       <th>電話番号</th>
-      <td>090-0000-0000</td>
+      <td id="addrPhone">-</td>
     </tr>
   </table>
 </div>
@@ -565,10 +520,9 @@
     お支払い方法
   </div>
   <div class="payment-row">
-    <div class="card-icon visa">VISA</div>
+    <div class="card-icon visa">CARD</div>
     <div class="payment-detail">
-      <div class="payment-brand">Visa</div>
-      <div class="payment-number">**** **** **** 4242</div>
+      <div class="payment-brand">クレジットカードでお支払い済み</div>
     </div>
   </div>
 </div>
@@ -576,8 +530,8 @@
 <div class="gap"></div>
 
 <!-- 再注文 -->
-<div class="reorder-block">
-  <button class="reorder-btn" onclick="showToast('カゴに追加しました'); setTimeout(() => { window.location.href='komcho-market-cart.html'; }, 800)">
+<div class="reorder-block" id="reorderBlock">
+  <button class="reorder-btn" onclick="reorder()">
     同じ商品を再注文する
   </button>
 </div>
@@ -587,9 +541,9 @@
   <div class="contact-note">
     商品や配送について、ご不明な点がございましたらお気軽にお問い合わせください。
   </div>
-  <button class="contact-btn" onclick="window.location.href='komcho-market-shop-contact.html'">
+  <button class="contact-btn" id="contactShopBtn">
     <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-    〇〇農園にお問い合わせ
+    <span id="contactShopLabel">店舗にお問い合わせ</span>
   </button>
 </div>
 
@@ -611,7 +565,7 @@
     <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
     <span>カゴ</span>
   </a>
-  <a class="nav-item active" href="komcho-market-top.html">
+  <a class="nav-item active" href="komcho-market-mypage.html">
     <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
     <span>マイページ</span>
   </a>
@@ -620,13 +574,147 @@
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
-  function copyTracking() {
-    navigator.clipboard.writeText('1234-5678-9012').then(() => {
-      showToast('お荷物番号をコピーしました');
-    }).catch(() => {
-      showToast('1234-5678-9012');
+  const SUPABASE_URL = 'https://uawhrpizzlchkvmzrjzo.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_FaOqUE1PDbo-fpT9KhkWaw__BShLngI';
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  const statusLabelMap = { new: '準備中', shipped: '発送済み', cancelled: 'キャンセル' };
+  const detailThumbClasses = ['g1', 'g2', 'g3'];
+  let currentOrder = null;
+
+  (async function initOrderDetail() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) {
+      window.location.href = 'komcho-market-login.html';
+      return;
+    }
+
+    const orderId = new URLSearchParams(window.location.search).get('id');
+    if (!orderId) {
+      window.location.href = 'komcho-market-orders.html';
+      return;
+    }
+
+    const { data: order, error } = await supabaseClient
+      .from('orders')
+      .select('*, shops(id, shop_name, logo_url), order_items(*)')
+      .eq('id', orderId)
+      .eq('user_id', session.user.id)
+      .single();
+
+    if (error || !order) {
+      alert('注文が見つかりませんでした');
+      window.location.href = 'komcho-market-orders.html';
+      return;
+    }
+
+    currentOrder = order;
+    renderOrder(order);
+  })();
+
+  function renderOrder(order) {
+    const dateStr = new Date(order.created_at).toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
+    document.getElementById('orderNumberLg').textContent = '注文 #' + order.id.slice(0, 8).toUpperCase();
+    document.getElementById('orderDateLg').textContent = dateStr;
+
+    const statusLabel = statusLabelMap[order.status] || order.status;
+    const statusEl = document.getElementById('orderStatusLg');
+    statusEl.textContent = statusLabel;
+    statusEl.className = 'order-status-lg ' + (order.status === 'shipped' ? 'delivered' : order.status === 'cancelled' ? 'cancelled' : 'preparing');
+
+    // タイムライン
+    if (order.status === 'cancelled') {
+      document.getElementById('statusTimeline').style.display = 'none';
+    } else {
+      const step2done = order.status === 'shipped';
+      document.getElementById('timelineLine1').className = 'timeline-line done';
+      document.getElementById('timelineDot2').className = 'timeline-dot ' + (step2done ? 'done' : 'current');
+      document.getElementById('timelineLabel2').className = 'timeline-label ' + (step2done ? 'done' : 'current');
+      document.getElementById('timelineLine2').className = 'timeline-line ' + (step2done ? 'done' : '');
+      document.getElementById('timelineDot3').className = 'timeline-dot' + (step2done ? '' : '');
+      document.getElementById('timelineLabel3').className = 'timeline-label' + (step2done ? '' : '');
+    }
+
+    // 店舗
+    const logoInner = order.shops?.logo_url
+      ? `<img src="${order.shops.logo_url}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">`
+      : 'SHOP<br>LOGO';
+    document.getElementById('shopLogoSm').innerHTML = logoInner;
+    document.getElementById('shopNameSm').textContent = order.shops?.shop_name || '';
+    document.getElementById('contactShopLabel').textContent = `${order.shops?.shop_name || '店舗'}にお問い合わせ`;
+    document.getElementById('contactShopBtn').addEventListener('click', () => {
+      window.location.href = `komcho-market-shop-contact.html?shop=${order.shops?.id || ''}`;
     });
+
+    // 商品一覧
+    document.getElementById('productList').innerHTML = (order.order_items || []).map((item, i) => {
+      const thumbClass = detailThumbClasses[i % detailThumbClasses.length];
+      const thumbInner = item.product_image
+        ? `<img src="${item.product_image}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">`
+        : '🛍️';
+      return `
+        <div class="product-row">
+          <div class="product-thumb ${thumbClass}" style="overflow:hidden;">${thumbInner}</div>
+          <div class="product-info">
+            <div class="product-name">${item.product_name}</div>
+            <div class="product-meta">数量：${item.quantity}</div>
+          </div>
+          <div class="product-price">¥${(item.price * item.quantity).toLocaleString()}</div>
+        </div>
+      `;
+    }).join('');
+
+    // 金額
+    document.getElementById('priceSubtotal').textContent = '¥' + order.subtotal.toLocaleString();
+    document.getElementById('priceShippingLabel').textContent = '送料';
+    document.getElementById('priceShipping').textContent = order.shipping_fee > 0 ? '¥' + order.shipping_fee.toLocaleString() : '無料';
+    if (order.point_discount > 0) {
+      document.getElementById('priceDiscountRow').style.display = 'flex';
+      document.getElementById('priceDiscount').textContent = '−¥' + order.point_discount.toLocaleString();
+    }
+    document.getElementById('priceTotal').textContent = '¥' + order.total.toLocaleString();
+    document.getElementById('priceEarnPt').textContent = '+' + order.points_earned + 'pt';
+
+    // 配送情報（発送済みのみ表示）
+    if (order.status === 'shipped') {
+      document.getElementById('deliveryInfoBlock').style.display = 'block';
+      document.getElementById('deliveryMethodValue').textContent =
+        order.shipping_fee > 0 ? '通常便／クール便（店舗設定による）' : '送料無料';
+    }
+
+    // 配送先住所
+    document.getElementById('addrName').textContent = order.address_name || '-';
+    document.getElementById('addrLine').innerHTML = `〒${order.address_postal || ''}<br>${order.address_prefecture || ''}${order.address_line || ''}${order.address_building ? '<br>' + order.address_building : ''}`;
+    document.getElementById('addrPhone').textContent = order.address_phone || '-';
+
+    // 再注文ボタン（キャンセル済みは非表示）
+    document.getElementById('reorderBlock').style.display = order.status === 'cancelled' ? 'none' : 'block';
+  }
+
+  // 再注文：この注文の商品をもう一度カゴに追加する
+  async function reorder() {
+    if (!currentOrder) return;
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) return;
+
+    for (const item of currentOrder.order_items) {
+      const { data: existing } = await supabaseClient
+        .from('cart_items')
+        .select('id, quantity')
+        .eq('user_id', session.user.id)
+        .eq('product_id', item.product_id)
+        .maybeSingle();
+
+      if (existing) {
+        await supabaseClient.from('cart_items').update({ quantity: existing.quantity + item.quantity }).eq('id', existing.id);
+      } else {
+        await supabaseClient.from('cart_items').insert({ user_id: session.user.id, product_id: item.product_id, quantity: item.quantity });
+      }
+    }
+    showToast('カゴに追加しました');
+    setTimeout(() => { window.location.href = 'komcho-market-cart.html'; }, 800);
   }
 
   function showToast(msg) {

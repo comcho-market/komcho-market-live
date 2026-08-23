@@ -484,7 +484,7 @@
     </svg>
     <span class="logo-text">こむちょマーケット</span>
   </a>
-  <div class="header-step">〇〇農園</div>
+  <div class="header-step" id="headerShopName">店舗名</div>
 </header>
 
 <!-- STEP BAR -->
@@ -656,18 +656,18 @@
       <div class="point-use-top">
         <div class="point-use-left">
           <div class="point-use-title-sm">🌿 使用するポイントを入力</div>
-          <div class="point-use-balance">残高：<strong>1,240pt</strong>（1pt＝1円）</div>
+          <div class="point-use-balance">残高：<strong id="pointBalanceDisplay">0pt</strong>（1pt＝1円）</div>
         </div>
         <button class="point-all-btn" onclick="useAllPoint()">全部使う</button>
       </div>
       <div class="point-input-row">
         <div class="point-input-wrap">
           <input class="point-input" type="number" id="pointInput"
-            placeholder="0" min="0" max="1240" inputmode="numeric"
+            placeholder="0" min="0" max="0" inputmode="numeric"
             oninput="onPointInput()">
           <span class="point-input-unit">pt</span>
         </div>
-        <div class="point-input-note">上限：1,240pt</div>
+        <div class="point-input-note" id="pointInputNote">上限：0pt</div>
       </div>
       <div class="point-discount-preview" id="pointDiscountPreview">
         ✓ 1,240円分のポイントを使用します
@@ -684,44 +684,29 @@
       注文内容
     </div>
 
-    <div class="order-items">
-      <div class="order-item-row">
-        <div class="order-item-thumb g1">🫙</div>
-        <div class="order-item-info">
-          <div class="order-item-name">無添加 自家製味噌 500g</div>
-          <div class="order-item-meta">数量：1</div>
-        </div>
-        <div class="order-item-price">¥1,800</div>
-      </div>
-      <div class="order-item-row">
-        <div class="order-item-thumb g2">🥕</div>
-        <div class="order-item-info">
-          <div class="order-item-name">季節の野菜セット（S）</div>
-          <div class="order-item-meta">数量：1</div>
-        </div>
-        <div class="order-item-price">¥3,200</div>
-      </div>
+    <div class="order-items" id="orderItemsList">
+      <div style="padding:8px 0; font-size:12px; color:var(--text-sub);">読み込み中...</div>
     </div>
 
     <div class="summary-rows">
       <div class="summary-row">
         <span>商品合計</span>
-        <span>¥5,000</span>
+        <span id="subtotalDisplay">¥0</span>
       </div>
       <div class="summary-row">
-        <span>送料（クール便・冷蔵）</span>
-        <span>¥1,000</span>
+        <span id="shippingLabelDisplay">送料</span>
+        <span id="shippingDisplay">¥0</span>
       </div>
       <div class="summary-row discount" id="pointDiscountRow" style="display:none;">
         <span>ポイント利用</span>
-        <span id="pointDiscountAmount">−¥1,240</span>
+        <span id="pointDiscountAmount">−¥0</span>
       </div>
       <div class="summary-row total">
         <span>お支払い合計</span>
-        <span id="grandTotal">¥6,000</span>
+        <span id="grandTotal">¥0</span>
       </div>
       <div class="summary-row point-earn" id="pointEarnRow">
-        🌿 この注文で <strong id="earnPt">30pt</strong> 獲得予定
+        🌿 この注文で <strong id="earnPt">0pt</strong> 獲得予定
       </div>
     </div>
   </div>
@@ -736,15 +721,15 @@
     <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
   </div>
   <div class="complete-title">ご注文ありがとうございます！</div>
-  <div class="complete-sub">
-    〇〇農園に注文が送られました。<br>
+  <div class="complete-sub" id="completeSub">
+    店舗に注文が送られました。<br>
     発送準備ができ次第、メールでお知らせします。
   </div>
 
   <div class="complete-order-card">
     <div class="complete-order-row">
       <span class="label">注文番号</span>
-      <span class="value">#2311</span>
+      <span class="value" id="completeOrderNo">#----</span>
     </div>
     <div class="complete-order-row">
       <span class="label">お支払い金額</span>
@@ -752,11 +737,11 @@
     </div>
     <div class="complete-order-row">
       <span class="label">お届け先</span>
-      <span class="value">京都府京都市中京区</span>
+      <span class="value" id="completeAddress">-</span>
     </div>
     <div class="complete-order-row">
       <span class="label">配送方法</span>
-      <span class="value">クール便（冷蔵）</span>
+      <span class="value" id="completeShippingLabel">-</span>
     </div>
   </div>
 
@@ -764,16 +749,6 @@
     <div class="complete-point-label">🌿 獲得ポイント</div>
     <div class="complete-point-value" id="completeEarnPt">+30pt</div>
     <div class="complete-point-note">次回のお買い物に使えます（1pt＝1円）</div>
-  </div>
-
-  <!-- ゲスト向け登録促進 -->
-  <div class="guest-prompt" id="guestPrompt" style="display:none;">
-    <div class="guest-prompt-title">🌿 会員登録でポイントを受け取れます</div>
-    <div class="guest-prompt-text">
-      今回の購入で<strong>30pt</strong>が発生しています。<br>
-      会員登録すると次回のお買い物に使えます。登録は無料・1分で完了！
-    </div>
-    <button class="guest-prompt-btn" onclick="window.location.href='komcho-market-terms.html'">無料で会員登録する</button>
   </div>
 
   <button class="complete-btn" onclick="goHome()">ショッピングを続ける</button>
@@ -804,24 +779,14 @@
 
   let savedAddresses = [];
 
-  // 登録済み住所の読み込み（ログイン中の場合のみ）
+  // 登録済み住所の読み込み
   async function loadSavedAddresses() {
-    const { data: { session } } = await supabaseClient.auth.getSession();
     const wrap = document.getElementById('addressOptions');
-
-    if (!session) {
-      // ゲストの場合は新規入力フォームを開いて表示
-      wrap.innerHTML = '';
-      document.getElementById('newAddressForm').classList.add('open');
-      document.getElementById('saveAddress').checked = false;
-      document.getElementById('saveAddress').closest('.save-check-wrap').style.display = 'none';
-      return;
-    }
 
     const { data: addresses } = await supabaseClient
       .from('addresses')
       .select('*')
-      .eq('user_id', session.user.id)
+      .eq('user_id', currentUserId)
       .order('is_default', { ascending: false })
       .order('created_at', { ascending: true });
 
@@ -843,16 +808,12 @@
       </div>
     `).join('');
   }
-  loadSavedAddresses();
 
-  // 新しい住所をデータベースに保存（会員かつチェック済みの場合）
+  // 新しい住所をデータベースに保存（チェック済みの場合）
   async function saveNewAddressIfNeeded() {
     const form = document.getElementById('newAddressForm');
     if (!form.classList.contains('open')) return;
     if (!document.getElementById('saveAddress').checked) return;
-
-    const { data: { session } } = await supabaseClient.auth.getSession();
-    if (!session) return;
 
     const lastName = document.getElementById('newAddrLastName').value.trim();
     const firstName = document.getElementById('newAddrFirstName').value.trim();
@@ -860,7 +821,7 @@
     if (!lastName || !addressLine) return;
 
     await supabaseClient.from('addresses').insert({
-      user_id: session.user.id,
+      user_id: currentUserId,
       name: (lastName + ' ' + firstName).trim(),
       postal_code: document.getElementById('newAddrPostal').value.trim(),
       prefecture: document.getElementById('newAddrPrefecture').value.trim(),
@@ -873,16 +834,105 @@
 </script>
 
 <script>
-  const POINT_BALANCE = 1240;
-  const SUBTOTAL = 5000;
-  const SHIPPING = 1000;
-  let baseTotal = SUBTOTAL + SHIPPING; // 6000
+  let currentUserId = null;
+  let shopId = null;
+  let shopInfo = null;
+  let cartRows = [];
+  let subtotal = 0;
+  let shippingFee = 0;
+  let shippingLabel = '通常便';
+  let pointBalance = 0;
+  let baseTotal = 0;
+
+  const checkoutThumbClasses = ['g1', 'g2', 'g3'];
+
+  (async function initCheckout() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) {
+      window.location.href = 'komcho-market-login.html';
+      return;
+    }
+    currentUserId = session.user.id;
+
+    shopId = new URLSearchParams(window.location.search).get('shop');
+    if (!shopId) {
+      window.location.href = 'komcho-market-cart.html';
+      return;
+    }
+
+    // カゴの中身（この店舗分のみ）を取得
+    const { data: cart, error } = await supabaseClient
+      .from('cart_items')
+      .select('id, quantity, products(id, name, price, image_url, shipping_free, shipping_method, shops(id, shop_name, shipping_normal, shipping_cold, free_shipping_threshold))')
+      .eq('user_id', currentUserId);
+
+    if (error || !cart) {
+      alert('カゴの読み込みに失敗しました');
+      window.location.href = 'komcho-market-cart.html';
+      return;
+    }
+
+    cartRows = cart.filter(r => r.products && r.products.shops && r.products.shops.id === shopId);
+    if (cartRows.length === 0) {
+      window.location.href = 'komcho-market-cart.html';
+      return;
+    }
+
+    shopInfo = cartRows[0].products.shops;
+    document.getElementById('headerShopName').textContent = shopInfo.shop_name || '';
+    document.getElementById('completeSub').innerHTML = `${shopInfo.shop_name || 'こちら'}に注文が送られました。<br>発送準備ができ次第、メールでお知らせします。`;
+
+    // 送料計算（カゴページと同じロジック）
+    subtotal = cartRows.reduce((s, r) => s + (r.products.price || 0) * r.quantity, 0);
+    const hasCold = cartRows.some(r => r.products.shipping_method === 'cold' || r.products.shipping_method === 'frozen');
+    const allFree = cartRows.every(r => r.products.shipping_free);
+    const threshold = shopInfo.free_shipping_threshold;
+    const overThreshold = threshold != null && subtotal >= threshold;
+    const isFree = allFree || overThreshold;
+    const baseShipping = hasCold ? (shopInfo.shipping_cold ?? 1000) : (shopInfo.shipping_normal ?? 800);
+    shippingFee = isFree ? 0 : baseShipping;
+    shippingLabel = hasCold ? 'クール便（冷蔵・冷凍）' : '通常便';
+    baseTotal = subtotal + shippingFee;
+
+    // 商品明細を描画
+    document.getElementById('orderItemsList').innerHTML = cartRows.map((r, i) => {
+      const p = r.products;
+      const thumbClass = checkoutThumbClasses[i % checkoutThumbClasses.length];
+      const thumbInner = p.image_url
+        ? `<img src="${p.image_url}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">`
+        : '🛍️';
+      return `
+        <div class="order-item-row">
+          <div class="order-item-thumb ${thumbClass}" style="overflow:hidden;">${thumbInner}</div>
+          <div class="order-item-info">
+            <div class="order-item-name">${p.name}</div>
+            <div class="order-item-meta">数量：${r.quantity}</div>
+          </div>
+          <div class="order-item-price">¥${(p.price * r.quantity).toLocaleString()}</div>
+        </div>
+      `;
+    }).join('');
+
+    document.getElementById('subtotalDisplay').textContent = '¥' + subtotal.toLocaleString();
+    document.getElementById('shippingLabelDisplay').textContent = `送料（${shippingLabel}）`;
+    document.getElementById('shippingDisplay').textContent = isFree ? '無料' : '¥' + shippingFee.toLocaleString();
+
+    // ポイント残高
+    const { data: profile } = await supabaseClient.from('profiles').select('points').eq('id', currentUserId).single();
+    pointBalance = profile?.points || 0;
+    const maxPoint = Math.min(pointBalance, baseTotal);
+    document.getElementById('pointBalanceDisplay').textContent = pointBalance.toLocaleString() + 'pt';
+    document.getElementById('pointInput').max = maxPoint;
+    document.getElementById('pointInputNote').textContent = '上限：' + maxPoint.toLocaleString() + 'pt';
+
+    await loadSavedAddresses();
+    updateTotal(0);
+  })();
 
   // 住所選択
   function selectAddress(el) {
     document.querySelectorAll('.address-option').forEach(o => o.classList.remove('selected'));
     el.classList.add('selected');
-    // 新しい住所フォームを閉じる
     document.getElementById('newAddressForm').classList.remove('open');
   }
 
@@ -891,12 +941,11 @@
     const form = document.getElementById('newAddressForm');
     form.classList.toggle('open');
     if (form.classList.contains('open')) {
-      // 選択解除
       document.querySelectorAll('.address-option').forEach(o => o.classList.remove('selected'));
     }
   }
 
-  // 支払い選択
+  // 支払い選択（今回はUIのみ。実際の決済処理は別タスクで対応）
   function selectPayment(el, isNew) {
     document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
     el.classList.add('selected');
@@ -906,7 +955,7 @@
 
   // 全部使うボタン
   function useAllPoint() {
-    const max = Math.min(POINT_BALANCE, baseTotal);
+    const max = Math.min(pointBalance, baseTotal);
     document.getElementById('pointInput').value = max;
     onPointInput();
   }
@@ -915,7 +964,7 @@
   function onPointInput() {
     const input = document.getElementById('pointInput');
     let val = parseInt(input.value) || 0;
-    const max = Math.min(POINT_BALANCE, baseTotal);
+    const max = Math.min(pointBalance, baseTotal);
     if (val < 0) val = 0;
     if (val > max) { val = max; input.value = max; }
 
@@ -940,8 +989,6 @@
     document.getElementById('ctaTotal').textContent = '¥' + total.toLocaleString();
     document.getElementById('earnPt').textContent = earnPt + 'pt';
     document.getElementById('ctaPointNote').textContent = '🌿 ' + earnPt + 'pt 獲得予定';
-    document.getElementById('completeEarnPt').textContent = '+' + earnPt + 'pt';
-    document.getElementById('completeTotal').textContent = '¥' + total.toLocaleString();
   }
 
   // カード番号フォーマット
@@ -967,9 +1014,106 @@
 
   // 注文確定
   async function placeOrder() {
+    const orderBtn = document.querySelector('.order-btn');
+    orderBtn.disabled = true;
+    orderBtn.style.opacity = '0.6';
+
     await saveNewAddressIfNeeded();
 
-    // ステップバー更新
+    // 配送先情報を取得（既存住所選択 or 新規フォーム）
+    const selectedOption = document.querySelector('.address-option.selected');
+    let addressInfo;
+    if (selectedOption) {
+      const addr = savedAddresses.find(a => a.id === selectedOption.dataset.addressId);
+      addressInfo = addr ? {
+        name: addr.name, postal: addr.postal_code, prefecture: addr.prefecture,
+        line: addr.address_line, building: addr.building, phone: addr.phone
+      } : null;
+    } else {
+      const lastName = document.getElementById('newAddrLastName').value.trim();
+      const firstName = document.getElementById('newAddrFirstName').value.trim();
+      addressInfo = {
+        name: (lastName + ' ' + firstName).trim(),
+        postal: document.getElementById('newAddrPostal').value.trim(),
+        prefecture: document.getElementById('newAddrPrefecture').value.trim(),
+        line: document.getElementById('newAddrLine').value.trim(),
+        building: document.getElementById('newAddrBuilding').value.trim(),
+        phone: document.getElementById('newAddrPhone').value.trim()
+      };
+    }
+
+    if (!addressInfo || !addressInfo.name || !addressInfo.line) {
+      alert('配送先住所を入力してください');
+      orderBtn.disabled = false;
+      orderBtn.style.opacity = '1';
+      return;
+    }
+
+    const pointsUsed = parseInt(document.getElementById('pointInput').value) || 0;
+    const total = Math.max(0, baseTotal - pointsUsed);
+    const earnPt = Math.floor(total / 200);
+
+    // 注文を作成
+    const { data: order, error: orderError } = await supabaseClient
+      .from('orders')
+      .insert({
+        user_id: currentUserId,
+        shop_id: shopId,
+        status: 'pending',
+        subtotal: subtotal,
+        shipping_fee: shippingFee,
+        point_discount: pointsUsed,
+        total: total,
+        points_earned: earnPt,
+        address_name: addressInfo.name,
+        address_postal: addressInfo.postal,
+        address_prefecture: addressInfo.prefecture,
+        address_line: addressInfo.line,
+        address_building: addressInfo.building,
+        address_phone: addressInfo.phone,
+        payment_method: 'card'
+      })
+      .select()
+      .single();
+
+    if (orderError || !order) {
+      console.error('注文作成エラー:', orderError);
+      alert('注文の作成に失敗しました：' + (orderError?.message || ''));
+      orderBtn.disabled = false;
+      orderBtn.style.opacity = '1';
+      return;
+    }
+
+    // 注文明細を作成
+    const orderItemsPayload = cartRows.map(r => ({
+      order_id: order.id,
+      product_id: r.products.id,
+      product_name: r.products.name,
+      product_image: r.products.image_url,
+      price: r.products.price,
+      quantity: r.quantity
+    }));
+    const { error: itemsError } = await supabaseClient.from('order_items').insert(orderItemsPayload);
+    if (itemsError) {
+      console.error('注文明細作成エラー:', itemsError);
+    }
+
+    // カゴから該当商品を削除
+    const cartIds = cartRows.map(r => r.id);
+    await supabaseClient.from('cart_items').delete().in('id', cartIds);
+
+    // ポイントを更新（使用分を引き、獲得分を足す）
+    await supabaseClient.from('profiles')
+      .update({ points: pointBalance - pointsUsed + earnPt })
+      .eq('id', currentUserId);
+
+    // 完了画面表示
+    document.getElementById('completeOrderNo').textContent = '#' + order.id.slice(0, 8).toUpperCase();
+    document.getElementById('completeTotal').textContent = '¥' + total.toLocaleString();
+    document.getElementById('completeAddress').textContent = `${addressInfo.prefecture || ''}${addressInfo.line || ''}`;
+    document.getElementById('completeShippingLabel').textContent = shippingLabel;
+    document.getElementById('completeEarnPt').textContent = '+' + earnPt + 'pt';
+
     document.querySelectorAll('.step-circle').forEach((el, i) => {
       el.className = 'step-circle ' + (i < 2 ? 'done' : 'active');
     });
