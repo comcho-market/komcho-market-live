@@ -862,7 +862,17 @@
     await loadAddresses();
     loadWishlist(session.user.id);
     loadFollowedShops(session.user.id);
+    updateCartBadgesUI(session.user.id);
   })();
+
+  async function updateCartBadgesUI(userId) {
+    const { data } = await supabaseClient.from('cart_items').select('quantity').eq('user_id', userId);
+    const total = (data || []).reduce((s, i) => s + i.quantity, 0);
+    document.querySelectorAll('.cart-badge').forEach(el => {
+      el.textContent = total;
+      el.style.display = total > 0 ? 'flex' : 'none';
+    });
+  }
 
   // ログアウト処理
   async function logout() {

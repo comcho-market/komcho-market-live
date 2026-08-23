@@ -522,6 +522,16 @@
   let currentUserId = null;
   let wishSet = new Set();
 
+  async function updateCartBadgesUI(userId) {
+    if (!userId) return;
+    const { data } = await supabaseClient.from('cart_items').select('quantity').eq('user_id', userId);
+    const total = (data || []).reduce((s, i) => s + i.quantity, 0);
+    document.querySelectorAll('.cart-badge').forEach(el => {
+      el.textContent = total;
+      el.style.display = total > 0 ? 'flex' : 'none';
+    });
+  }
+
   async function toggleWish(e, id) {
     e.preventDefault();
     e.stopPropagation();
@@ -554,6 +564,7 @@
       bar.style.display = 'block';
       const { data: favs } = await supabaseClient.from('favorites').select('product_id').eq('user_id', currentUserId);
       if (favs) wishSet = new Set(favs.map(f => f.product_id));
+      updateCartBadgesUI(currentUserId);
     }
 
     const grid = document.getElementById('newArrivalsGrid');

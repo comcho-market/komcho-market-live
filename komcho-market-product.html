@@ -528,8 +528,8 @@
 
 <!-- BOTTOM CTA -->
 <div class="bottom-cta">
-  <button class="btn-cart" onclick="location.href='komcho-market-cart.html'">カゴに入れる</button>
-  <button class="btn-buy" onclick="location.href='komcho-market-checkout.html'">今すぐ買う</button>
+  <button class="btn-cart" id="addToCartBtn">カゴに入れる</button>
+  <button class="btn-buy" id="buyNowBtn">今すぐ買う</button>
 </div>
 
 <!-- BOTTOM NAV -->
@@ -590,6 +590,7 @@
         .eq('product_id', productId)
         .maybeSingle();
       if (fav) document.getElementById('wishBtn').classList.add('active');
+      updateCartBadges(currentUserId);
     }
 
     const { data: p, error } = await supabaseClient
@@ -693,6 +694,73 @@
       wishBtn.classList.add('active');
     }
   });
+
+  // カゴに追加（既にカゴにある場合は数量を+1）
+  async function addToCart() {
+    if (!currentProductId) return;
+    if (!currentUserId) {
+      window.location.href = 'komcho-market-login.html';
+      return false;
+    }
+    const { data: existing } = await supabaseClient
+      .from('cart_items')
+      .select('id, quantity')
+      .eq('user_id', currentUserId)
+      .eq('product_id', currentProductId)
+      .maybeSingle();
+
+    let error;
+    if (existing) {
+      ({ error } = await supabaseClient.from('cart_items')
+        .update({ quantity: existing.quantity + 1 })
+        .eq('id', existing.id));
+    } else {
+      ({ error } = await supabaseClient.from('cart_items')
+        .insert({ user_id: currentUserId, product_id: currentProductId, quantity: 1 }));
+    }
+
+    if (error) {
+      console.error('カゴ追加エラー:', error);
+      alert('カゴへの追加に失敗しました：' + error.message);
+      return false;
+    }
+    updateCartBadges(currentUserId);
+    return true;
+  }
+
+  document.getElementById('addToCartBtn').addEventListener('click', async () => {
+    const ok = await addToCart();
+    if (ok) showCartToast();
+  });
+
+  document.getElementById('buyNowBtn').addEventListener('click', async () => {
+    const ok = await addToCart();
+    if (ok) window.location.href = 'komcho-market-cart.html';
+  });
+
+  function showCartToast() {
+    let toast = document.getElementById('cartToast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'cartToast';
+      toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--green-dark);color:#fff;font-size:13px;font-weight:600;padding:10px 24px;border-radius:20px;z-index:500;white-space:nowrap;opacity:0;transition:opacity 0.2s;';
+      toast.textContent = 'カゴに追加しました ✓';
+      document.body.appendChild(toast);
+    }
+    requestAnimationFrame(() => { toast.style.opacity = '1'; });
+    setTimeout(() => { toast.style.opacity = '0'; }, 1600);
+  }
+
+  // カゴ件数バッジ（ヘッダー・下部ナビ）の更新
+  async function updateCartBadges(userId) {
+    if (!userId) return;
+    const { data } = await supabaseClient.from('cart_items').select('quantity').eq('user_id', userId);
+    const total = (data || []).reduce((sum, item) => sum + item.quantity, 0);
+    document.querySelectorAll('.cart-badge').forEach(el => {
+      el.textContent = total;
+      el.style.display = total > 0 ? 'flex' : 'none';
+    });
+  }
 </script>
 </body>
 </html>
