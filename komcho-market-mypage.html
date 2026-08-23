@@ -545,52 +545,8 @@
       <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
     </a>
   </div>
-  <div class="order-list">
-    <a class="order-item" href="komcho-market-order-detail.html" style="text-decoration:none;color:inherit;display:block;">
-      <div class="order-item-header">
-        <div class="order-date">2026年6月15日　注文 #2310</div>
-        <div class="order-status delivered">お届け済み</div>
-      </div>
-      <div class="order-products">
-        <div class="order-thumb g2">🌾</div>
-        <div class="order-info">
-          <div class="order-shop">〇〇農園</div>
-          <div class="order-name">無農薬コシヒカリ玄米 2kg</div></div></a>
-      <div class="order-footer">
-        <div class="order-total">¥2,100</div>
-        <div class="order-point-pill">🌿 +10pt 獲得</div>
-      </div>
-    </div>
-    <a class="order-item" href="komcho-market-order-detail.html" style="text-decoration:none;color:inherit;display:block;">
-      <div class="order-item-header">
-        <div class="order-date">2026年6月8日　注文 #2305</div>
-        <div class="order-status shipping">配送中</div>
-      </div>
-      <div class="order-products">
-        <div class="order-thumb g1">🍯</div>
-        <div class="order-info">
-          <div class="order-shop">〇〇農園</div>
-          <div class="order-name">完熟梅の無添加シロップ ほか2点</div></div></a>
-      <div class="order-footer">
-        <div class="order-total">¥5,600</div>
-        <div class="order-point-pill">🌿 +28pt 獲得</div>
-      </div>
-    </div>
-    <a class="order-item" href="komcho-market-order-detail.html" style="text-decoration:none;color:inherit;display:block;">
-      <div class="order-item-header">
-        <div class="order-date">2026年5月10日　注文 #2298</div>
-        <div class="order-status delivered">お届け済み</div>
-      </div>
-      <div class="order-products">
-        <div class="order-thumb g3">🫙</div>
-        <div class="order-info">
-          <div class="order-shop">〇〇農園</div>
-          <div class="order-name">無添加 自家製味噌 500g</div></div></a>
-      <div class="order-footer">
-        <div class="order-total">¥1,800</div>
-        <div class="order-point-pill">🌿 +9pt 獲得</div>
-      </div>
-    </div>
+  <div class="order-list" id="orderHistoryList">
+    <p style="font-size:12px;color:var(--text-sub);padding:8px 0;">読み込み中...</p>
   </div>
 </div>
 
@@ -862,6 +818,7 @@
     await loadAddresses();
     loadWishlist(session.user.id);
     loadFollowedShops(session.user.id);
+    loadOrderHistory(session.user.id);
     updateCartBadgesUI(session.user.id);
   })();
 
@@ -1069,6 +1026,59 @@
           </div>
           <div class="shop-follow-arrow">
             <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+        </a>
+      `;
+    }).join('');
+  }
+
+  // 注文履歴の取得・描画（最新3件のみ表示）
+  const mypageOrderStatusLabelMap = { new: '準備中', shipped: '発送済み', cancelled: 'キャンセル' };
+  const mypageOrderThumbClasses = ['g1', 'g2', 'g3'];
+  async function loadOrderHistory(userId) {
+    const list = document.getElementById('orderHistoryList');
+    const { data, error } = await supabaseClient
+      .from('orders')
+      .select('id, status, total, created_at, points_earned, shops(shop_name), order_items(product_name, quantity)')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(3);
+
+    if (error) {
+      console.error('注文履歴取得エラー:', error);
+      list.innerHTML = '<p style="font-size:12px;color:var(--text-sub);padding:8px 0;">読み込みに失敗しました</p>';
+      return;
+    }
+    if (!data || data.length === 0) {
+      list.innerHTML = '<p style="font-size:12px;color:var(--text-sub);padding:8px 0;">まだ注文履歴がありません</p>';
+      return;
+    }
+
+    list.innerHTML = data.map((order, i) => {
+      const dateStr = new Date(order.created_at).toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
+      const statusLabel = mypageOrderStatusLabelMap[order.status] || order.status;
+      const items = order.order_items || [];
+      const nameLabel = items.length > 1
+        ? `${items[0].product_name} ほか${items.length - 1}点`
+        : (items[0]?.product_name || '');
+      const thumbClass = mypageOrderThumbClasses[i % mypageOrderThumbClasses.length];
+
+      return `
+        <a class="order-item" href="komcho-market-order-detail.html?id=${order.id}" style="text-decoration:none;color:inherit;display:block;">
+          <div class="order-item-header">
+            <div class="order-date">${dateStr}　注文 #${order.id.slice(0, 8).toUpperCase()}</div>
+            <div class="order-status ${order.status}">${statusLabel}</div>
+          </div>
+          <div class="order-products">
+            <div class="order-thumb ${thumbClass}">🛍️</div>
+            <div class="order-info">
+              <div class="order-shop">${order.shops?.shop_name || ''}</div>
+              <div class="order-name">${nameLabel}</div>
+            </div>
+          </div>
+          <div class="order-footer">
+            <div class="order-total">¥${order.total.toLocaleString()}</div>
+            <div class="order-point-pill">🌿 +${order.points_earned}pt 獲得</div>
           </div>
         </a>
       `;
