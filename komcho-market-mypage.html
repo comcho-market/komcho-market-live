@@ -172,6 +172,9 @@
   }
   .order-status.delivered { background: var(--green-light); color: var(--green-dark); }
   .order-status.shipping  { background: #FFF3CD; color: #856404; }
+  .order-status.new { background: #E8F0FE; color: #1A56DB; }
+  .order-status.cancelled { background: #F5F5F5; color: #999; }
+  .order-status.cancel_requested { background: #FFF0F0; color: #CC4444; }
   .order-products { display: flex; gap: 8px; margin-bottom: 8px; }
   .order-thumb {
     width: 44px; height: 44px; border-radius: 8px;
@@ -1033,7 +1036,7 @@
   }
 
   // 注文履歴の取得・描画（最新3件のみ表示）
-  const mypageOrderStatusLabelMap = { new: '準備中', shipped: '発送済み', cancelled: 'キャンセル' };
+  const mypageOrderStatusLabelMap = { new: '準備中', shipped: '発送済み', cancelled: 'キャンセル', cancel_requested: 'キャンセル依頼中' };
   const mypageOrderThumbClasses = ['g1', 'g2', 'g3'];
   async function loadOrderHistory(userId) {
     const list = document.getElementById('orderHistoryList');

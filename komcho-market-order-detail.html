@@ -529,6 +529,21 @@
 
 <div class="gap"></div>
 
+<!-- キャンセル -->
+<div class="section-block" id="cancelBlock" style="display:none;">
+  <div id="cancelRequestArea">
+    <button class="reorder-btn" style="border-color:#CC4444;color:#CC4444;" onclick="requestCancel()">
+      キャンセルをお願いする
+    </button>
+    <p style="font-size:11px;color:var(--text-sub);text-align:center;margin-top:8px;">発送前の注文のみキャンセルをお願いできます。店舗の確認後にキャンセルが確定します。</p>
+  </div>
+  <div id="cancelRequestedNote" style="display:none;text-align:center;font-size:13px;color:#CC4444;font-weight:700;padding:8px 0;">
+    ⏳ キャンセル依頼中です。店舗の確認をお待ちください。
+  </div>
+</div>
+
+<div class="gap"></div>
+
 <!-- 再注文 -->
 <div class="reorder-block" id="reorderBlock">
   <button class="reorder-btn" onclick="reorder()">
@@ -580,7 +595,7 @@
   const SUPABASE_KEY = 'sb_publishable_FaOqUE1PDbo-fpT9KhkWaw__BShLngI';
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  const statusLabelMap = { new: '準備中', shipped: '発送済み', cancelled: 'キャンセル' };
+  const statusLabelMap = { new: '準備中', shipped: '発送済み', cancelled: 'キャンセル', cancel_requested: 'キャンセル依頼中' };
   const detailThumbClasses = ['g1', 'g2', 'g3'];
   let currentOrder = null;
 
@@ -622,7 +637,7 @@
     const statusLabel = statusLabelMap[order.status] || order.status;
     const statusEl = document.getElementById('orderStatusLg');
     statusEl.textContent = statusLabel;
-    statusEl.className = 'order-status-lg ' + (order.status === 'shipped' ? 'delivered' : order.status === 'cancelled' ? 'cancelled' : 'preparing');
+    statusEl.className = 'order-status-lg ' + (order.status === 'shipped' ? 'delivered' : (order.status === 'cancelled' || order.status === 'cancel_requested') ? 'cancelled' : 'preparing');
 
     // タイムライン
     if (order.status === 'cancelled') {
@@ -691,6 +706,40 @@
 
     // 再注文ボタン（キャンセル済みは非表示）
     document.getElementById('reorderBlock').style.display = order.status === 'cancelled' ? 'none' : 'block';
+
+    // キャンセル関連の表示
+    if (order.status === 'new') {
+      document.getElementById('cancelBlock').style.display = 'block';
+      document.getElementById('cancelRequestArea').style.display = 'block';
+      document.getElementById('cancelRequestedNote').style.display = 'none';
+    } else if (order.status === 'cancel_requested') {
+      document.getElementById('cancelBlock').style.display = 'block';
+      document.getElementById('cancelRequestArea').style.display = 'none';
+      document.getElementById('cancelRequestedNote').style.display = 'block';
+    } else {
+      document.getElementById('cancelBlock').style.display = 'none';
+    }
+  }
+
+  // キャンセル依頼
+  async function requestCancel() {
+    if (!currentOrder) return;
+    if (!confirm('この注文のキャンセルをお願いしますか？店舗の確認後にキャンセルが確定します。')) return;
+
+    const { error } = await supabaseClient
+      .from('orders')
+      .update({ status: 'cancel_requested' })
+      .eq('id', currentOrder.id);
+
+    if (error) {
+      console.error('キャンセル依頼エラー:', error);
+      alert('キャンセル依頼に失敗しました：' + error.message);
+      return;
+    }
+
+    currentOrder.status = 'cancel_requested';
+    renderOrder(currentOrder);
+    showToast('キャンセルを依頼しました');
   }
 
   // 再注文：この注文の商品をもう一度カゴに追加する

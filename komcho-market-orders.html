@@ -110,6 +110,7 @@
   .order-status.shipping  { background: #FFF3CD; color: #856404; }
   .order-status.preparing { background: #E8F0FE; color: #1A56DB; }
   .order-status.cancelled { background: #F5F5F5; color: #999; }
+  .order-status.cancel_requested { background: #FFF0F0; color: #CC4444; }
 
   /* SHOP INFO */
   .order-shop-row {
@@ -340,7 +341,7 @@
   const SUPABASE_KEY = 'sb_publishable_FaOqUE1PDbo-fpT9KhkWaw__BShLngI';
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  const statusLabelMap = { new: '準備中', shipped: '発送済み', cancelled: 'キャンセル' };
+  const statusLabelMap = { new: '準備中', shipped: '発送済み', cancelled: 'キャンセル', cancel_requested: 'キャンセル依頼中' };
   const orderThumbClasses = ['g1', 'g2', 'g3'];
   let allOrders = [];
 
@@ -369,7 +370,9 @@
 
   function renderOrders(status) {
     const list = document.getElementById('orderList');
-    const filtered = status === 'all' ? allOrders : allOrders.filter(o => o.status === status);
+    const filtered = status === 'all' ? allOrders
+      : status === 'new' ? allOrders.filter(o => o.status === 'new' || o.status === 'cancel_requested')
+      : allOrders.filter(o => o.status === status);
 
     document.getElementById('emptyState').classList.toggle('visible', filtered.length === 0);
     list.style.display = filtered.length === 0 ? 'none' : 'flex';

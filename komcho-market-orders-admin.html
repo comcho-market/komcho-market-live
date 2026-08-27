@@ -146,6 +146,7 @@
   .order-card.is-new      { border-left: 3px solid #E05A5A; }
   .order-card.is-shipped  { border-left: 3px solid var(--green-mid); }
   .order-card.is-cancelled{ border-left: 3px solid var(--border); opacity: 0.7; }
+  .order-card.is-cancel-requested{ border-left: 3px solid #CC4444; }
 
   .order-card-header {
     display: flex; align-items: center; justify-content: space-between;
@@ -162,6 +163,7 @@
   .order-status.new      { background: #FFF0F0; color: #E05A5A; }
   .order-status.shipped  { background: var(--green-light); color: var(--green-dark); }
   .order-status.cancelled{ background: #F5F5F5; color: #999; }
+  .order-status.cancel_requested{ background: #CC4444; color: #fff; }
 
   /* CUSTOMER ROW */
   .order-customer {
@@ -525,13 +527,16 @@
 <!-- FILTER TABS -->
 <div class="filter-tabs">
   <div class="filter-tab new-tab active" onclick="filterOrders('new', this)">
-    新規注文<span class="tab-badge" id="newBadge">3</span>
+    新規注文<span class="tab-badge" id="newBadge">0</span>
+  </div>
+  <div class="filter-tab new-tab" onclick="filterOrders('cancel_requested', this)">
+    キャンセル依頼<span class="tab-badge" id="cancelRequestedBadge">0</span>
   </div>
   <div class="filter-tab" onclick="filterOrders('shipped', this)">
-    発送済み<span class="tab-badge" id="shippedBadge">10</span>
+    発送済み<span class="tab-badge" id="shippedBadge">0</span>
   </div>
   <div class="filter-tab" onclick="filterOrders('cancelled', this)">
-    キャンセル<span class="tab-badge" id="cancelledBadge">1</span>
+    キャンセル<span class="tab-badge" id="cancelledBadge">0</span>
   </div>
 </div>
 
@@ -701,9 +706,9 @@ function renderOrders(status) {
 
   grid.innerHTML = list.map(order => {
     const total = getOrderTotal(order);
-    const statusClass = { new: 'new', shipped: 'shipped', cancelled: 'cancelled' }[order.status];
-    const statusLabel = { new: '新規注文', shipped: '発送済み', cancelled: 'キャンセル' }[order.status];
-    const cardClass   = { new: 'is-new', shipped: 'is-shipped', cancelled: 'is-cancelled' }[order.status];
+    const statusClass = { new: 'new', shipped: 'shipped', cancelled: 'cancelled', cancel_requested: 'cancel_requested' }[order.status];
+    const statusLabel = { new: '新規注文', shipped: '発送済み', cancelled: 'キャンセル', cancel_requested: 'キャンセル依頼中' }[order.status];
+    const cardClass   = { new: 'is-new', shipped: 'is-shipped', cancelled: 'is-cancelled', cancel_requested: 'is-cancel-requested' }[order.status];
 
     // お届け先が異なるバッジ（一覧カード用）
     const giftBadge = order.delivery
@@ -720,10 +725,18 @@ function renderOrders(status) {
         ${order.carrier}　追跡番号：<span class="tracking-number">${order.tracking}</span>
       </div>` : '';
 
-    const actionBtns = order.status === 'new'
-      ? `<button class="btn-detail" onclick="openDetail('${order.id}')">詳細</button>
-         <button class="btn-ship"   onclick="openShipModal('${order.id}')">発送処理</button>`
-      : `<button class="btn-detail" onclick="openDetail('${order.id}')">詳細・納品書</button>`;
+    let actionBtns;
+    if (order.status === 'new') {
+      actionBtns = `<button class="btn-detail" onclick="openDetail('${order.id}')">詳細</button>
+         <button class="btn-ship" onclick="openShipModal('${order.id}')">発送処理</button>
+         <button class="btn-detail" style="color:#CC4444;border-color:#CC4444;" onclick="cancelOrderByShop('${order.id}')">キャンセル</button>`;
+    } else if (order.status === 'cancel_requested') {
+      actionBtns = `<button class="btn-detail" onclick="openDetail('${order.id}')">詳細</button>
+         <button class="btn-detail" style="color:#CC4444;border-color:#CC4444;" onclick="approveCancel('${order.id}')">キャンセルを承認</button>
+         <button class="btn-detail" onclick="declineCancel('${order.id}')">依頼を却下</button>`;
+    } else {
+      actionBtns = `<button class="btn-detail" onclick="openDetail('${order.id}')">詳細・納品書</button>`;
+    }
 
     return `
       <div class="order-card ${cardClass}">
@@ -825,6 +838,72 @@ async function submitShipping() {
   updateBadges();
   renderOrders(currentStatus);
   showToast('発送済みに更新しました ✓');
+}
+
+// ===== キャンセル依頼の承認 =====
+async function approveCancel(orderId) {
+  if (!confirm('このキャンセル依頼を承認しますか？注文がキャンセル済みになります。')) return;
+
+  const { error } = await supabaseClient
+    .from('orders')
+    .update({ status: 'cancelled' })
+    .eq('id', orderId);
+
+  if (error) {
+    console.error('キャンセル承認エラー:', error);
+    showToast('更新に失敗しました：' + error.message);
+    return;
+  }
+
+  const order = orders.find(o => o.id === orderId);
+  order.status = 'cancelled';
+  updateBadges();
+  renderOrders(currentStatus);
+  showToast('キャンセルを承認しました');
+}
+
+// ===== キャンセル依頼の却下（注文を新規注文に戻す） =====
+async function declineCancel(orderId) {
+  if (!confirm('このキャンセル依頼を却下しますか？注文は通常通り進行します。')) return;
+
+  const { error } = await supabaseClient
+    .from('orders')
+    .update({ status: 'new' })
+    .eq('id', orderId);
+
+  if (error) {
+    console.error('キャンセル却下エラー:', error);
+    showToast('更新に失敗しました：' + error.message);
+    return;
+  }
+
+  const order = orders.find(o => o.id === orderId);
+  order.status = 'new';
+  updateBadges();
+  renderOrders(currentStatus);
+  showToast('依頼を却下し、注文を再開しました');
+}
+
+// ===== お店側から直接キャンセル（欠品時など） =====
+async function cancelOrderByShop(orderId) {
+  if (!confirm('この注文をキャンセルしますか？お客様には注文詳細画面でキャンセル済みと表示されます。')) return;
+
+  const { error } = await supabaseClient
+    .from('orders')
+    .update({ status: 'cancelled' })
+    .eq('id', orderId);
+
+  if (error) {
+    console.error('キャンセルエラー:', error);
+    showToast('更新に失敗しました：' + error.message);
+    return;
+  }
+
+  const order = orders.find(o => o.id === orderId);
+  order.status = 'cancelled';
+  updateBadges();
+  renderOrders(currentStatus);
+  showToast('注文をキャンセルしました');
 }
 
 // ===== 注文詳細モーダル =====
@@ -990,14 +1069,16 @@ function closeModalOutside(e, id) {
 
 // ===== バッジ・サマリー更新 =====
 function updateBadges() {
-  const newCount       = orders.filter(o => o.status === 'new').length;
-  const shippedCount   = orders.filter(o => o.status === 'shipped').length;
-  const cancelledCount = orders.filter(o => o.status === 'cancelled').length;
-  document.getElementById('newBadge').textContent       = newCount;
-  document.getElementById('shippedBadge').textContent   = shippedCount;
-  document.getElementById('cancelledBadge').textContent = cancelledCount;
-  document.getElementById('newOrderCount').textContent  = newCount;
-  document.getElementById('shippedCount').textContent   = shippedCount;
+  const newCount             = orders.filter(o => o.status === 'new').length;
+  const cancelRequestedCount = orders.filter(o => o.status === 'cancel_requested').length;
+  const shippedCount         = orders.filter(o => o.status === 'shipped').length;
+  const cancelledCount       = orders.filter(o => o.status === 'cancelled').length;
+  document.getElementById('newBadge').textContent             = newCount;
+  document.getElementById('cancelRequestedBadge').textContent = cancelRequestedCount;
+  document.getElementById('shippedBadge').textContent         = shippedCount;
+  document.getElementById('cancelledBadge').textContent       = cancelledCount;
+  document.getElementById('newOrderCount').textContent        = newCount + cancelRequestedCount;
+  document.getElementById('shippedCount').textContent         = shippedCount;
 
   // 今月の実績
   const now = new Date();
