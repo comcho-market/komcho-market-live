@@ -493,26 +493,24 @@
 
 <!-- 今月のサマリー -->
 <div class="summary-wrap">
-  <div class="summary-label">📊 今月の実績（2026年7月）</div>
+  <div class="summary-label" id="summaryMonthLabel">📊 今月の実績</div>
   <div class="summary-grid">
     <div class="summary-card">
       <div class="summary-card-label">売上合計</div>
-      <div class="summary-card-value">¥<span id="totalSales">84,200</span></div>
-      <div class="summary-card-sub">先月比 +12%</div>
+      <div class="summary-card-value">¥<span id="totalSales">0</span></div>
     </div>
     <div class="summary-card">
       <div class="summary-card-label">注文件数</div>
-      <div class="summary-card-value"><span id="totalOrders">14</span><span>件</span></div>
-      <div class="summary-card-sub">先月比 +3件</div>
+      <div class="summary-card-value"><span id="totalOrders">0</span><span>件</span></div>
     </div>
     <div class="summary-card alert">
       <div class="summary-card-label">未対応の注文</div>
-      <div class="summary-card-value"><span id="newOrderCount">3</span><span>件</span></div>
+      <div class="summary-card-value"><span id="newOrderCount">0</span><span>件</span></div>
       <div class="summary-card-sub">早めの対応をお願いします</div>
     </div>
     <div class="summary-card">
       <div class="summary-card-label">発送済み</div>
-      <div class="summary-card-value"><span id="shippedCount">10</span><span>件</span></div>
+      <div class="summary-card-value"><span id="shippedCount">0</span><span>件</span></div>
       <div class="summary-card-sub">今月累計</div>
     </div>
   </div>
@@ -583,88 +581,98 @@
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
-// ===== 注文データ =====
-const orders = [
-  {
-    id: 'ORD-2311', date: '2026年7月1日 09:42',
-    status: 'new',
-    customer:  { name: '山田 花子', address: '京都府京都市中京区○○町1-2-3' },
-    delivery:  { name: '山田 太郎', address: '東京都新宿区△△町5-6-7' }, // null なら注文者と同じ
-    note: '熨斗をつけていただけると嬉しいです。「御中元」でお願いします。',
-    products: [
-      { emoji: '🫙', grade: 'g1', name: '無添加 自家製味噌 500g', qty: 1, price: 1800 },
-      { emoji: '🥕', grade: 'g2', name: '季節の野菜セット（S）',  qty: 1, price: 3200 },
-    ],
-    shipping: 1000, carrier: '', tracking: ''
-  },
-  {
-    id: 'ORD-2310', date: '2026年7月1日 08:15',
-    status: 'new',
-    customer: { name: '鈴木 一郎', address: '大阪府大阪市北区△△町4-5' },
-    delivery: null,
-    note: '',
-    products: [
-      { emoji: '🍯', grade: 'g1', name: '完熟梅の無添加シロップ', qty: 2, price: 3600 },
-    ],
-    shipping: 800, carrier: '', tracking: ''
-  },
-  {
-    id: 'ORD-2309', date: '2026年6月30日 21:03',
-    status: 'new',
-    customer: { name: '田中 美智子', address: '東京都渋谷区□□町7-8-9' },
-    delivery: null,
-    note: '不在が多いので、夕方以降の配達をご指定いただけると助かります。',
-    products: [
-      { emoji: '🌾', grade: 'g3', name: '無農薬コシヒカリ玄米 2kg', qty: 1, price: 2100 },
-    ],
-    shipping: 800, carrier: '', tracking: ''
-  },
-  {
-    id: 'ORD-2308', date: '2026年6月29日 14:20',
-    status: 'shipped',
-    customer: { name: '伊藤 さくら', address: '神奈川県横浜市中区◇◇町2-1' },
-    delivery: null,
-    note: '',
-    products: [
-      { emoji: '🫙', grade: 'g1', name: '無添加 自家製味噌 500g', qty: 2, price: 3600 },
-    ],
-    shipping: 1000, carrier: 'ヤマト運輸', tracking: '1234-5678-9001'
-  },
-  {
-    id: 'ORD-2307', date: '2026年6月28日 11:05',
-    status: 'shipped',
-    customer: { name: '佐藤 健太', address: '愛知県名古屋市中村区★★町3-3' },
-    delivery: null,
-    note: '',
-    products: [
-      { emoji: '🥕', grade: 'g2', name: '季節の野菜セット（S）',  qty: 1, price: 3200 },
-      { emoji: '🍯', grade: 'g1', name: '完熟梅の無添加シロップ', qty: 1, price: 1800 },
-    ],
-    shipping: 800, carrier: '佐川急便', tracking: '9876-5432-1000'
-  },
-  {
-    id: 'ORD-2305', date: '2026年6月25日 16:44',
-    status: 'cancelled',
-    customer: { name: '高橋 明', address: '福岡県福岡市博多区▲▲町1-9' },
-    delivery: null,
-    note: '',
-    products: [
-      { emoji: '🌾', grade: 'g3', name: '無農薬コシヒカリ玄米 2kg', qty: 1, price: 2100 },
-    ],
-    shipping: 800, carrier: '', tracking: ''
-  },
-];
+const SUPABASE_URL = 'https://uawhrpizzlchkvmzrjzo.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_FaOqUE1PDbo-fpT9KhkWaw__BShLngI';
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+const carrierNames = {
+  yamato: 'ヤマト運輸', sagawa: '佐川急便',
+  yupack: '日本郵便（ゆうパック）', fukutsu: '福山通運', other: 'その他'
+};
+const orderThumbClasses = ['g1', 'g2', 'g3', 'g4'];
+
+let orders = [];
 let currentShipOrderId = null;
 let currentStatus = 'new';
+let currentShopId = null;
+let currentShopInfo = null;
 
-// ===== 初期描画 =====
-renderOrders('new');
+// ===== 初期化：ログイン確認 → 自分のショップ取得 → 注文データ取得 =====
+(async function initOrdersAdmin() {
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (!session) {
+    window.location.href = 'komcho-market-seller-login.html';
+    return;
+  }
+
+  const { data: shop, error: shopError } = await supabaseClient
+    .from('shops')
+    .select('id, shop_name, address')
+    .eq('owner_id', session.user.id)
+    .single();
+
+  if (shopError || !shop) {
+    window.location.href = 'komcho-market-seller-login.html';
+    return;
+  }
+  currentShopId = shop.id;
+  currentShopInfo = shop;
+
+  await loadOrders();
+})();
+
+async function loadOrders() {
+  const { data, error } = await supabaseClient
+    .from('orders')
+    .select('*, order_items(*)')
+    .eq('shop_id', currentShopId)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('注文取得エラー:', error);
+    showToast('注文の読み込みに失敗しました');
+    return;
+  }
+
+  // 画面の描画関数がそのまま使える形にデータを変換
+  orders = (data || []).map(o => ({
+    id: o.id,
+    displayId: '#' + o.id.slice(0, 8).toUpperCase(),
+    date: new Date(o.created_at).toLocaleString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
+    createdAt: o.created_at,
+    status: o.status,
+    customer: {
+      name: o.address_name || '（お名前未登録）',
+      address: `〒${o.address_postal || ''} ${o.address_prefecture || ''}${o.address_line || ''}${o.address_building ? ' ' + o.address_building : ''}`
+    },
+    delivery: null,
+    note: '',
+    products: (o.order_items || []).map(item => ({
+      name: item.product_name,
+      image: item.product_image,
+      qty: item.quantity,
+      price: item.price
+    })),
+    shipping: o.shipping_fee || 0,
+    subtotal: o.subtotal || 0,
+    total: o.total || 0,
+    carrier: o.carrier || '',
+    tracking: o.tracking_number || ''
+  }));
+
+  const monthLabel = new Date().toLocaleDateString('ja-JP', { year: 'numeric', month: 'long' });
+  document.getElementById('summaryMonthLabel').textContent = `📊 今月の実績（${monthLabel}）`;
+
+  updateBadges();
+  renderOrders(currentStatus);
+}
 
 function getOrderTotal(order) {
-  return order.products.reduce((s, p) => s + p.price * p.qty, 0) + order.shipping;
+  return order.total || (order.products.reduce((s, p) => s + p.price * p.qty, 0) + order.shipping);
 }
+
 
 function filterOrders(status, tabEl) {
   currentStatus = status;
@@ -715,7 +723,7 @@ function renderOrders(status) {
       <div class="order-card ${cardClass}">
         <div class="order-card-header">
           <div class="order-card-header-left">
-            <div class="order-number">${order.id}</div>
+            <div class="order-number">${order.displayId}</div>
             <div class="order-date">${order.date}</div>
           </div>
           <div class="order-status ${statusClass}">${statusLabel}</div>
@@ -731,16 +739,22 @@ function renderOrders(status) {
         </div>
         ${noteRow}
         <div class="order-products">
-          ${order.products.map(p => `
+          ${order.products.map((p, i) => {
+            const thumbClass = orderThumbClasses[i % orderThumbClasses.length];
+            const thumbInner = p.image
+              ? `<img src="${p.image}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">`
+              : '🛍️';
+            return `
             <div class="order-product-row">
-              <div class="order-product-thumb ${p.grade}">${p.emoji}</div>
+              <div class="order-product-thumb ${thumbClass}" style="overflow:hidden;">${thumbInner}</div>
               <div class="order-product-info">
                 <div class="order-product-name">${p.name}</div>
                 <div class="order-product-meta">数量：${p.qty}</div>
               </div>
               <div class="order-product-price">¥${(p.price * p.qty).toLocaleString()}</div>
             </div>
-          `).join('')}
+          `;
+          }).join('')}
         </div>
         ${trackingRow}
         <div class="order-card-footer">
@@ -765,7 +779,7 @@ function openShipModal(orderId) {
     : `${order.customer.name} 様`;
 
   document.getElementById('shipOrderInfo').innerHTML = `
-    <div class="ship-order-info-row"><span class="label">注文番号</span><span class="value">${order.id}</span></div>
+    <div class="ship-order-info-row"><span class="label">注文番号</span><span class="value">${order.displayId}</span></div>
     <div class="ship-order-info-row"><span class="label">注文者</span><span class="value">${order.customer.name} 様</span></div>
     <div class="ship-order-info-row"><span class="label">発送先</span><span class="value">${shipTo}</span></div>
     <div class="ship-order-info-row"><span class="label">商品数</span><span class="value">${order.products.length}点</span></div>
@@ -777,19 +791,28 @@ function openShipModal(orderId) {
   document.body.style.overflow = 'hidden';
 }
 
-function submitShipping() {
+async function submitShipping() {
   const carrier  = document.getElementById('carrierSelect').value;
   const tracking = document.getElementById('trackingInput').value.trim();
   if (!carrier)  { showToast('配送業者を選択してください'); return; }
   if (!tracking) { showToast('追跡番号を入力してください'); return; }
 
+  const carrierLabel = carrierNames[carrier] || carrier;
+
+  const { error } = await supabaseClient
+    .from('orders')
+    .update({ status: 'shipped', carrier: carrierLabel, tracking_number: tracking })
+    .eq('id', currentShipOrderId);
+
+  if (error) {
+    console.error('発送処理エラー:', error);
+    showToast('更新に失敗しました：' + error.message);
+    return;
+  }
+
   const order = orders.find(o => o.id === currentShipOrderId);
-  const carrierNames = {
-    yamato: 'ヤマト運輸', sagawa: '佐川急便',
-    yupack: '日本郵便（ゆうパック）', fukutsu: '福山通運', other: 'その他'
-  };
   order.status   = 'shipped';
-  order.carrier  = carrierNames[carrier] || carrier;
+  order.carrier  = carrierLabel;
   order.tracking = tracking;
 
   closeModal('shipModal');
@@ -804,7 +827,7 @@ function openDetail(orderId) {
   const sub   = order.products.reduce((s, p) => s + p.price * p.qty, 0);
   const total = sub + order.shipping;
 
-  document.getElementById('detailModalTitle').textContent = `注文詳細 ${order.id}`;
+  document.getElementById('detailModalTitle').textContent = `注文詳細 ${order.displayId}`;
 
   // お届け先ブロック
   const deliveryBlock = order.delivery ? `
@@ -840,7 +863,7 @@ function openDetail(orderId) {
     <div class="detail-section">
       <div class="detail-section-title">注文者情報</div>
       <table class="detail-info-table">
-        <tr><th>注文番号</th><td>${order.id}</td></tr>
+        <tr><th>注文番号</th><td>${order.displayId}</td></tr>
         <tr><th>注文日時</th><td>${order.date}</td></tr>
         <tr><th>注文者</th><td>${order.customer.name} 様<br><span style="font-size:11px;color:var(--text-sub);">${order.customer.address}</span></td></tr>
         ${deliveryBlock}
@@ -851,15 +874,21 @@ function openDetail(orderId) {
     <div class="detail-section">
       <div class="detail-section-title">商品</div>
       <div class="detail-product-list">
-        ${order.products.map(p => `
+        ${order.products.map((p, i) => {
+          const thumbClass = orderThumbClasses[i % orderThumbClasses.length];
+          const thumbInner = p.image
+            ? `<img src="${p.image}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">`
+            : '🛍️';
+          return `
           <div class="detail-product-row">
-            <div class="detail-product-thumb ${p.grade}">${p.emoji}</div>
+            <div class="detail-product-thumb ${thumbClass}" style="overflow:hidden;">${thumbInner}</div>
             <div class="detail-product-info">
               <div class="detail-product-name">${p.name}</div>
               <div class="detail-product-meta">数量：${p.qty}</div>
             </div>
             <div class="detail-product-price">¥${(p.price * p.qty).toLocaleString()}</div>
-          </div>`).join('')}
+          </div>`;
+        }).join('')}
       </div>
     </div>
     <div class="detail-section">
@@ -908,7 +937,7 @@ function printDeliveryNote(orderId) {
     </div>
     ${orderPersonBlock}
     <div class="dn-thanks">この度はご注文いただき、誠にありがとうございます。<br>下記の通り納品いたします。</div>
-    <div class="dn-order-number">注文番号：${order.id}　／　注文日：${order.date}</div>
+    <div class="dn-order-number">注文番号：${order.displayId}　／　注文日：${order.date}</div>
     <table class="dn-table">
       <thead>
         <tr>
@@ -935,9 +964,8 @@ function printDeliveryNote(orderId) {
       <div class="dn-total-row grand"><span class="label">合計（税込）</span><span class="value">¥${total.toLocaleString()}</span></div>
     </div>
     <div class="dn-shop-block">
-      <div class="dn-shop-name">〇〇農園</div>
-      〒629-3400　京都府京丹後市○○町1-1<br>
-      TEL：0772-00-0000　／　Email：info@marumaru-farm.jp<br>
+      <div class="dn-shop-name">${currentShopInfo?.shop_name || ''}</div>
+      ${currentShopInfo?.address || ''}<br>
       こむちょマーケット 出店ショップ
     </div>
   `;
@@ -954,7 +982,7 @@ function closeModalOutside(e, id) {
   if (e.target === document.getElementById(id)) closeModal(id);
 }
 
-// ===== バッジ更新 =====
+// ===== バッジ・サマリー更新 =====
 function updateBadges() {
   const newCount       = orders.filter(o => o.status === 'new').length;
   const shippedCount   = orders.filter(o => o.status === 'shipped').length;
@@ -964,6 +992,16 @@ function updateBadges() {
   document.getElementById('cancelledBadge').textContent = cancelledCount;
   document.getElementById('newOrderCount').textContent  = newCount;
   document.getElementById('shippedCount').textContent   = shippedCount;
+
+  // 今月の実績
+  const now = new Date();
+  const thisMonthOrders = orders.filter(o => {
+    const d = new Date(o.createdAt);
+    return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() && o.status !== 'cancelled';
+  });
+  const totalSales = thisMonthOrders.reduce((s, o) => s + getOrderTotal(o), 0);
+  document.getElementById('totalSales').textContent = totalSales.toLocaleString();
+  document.getElementById('totalOrders').textContent = thisMonthOrders.length;
 }
 
 // ===== トースト =====
