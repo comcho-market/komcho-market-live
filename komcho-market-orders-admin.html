@@ -658,7 +658,10 @@ async function loadOrders() {
       name: o.address_name || '（お名前未登録）',
       address: `〒${o.address_postal || ''} ${o.address_prefecture || ''}${o.address_line || ''}${o.address_building ? ' ' + o.address_building : ''}`
     },
-    delivery: null,
+    delivery: o.delivery_name ? {
+      name: o.delivery_name,
+      address: `〒${o.delivery_postal || ''} ${o.delivery_prefecture || ''}${o.delivery_line || ''}${o.delivery_building ? ' ' + o.delivery_building : ''}`
+    } : null,
     note: '',
     products: (o.order_items || []).map(item => ({
       name: item.product_name,

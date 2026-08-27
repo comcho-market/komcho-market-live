@@ -565,6 +565,46 @@
         <span class="save-check-label">🏠 この住所を保存して次回から使う</span>
       </label>
     </div>
+
+    <!-- 贈り物トグル -->
+    <label class="save-check-wrap" style="margin-top:14px;border-top:1px solid var(--border);padding-top:14px;">
+      <input type="checkbox" id="giftToggle" onchange="toggleGiftForm()">
+      <span class="save-check-label">🎁 贈り物として、別の方にお届けする</span>
+    </label>
+
+    <div class="new-address-form" id="deliveryForm">
+      <p style="font-size:11px;color:var(--text-sub);margin-bottom:10px;">上記は「ご注文者情報」として扱われます。実際にお届けする方の情報を入力してください。</p>
+      <div class="form-row">
+        <div class="form-field">
+          <label class="form-label form-label-req">姓</label>
+          <input class="form-input" type="text" placeholder="山田" id="deliveryLastName">
+        </div>
+        <div class="form-field">
+          <label class="form-label form-label-req">名</label>
+          <input class="form-input" type="text" placeholder="太郎" id="deliveryFirstName">
+        </div>
+      </div>
+      <div class="form-field">
+        <label class="form-label form-label-req">郵便番号</label>
+        <input class="form-input" type="text" placeholder="000-0000" inputmode="numeric" maxlength="8" id="deliveryPostal">
+      </div>
+      <div class="form-field">
+        <label class="form-label form-label-req">都道府県</label>
+        <input class="form-input" type="text" placeholder="東京都" id="deliveryPrefecture">
+      </div>
+      <div class="form-field">
+        <label class="form-label form-label-req">市区町村・番地</label>
+        <input class="form-input" type="text" placeholder="新宿区△△町5-6-7" id="deliveryLine">
+      </div>
+      <div class="form-field">
+        <label class="form-label">建物名・部屋番号（任意）</label>
+        <input class="form-input" type="text" placeholder="○○マンション 101号室" id="deliveryBuilding">
+      </div>
+      <div class="form-field">
+        <label class="form-label form-label-req">電話番号</label>
+        <input class="form-input" type="tel" placeholder="090-0000-0000" inputmode="tel" id="deliveryPhone">
+      </div>
+    </div>
   </div>
 
   <div class="gap"></div>
@@ -945,6 +985,10 @@
     }
   }
 
+  function toggleGiftForm() {
+    document.getElementById('deliveryForm').classList.toggle('open', document.getElementById('giftToggle').checked);
+  }
+
   // 支払い選択（今回はUIのみ。実際の決済処理は別タスクで対応）
   function selectPayment(el, isNew) {
     document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
@@ -1049,6 +1093,28 @@
       return;
     }
 
+    // 贈り物として別の方に届ける場合の入力チェック・情報取得
+    let deliveryInfo = null;
+    if (document.getElementById('giftToggle').checked) {
+      const dLastName = document.getElementById('deliveryLastName').value.trim();
+      const dFirstName = document.getElementById('deliveryFirstName').value.trim();
+      const dLine = document.getElementById('deliveryLine').value.trim();
+      deliveryInfo = {
+        name: (dLastName + ' ' + dFirstName).trim(),
+        postal: document.getElementById('deliveryPostal').value.trim(),
+        prefecture: document.getElementById('deliveryPrefecture').value.trim(),
+        line: dLine,
+        building: document.getElementById('deliveryBuilding').value.trim(),
+        phone: document.getElementById('deliveryPhone').value.trim()
+      };
+      if (!deliveryInfo.name || !deliveryInfo.line) {
+        alert('お届け先（贈り先）の情報を入力してください');
+        orderBtn.disabled = false;
+        orderBtn.style.opacity = '1';
+        return;
+      }
+    }
+
     const pointsUsed = parseInt(document.getElementById('pointInput').value) || 0;
     const total = Math.max(0, baseTotal - pointsUsed);
     const earnPt = Math.floor(total / 200);
@@ -1071,6 +1137,12 @@
         address_line: addressInfo.line,
         address_building: addressInfo.building,
         address_phone: addressInfo.phone,
+        delivery_name: deliveryInfo?.name || null,
+        delivery_postal: deliveryInfo?.postal || null,
+        delivery_prefecture: deliveryInfo?.prefecture || null,
+        delivery_line: deliveryInfo?.line || null,
+        delivery_building: deliveryInfo?.building || null,
+        delivery_phone: deliveryInfo?.phone || null,
         payment_method: 'card'
       })
       .select()
@@ -1110,7 +1182,9 @@
     // 完了画面表示
     document.getElementById('completeOrderNo').textContent = '#' + order.id.slice(0, 8).toUpperCase();
     document.getElementById('completeTotal').textContent = '¥' + total.toLocaleString();
-    document.getElementById('completeAddress').textContent = `${addressInfo.prefecture || ''}${addressInfo.line || ''}`;
+    document.getElementById('completeAddress').textContent = deliveryInfo
+      ? `${deliveryInfo.prefecture || ''}${deliveryInfo.line || ''}（${deliveryInfo.name} 様）`
+      : `${addressInfo.prefecture || ''}${addressInfo.line || ''}`;
     document.getElementById('completeShippingLabel').textContent = shippingLabel;
     document.getElementById('completeEarnPt').textContent = '+' + earnPt + 'pt';
 
