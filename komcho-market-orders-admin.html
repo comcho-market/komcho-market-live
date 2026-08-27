@@ -40,6 +40,15 @@
     display: flex; align-items: center; justify-content: space-between;
     padding: 12px 16px;
   }
+  .header-back {
+    display: flex; align-items: center;
+    padding: 4px 0;
+  }
+  .header-back svg {
+    width: 22px; height: 22px;
+    stroke: var(--text-main); fill: none;
+    stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+  }
   .header-logo {
     display: flex; align-items: center; gap: 7px;
   }
@@ -481,12 +490,9 @@
 
 <!-- HEADER -->
 <header class="header">
-  <a class="header-logo" href="komcho-market-top.html">
-    <svg class="logo-icon" viewBox="0 0 60 48">
-      <path transform="translate(30,24)" d="M -26 7 C -17 -17 5 -24 24 -10 C 12 5 -2 19 -21 24"/>
-    </svg>
-    <span class="logo-text">こむちょマーケット</span>
-  </a>
+  <button class="header-back" onclick="window.location.href='komcho-market-shop-admin.html'">
+    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
   <div class="header-title">注文管理</div>
   <div class="header-spacer"></div>
 </header>
