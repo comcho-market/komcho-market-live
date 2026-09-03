@@ -654,14 +654,15 @@ async function loadOrders() {
     date: new Date(o.created_at).toLocaleString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
     createdAt: o.created_at,
     status: o.status,
-    customer: {
-      name: o.address_name || '（お名前未登録）',
-      address: `〒${o.address_postal || ''} ${o.address_prefecture || ''}${o.address_line || ''}${o.address_building ? ' ' + o.address_building : ''}`
+    buyer: {
+      name: o.delivery_name || '（お名前未登録）',
+      phone: o.delivery_phone || ''
     },
-    delivery: o.delivery_name ? {
-      name: o.delivery_name,
-      address: `〒${o.delivery_postal || ''} ${o.delivery_prefecture || ''}${o.delivery_line || ''}${o.delivery_building ? ' ' + o.delivery_building : ''}`
-    } : null,
+    shipTo: {
+      name: o.address_name || '',
+      address: `〒${o.address_postal || ''} ${o.address_prefecture || ''}${o.address_line || ''}${o.address_building ? ' ' + o.address_building : ''}`,
+      phone: o.address_phone || ''
+    },
     note: '',
     products: (o.order_items || []).map(item => ({
       name: item.product_name,
@@ -713,10 +714,6 @@ function renderOrders(status) {
     const statusLabel = { new: '新規注文', shipped: '発送済み', cancelled: 'キャンセル', cancel_requested: 'キャンセル依頼中' }[order.status];
     const cardClass   = { new: 'is-new', shipped: 'is-shipped', cancelled: 'is-cancelled', cancel_requested: 'is-cancel-requested' }[order.status];
 
-    // お届け先が異なるバッジ（一覧カード用）
-    const giftBadge = order.delivery
-      ? `<span class="gift-badge">⚠️ お届け先が異なります</span>` : '';
-
     // 備考（一覧カード用・短く表示）
     const noteRow = order.note
       ? `<div class="note-badge">💬 ${order.note.length > 40 ? order.note.slice(0,40)+'…' : order.note}</div>` : '';
@@ -755,8 +752,8 @@ function renderOrders(status) {
             <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           </div>
           <div style="flex:1;">
-            <div class="customer-name">${order.customer.name} 様${giftBadge}</div>
-            <div class="customer-address">${order.customer.address}</div>
+            <div class="customer-name">${order.shipTo.name} 様</div>
+            <div class="customer-address">${order.shipTo.address}</div>
           </div>
         </div>
         ${noteRow}
@@ -795,15 +792,11 @@ function openShipModal(orderId) {
   currentShipOrderId = orderId;
   const order = orders.find(o => o.id === orderId);
   const total = getOrderTotal(order);
-  // お届け先が異なる場合は発送先を明示
-  const shipTo = order.delivery
-    ? `${order.delivery.name} 様（${order.delivery.address}）`
-    : `${order.customer.name} 様`;
 
   document.getElementById('shipOrderInfo').innerHTML = `
     <div class="ship-order-info-row"><span class="label">注文番号</span><span class="value">${order.displayId}</span></div>
-    <div class="ship-order-info-row"><span class="label">注文者</span><span class="value">${order.customer.name} 様</span></div>
-    <div class="ship-order-info-row"><span class="label">発送先</span><span class="value">${shipTo}</span></div>
+    <div class="ship-order-info-row"><span class="label">購入者</span><span class="value">${order.buyer.name} 様</span></div>
+    <div class="ship-order-info-row"><span class="label">発送先</span><span class="value">${order.shipTo.name} 様（${order.shipTo.address}）</span></div>
     <div class="ship-order-info-row"><span class="label">商品数</span><span class="value">${order.products.length}点</span></div>
     <div class="ship-order-info-row"><span class="label">合計金額</span><span class="value">¥${total.toLocaleString()}</span></div>
   `;
@@ -917,19 +910,6 @@ function openDetail(orderId) {
 
   document.getElementById('detailModalTitle').textContent = `注文詳細 ${order.displayId}`;
 
-  // お届け先ブロック
-  const deliveryBlock = order.delivery ? `
-    <tr>
-      <th>お届け先</th>
-      <td>
-        <div class="delivery-diff-block">
-          <div class="diff-label">⚠️ 注文者と異なります</div>
-          <div class="diff-name">${order.delivery.name} 様</div>
-          <div class="diff-address">${order.delivery.address}</div>
-        </div>
-      </td>
-    </tr>` : '';
-
   // 備考ブロック（全文表示）
   const noteSection = order.note ? `
     <div class="detail-section">
@@ -949,12 +929,12 @@ function openDetail(orderId) {
 
   document.getElementById('detailModalBody').innerHTML = `
     <div class="detail-section">
-      <div class="detail-section-title">注文者情報</div>
+      <div class="detail-section-title">注文情報</div>
       <table class="detail-info-table">
         <tr><th>注文番号</th><td>${order.displayId}</td></tr>
         <tr><th>注文日時</th><td>${order.date}</td></tr>
-        <tr><th>注文者</th><td>${order.customer.name} 様<br><span style="font-size:11px;color:var(--text-sub);">${order.customer.address}</span></td></tr>
-        ${deliveryBlock}
+        <tr><th>購入者</th><td>${order.buyer.name} 様${order.buyer.phone ? '<br><span style="font-size:11px;color:var(--text-sub);">' + order.buyer.phone + '</span>' : ''}</td></tr>
+        <tr><th>発送先</th><td>${order.shipTo.name} 様<br><span style="font-size:11px;color:var(--text-sub);">${order.shipTo.address}${order.shipTo.phone ? '　' + order.shipTo.phone : ''}</span></td></tr>
       </table>
     </div>
     ${noteSection}
@@ -1005,25 +985,18 @@ function printDeliveryNote(orderId) {
   const total = sub + order.shipping;
   const today = new Date().toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
 
-  // 納品書の宛名：お届け先が異なる場合はお届け先を使う
-  const recipient = order.delivery || order.customer;
-
-  // お届け先が異なる場合のみ注文者情報も掲載
-  const orderPersonBlock = order.delivery ? `
-    <div class="dn-delivery-block">
-      <div class="dn-delivery-label">▶ ご注文者</div>
-      <div class="dn-delivery-name">${order.customer.name} 様</div>
-      <div class="dn-delivery-addr">${order.customer.address}</div>
-    </div>` : '';
-
   document.getElementById('deliveryNote').innerHTML = `
     <div class="dn-title">納　品　書</div>
     <div class="dn-date">発行日：${today}</div>
     <div class="dn-customer-block">
-      <div class="dn-customer-name">${recipient.name} 様</div>
-      <div class="dn-customer-address">${recipient.address}</div>
+      <div class="dn-delivery-label">▶ 発送先</div>
+      <div class="dn-customer-name">${order.shipTo.name} 様</div>
+      <div class="dn-customer-address">${order.shipTo.address}</div>
     </div>
-    ${orderPersonBlock}
+    <div class="dn-delivery-block">
+      <div class="dn-delivery-label">▶ 購入者</div>
+      <div class="dn-delivery-name">${order.buyer.name} 様${order.buyer.phone ? '　' + order.buyer.phone : ''}</div>
+    </div>
     <div class="dn-thanks">この度はご注文いただき、誠にありがとうございます。<br>下記の通り納品いたします。</div>
     <div class="dn-order-number">注文番号：${order.displayId}　／　注文日：${order.date}</div>
     <table class="dn-table">
