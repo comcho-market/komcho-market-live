@@ -530,6 +530,28 @@
       <label class="form-label form-label-req">電話番号</label>
       <input class="form-input" type="tel" placeholder="090-0000-0000" inputmode="tel" id="buyerPhone">
     </div>
+    <label class="save-check-wrap">
+      <input type="checkbox" id="sameAsShipping" checked onchange="toggleSameAsShipping()">
+      <span class="save-check-label">📮 発送先住所と同じ</span>
+    </label>
+    <div id="buyerAddressFields" style="display:none;margin-top:12px;">
+      <div class="form-field">
+        <label class="form-label form-label-req">郵便番号</label>
+        <input class="form-input" type="text" placeholder="000-0000" inputmode="numeric" maxlength="8" id="buyerPostal">
+      </div>
+      <div class="form-field">
+        <label class="form-label form-label-req">都道府県</label>
+        <input class="form-input" type="text" placeholder="京都府" id="buyerPrefecture">
+      </div>
+      <div class="form-field">
+        <label class="form-label form-label-req">市区町村・番地</label>
+        <input class="form-input" type="text" placeholder="京都市中京区○○町1-2-3" id="buyerLine">
+      </div>
+      <div class="form-field">
+        <label class="form-label">建物名・部屋番号（任意）</label>
+        <input class="form-input" type="text" placeholder="○○マンション 101号室" id="buyerBuilding">
+      </div>
+    </div>
   </div>
 
   <div class="gap"></div>
@@ -969,6 +991,11 @@
     }
   }
 
+  function toggleSameAsShipping() {
+    document.getElementById('buyerAddressFields').style.display =
+      document.getElementById('sameAsShipping').checked ? 'none' : 'block';
+  }
+
   // 支払い選択（今回はUIのみ。実際の決済処理は別タスクで対応）
   function selectPayment(el, isNew) {
     document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
@@ -1076,12 +1103,23 @@
     // ご注文者情報（常に発送先とは別で入力）
     const buyerLastName = document.getElementById('buyerLastName').value.trim();
     const buyerFirstName = document.getElementById('buyerFirstName').value.trim();
+    const sameAsShipping = document.getElementById('sameAsShipping').checked;
     const buyerInfo = {
       name: (buyerLastName + ' ' + buyerFirstName).trim(),
-      phone: document.getElementById('buyerPhone').value.trim()
+      phone: document.getElementById('buyerPhone').value.trim(),
+      postal: sameAsShipping ? addressInfo.postal : document.getElementById('buyerPostal').value.trim(),
+      prefecture: sameAsShipping ? addressInfo.prefecture : document.getElementById('buyerPrefecture').value.trim(),
+      line: sameAsShipping ? addressInfo.line : document.getElementById('buyerLine').value.trim(),
+      building: sameAsShipping ? addressInfo.building : document.getElementById('buyerBuilding').value.trim()
     };
     if (!buyerInfo.name) {
       alert('ご注文者情報（お名前）を入力してください');
+      orderBtn.disabled = false;
+      orderBtn.style.opacity = '1';
+      return;
+    }
+    if (!sameAsShipping && !buyerInfo.line) {
+      alert('ご注文者情報（住所）を入力してください');
       orderBtn.disabled = false;
       orderBtn.style.opacity = '1';
       return;
@@ -1111,6 +1149,10 @@
         address_phone: addressInfo.phone,
         delivery_name: buyerInfo.name,
         delivery_phone: buyerInfo.phone,
+        delivery_postal: buyerInfo.postal,
+        delivery_prefecture: buyerInfo.prefecture,
+        delivery_line: buyerInfo.line,
+        delivery_building: buyerInfo.building,
         payment_method: 'card'
       })
       .select()

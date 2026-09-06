@@ -620,7 +620,7 @@ let currentShopInfo = null;
 
   const { data: shop, error: shopError } = await supabaseClient
     .from('shops')
-    .select('id, shop_name, address')
+    .select('id, shop_name, address, phone')
     .eq('owner_id', session.user.id)
     .single();
 
@@ -656,7 +656,8 @@ async function loadOrders() {
     status: o.status,
     buyer: {
       name: o.delivery_name || '（お名前未登録）',
-      phone: o.delivery_phone || ''
+      phone: o.delivery_phone || '',
+      address: `〒${o.delivery_postal || ''} ${o.delivery_prefecture || ''}${o.delivery_line || ''}${o.delivery_building ? ' ' + o.delivery_building : ''}`
     },
     shipTo: {
       name: o.address_name || '',
@@ -795,7 +796,7 @@ function openShipModal(orderId) {
 
   document.getElementById('shipOrderInfo').innerHTML = `
     <div class="ship-order-info-row"><span class="label">注文番号</span><span class="value">${order.displayId}</span></div>
-    <div class="ship-order-info-row"><span class="label">購入者</span><span class="value">${order.buyer.name} 様</span></div>
+    <div class="ship-order-info-row"><span class="label">購入者</span><span class="value">${order.buyer.name} 様（${order.buyer.address}）</span></div>
     <div class="ship-order-info-row"><span class="label">発送先</span><span class="value">${order.shipTo.name} 様（${order.shipTo.address}）</span></div>
     <div class="ship-order-info-row"><span class="label">商品数</span><span class="value">${order.products.length}点</span></div>
     <div class="ship-order-info-row"><span class="label">合計金額</span><span class="value">¥${total.toLocaleString()}</span></div>
@@ -933,7 +934,7 @@ function openDetail(orderId) {
       <table class="detail-info-table">
         <tr><th>注文番号</th><td>${order.displayId}</td></tr>
         <tr><th>注文日時</th><td>${order.date}</td></tr>
-        <tr><th>購入者</th><td>${order.buyer.name} 様${order.buyer.phone ? '<br><span style="font-size:11px;color:var(--text-sub);">' + order.buyer.phone + '</span>' : ''}</td></tr>
+        <tr><th>購入者</th><td>${order.buyer.name} 様<br><span style="font-size:11px;color:var(--text-sub);">${order.buyer.address}${order.buyer.phone ? '　' + order.buyer.phone : ''}</span></td></tr>
         <tr><th>発送先</th><td>${order.shipTo.name} 様<br><span style="font-size:11px;color:var(--text-sub);">${order.shipTo.address}${order.shipTo.phone ? '　' + order.shipTo.phone : ''}</span></td></tr>
       </table>
     </div>
@@ -985,17 +986,22 @@ function printDeliveryNote(orderId) {
   const total = sub + order.shipping;
   const today = new Date().toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
 
+  // 購入者住所が発送先と同じ場合は「同上」表示
+  const buyerSameAsShipTo = order.buyer.address.trim() === order.shipTo.address.trim() && order.buyer.name === order.shipTo.name;
+  const buyerAddressLine = buyerSameAsShipTo ? '（発送先と同上）' : order.buyer.address;
+
   document.getElementById('deliveryNote').innerHTML = `
     <div class="dn-title">納　品　書</div>
     <div class="dn-date">発行日：${today}</div>
     <div class="dn-customer-block">
       <div class="dn-delivery-label">▶ 発送先</div>
       <div class="dn-customer-name">${order.shipTo.name} 様</div>
-      <div class="dn-customer-address">${order.shipTo.address}</div>
+      <div class="dn-customer-address">${order.shipTo.address}${order.shipTo.phone ? '　TEL：' + order.shipTo.phone : ''}</div>
     </div>
     <div class="dn-delivery-block">
       <div class="dn-delivery-label">▶ 購入者</div>
-      <div class="dn-delivery-name">${order.buyer.name} 様${order.buyer.phone ? '　' + order.buyer.phone : ''}</div>
+      <div class="dn-delivery-name">${order.buyer.name} 様</div>
+      <div class="dn-delivery-addr">${buyerAddressLine}${order.buyer.phone ? '　TEL：' + order.buyer.phone : ''}</div>
     </div>
     <div class="dn-thanks">この度はご注文いただき、誠にありがとうございます。<br>下記の通り納品いたします。</div>
     <div class="dn-order-number">注文番号：${order.displayId}　／　注文日：${order.date}</div>
@@ -1025,8 +1031,9 @@ function printDeliveryNote(orderId) {
       <div class="dn-total-row grand"><span class="label">合計（税込）</span><span class="value">¥${total.toLocaleString()}</span></div>
     </div>
     <div class="dn-shop-block">
+      <div class="dn-delivery-label">▶ 店舗情報</div>
       <div class="dn-shop-name">${currentShopInfo?.shop_name || ''}</div>
-      ${currentShopInfo?.address || ''}<br>
+      ${currentShopInfo?.address || '（住所未登録）'}${currentShopInfo?.phone ? '　TEL：' + currentShopInfo.phone : ''}<br>
       こむちょマーケット 出店ショップ
     </div>
   `;

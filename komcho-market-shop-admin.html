@@ -417,6 +417,10 @@
     <label class="field-label">所在地</label>
     <input class="field-input" type="text" id="shopAddressField" placeholder="都道府県・市区町村">
   </div>
+  <div class="field">
+    <label class="field-label">電話番号</label>
+    <input class="field-input" type="tel" id="shopPhoneField" placeholder="090-0000-0000">
+  </div>
 </div>
 
 <div class="gap"></div>
@@ -606,6 +610,7 @@
     currentShopId = shop.id;
     document.getElementById('shopNameField').value = shop.shop_name || '';
     document.getElementById('shopAddressField').value = shop.address || '';
+    document.getElementById('shopPhoneField').value = shop.phone || '';
     document.getElementById('shopAboutField').value = shop.about || '';
     document.getElementById('shopWebsiteField').value = shop.website_url || '';
     document.getElementById('shopInstagramField').value = shop.instagram_url || '';
@@ -744,6 +749,7 @@
     const { error } = await supabaseClient.from('shops').update({
       shop_name: document.getElementById('shopNameField').value.trim(),
       address: document.getElementById('shopAddressField').value.trim(),
+      phone: document.getElementById('shopPhoneField').value.trim(),
       about: document.getElementById('shopAboutField').value.trim(),
       website_url: normalizeUrl(document.getElementById('shopWebsiteField').value),
       instagram_url: normalizeUrl(document.getElementById('shopInstagramField').value),
