@@ -516,22 +516,16 @@
       <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       ご注文者情報
     </div>
-    <div class="form-row">
-      <div class="form-field">
-        <label class="form-label form-label-req">姓</label>
-        <input class="form-input" type="text" placeholder="山田" id="buyerLastName">
-      </div>
-      <div class="form-field">
-        <label class="form-label form-label-req">名</label>
-        <input class="form-input" type="text" placeholder="花子" id="buyerFirstName">
-      </div>
+    <div class="form-field">
+      <label class="form-label form-label-req">お名前</label>
+      <input class="form-input" type="text" placeholder="山田 花子" id="buyerName">
     </div>
     <div class="form-field">
       <label class="form-label form-label-req">電話番号</label>
       <input class="form-input" type="tel" placeholder="090-0000-0000" inputmode="tel" id="buyerPhone">
     </div>
     <label class="save-check-wrap">
-      <input type="checkbox" id="sameAsShipping" checked onchange="toggleSameAsShipping()">
+      <input type="checkbox" id="sameAsShipping" checked onchange="toggleSameAsShipping()" autocomplete="off">
       <span class="save-check-label">📮 発送先住所と同じ</span>
     </label>
     <div id="buyerAddressFields" style="display:none;margin-top:12px;">
@@ -900,6 +894,10 @@
     }
     currentUserId = session.user.id;
 
+    // 会員情報（お名前）を自動入力
+    const { data: profile } = await supabaseClient.from('profiles').select('name').eq('id', currentUserId).single();
+    if (profile?.name) document.getElementById('buyerName').value = profile.name;
+
     shopId = new URLSearchParams(window.location.search).get('shop');
     if (!shopId) {
       window.location.href = 'komcho-market-cart.html';
@@ -964,14 +962,24 @@
     document.getElementById('shippingDisplay').textContent = isFree ? '無料' : '¥' + shippingFee.toLocaleString();
 
     // ポイント残高
-    const { data: profile } = await supabaseClient.from('profiles').select('points').eq('id', currentUserId).single();
-    pointBalance = profile?.points || 0;
+    const { data: profilePoints } = await supabaseClient.from('profiles').select('points').eq('id', currentUserId).single();
+    pointBalance = profilePoints?.points || 0;
     const maxPoint = Math.min(pointBalance, baseTotal);
     document.getElementById('pointBalanceDisplay').textContent = pointBalance.toLocaleString() + 'pt';
     document.getElementById('pointInput').max = maxPoint;
     document.getElementById('pointInputNote').textContent = '上限：' + maxPoint.toLocaleString() + 'pt';
 
     await loadSavedAddresses();
+
+    // デフォルト住所の電話番号を、ご注文者情報の電話番号欄にも自動入力
+    if (savedAddresses.length > 0 && savedAddresses[0].phone) {
+      document.getElementById('buyerPhone').value = savedAddresses[0].phone;
+    }
+
+    // チェックボックスの見た目とフォーム表示状態を必ず一致させる（ブラウザの入力復元対策）
+    document.getElementById('sameAsShipping').checked = true;
+    toggleSameAsShipping();
+
     updateTotal(0);
   })();
 
@@ -1101,11 +1109,9 @@
     }
 
     // ご注文者情報（常に発送先とは別で入力）
-    const buyerLastName = document.getElementById('buyerLastName').value.trim();
-    const buyerFirstName = document.getElementById('buyerFirstName').value.trim();
     const sameAsShipping = document.getElementById('sameAsShipping').checked;
     const buyerInfo = {
-      name: (buyerLastName + ' ' + buyerFirstName).trim(),
+      name: document.getElementById('buyerName').value.trim(),
       phone: document.getElementById('buyerPhone').value.trim(),
       postal: sameAsShipping ? addressInfo.postal : document.getElementById('buyerPostal').value.trim(),
       prefecture: sameAsShipping ? addressInfo.prefecture : document.getElementById('buyerPrefecture').value.trim(),

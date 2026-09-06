@@ -915,6 +915,16 @@
       return;
     }
 
+    // 現在の登録件数を確認（新規追加で、まだ1件も無い場合は自動的にデフォルトにする）
+    let forceDefault = false;
+    if (!editingAddressId) {
+      const { count } = await supabaseClient
+        .from('addresses')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', session.user.id);
+      forceDefault = !count || count === 0;
+    }
+
     const payload = {
       user_id: session.user.id,
       name: name,
@@ -923,7 +933,7 @@
       address_line: addressLine,
       building: document.getElementById('addrBuilding').value.trim(),
       phone: document.getElementById('addrPhone').value.trim(),
-      is_default: document.getElementById('addrIsDefault').checked
+      is_default: forceDefault || document.getElementById('addrIsDefault').checked
     };
 
     // デフォルトに設定する場合、他の住所のデフォルトを解除

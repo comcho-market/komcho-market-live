@@ -422,52 +422,54 @@
   /* ===== 納品書（印刷用） ===== */
   .delivery-note-wrap {
     display: none;
-    padding: 32px 28px; background: #fff;
+    padding: 16px 20px; background: #fff;
     font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Yu Gothic', sans-serif;
     color: #1a1a1a;
+    font-size: 12px;
   }
-  .dn-title  { font-size: 24px; font-weight: 700; text-align: center; letter-spacing: 0.15em; margin-bottom: 6px; }
-  .dn-date   { font-size: 12px; text-align: right; color: #666; margin-bottom: 24px; }
-  .dn-customer-block { border-bottom: 2px solid #1a1a1a; padding-bottom: 14px; margin-bottom: 20px; }
-  .dn-customer-name  { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-  .dn-customer-address { font-size: 12px; color: #444; line-height: 1.7; }
-  .dn-thanks       { font-size: 12px; color: #444; margin-bottom: 20px; }
+  .dn-title  { font-size: 18px; font-weight: 700; text-align: center; letter-spacing: 0.12em; margin-bottom: 4px; }
+  .dn-date   { font-size: 10px; text-align: right; color: #666; margin-bottom: 10px; }
+  .dn-customer-block { border-bottom: 1.5px solid #1a1a1a; padding-bottom: 8px; margin-bottom: 8px; }
+  .dn-customer-name  { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+  .dn-customer-address { font-size: 11px; color: #444; line-height: 1.4; }
+  .dn-thanks       { font-size: 10px; color: #444; margin-bottom: 8px; }
   .dn-order-number {
-    font-size: 11px; color: #888; margin-bottom: 16px;
-    background: #f5f5f5; padding: 6px 10px; border-radius: 4px; display: inline-block;
+    font-size: 10px; color: #888; margin-bottom: 8px;
+    background: #f5f5f5; padding: 3px 8px; border-radius: 4px; display: inline-block;
   }
-  .dn-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 12px; }
+  .dn-table { width: 100%; border-collapse: collapse; margin-bottom: 8px; font-size: 11px; }
   .dn-table th {
     background: #f0ede8; text-align: left;
-    padding: 8px 10px; border: 1px solid #ddd; font-weight: 700;
+    padding: 4px 8px; border: 1px solid #ddd; font-weight: 700;
   }
-  .dn-table td { padding: 8px 10px; border: 1px solid #ddd; vertical-align: top; }
+  .dn-table td { padding: 4px 8px; border: 1px solid #ddd; vertical-align: top; }
   .dn-table tr:nth-child(even) td { background: #fafaf8; }
   .dn-table td.right { text-align: right; }
-  .dn-totals { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; margin-bottom: 28px; }
-  .dn-total-row { display: flex; gap: 20px; font-size: 12px; }
+  .dn-totals { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; margin-bottom: 10px; }
+  .dn-total-row { display: flex; gap: 16px; font-size: 11px; }
   .dn-total-row .label { color: #666; }
-  .dn-total-row .value { font-weight: 600; min-width: 80px; text-align: right; }
-  .dn-total-row.grand { font-size: 15px; font-weight: 700; color: #1a1a1a; }
-  .dn-divider { border: none; border-top: 1.5px solid #1a1a1a; margin-bottom: 8px; width: 200px; }
+  .dn-total-row .value { font-weight: 600; min-width: 70px; text-align: right; }
+  .dn-total-row.grand { font-size: 13px; font-weight: 700; color: #1a1a1a; }
+  .dn-divider { border: none; border-top: 1.5px solid #1a1a1a; margin-bottom: 4px; width: 160px; }
   .dn-shop-block {
-    border-top: 1px solid #ddd; padding-top: 16px;
-    font-size: 11px; color: #666; line-height: 1.9;
+    border-top: 1px solid #ddd; padding-top: 8px;
+    font-size: 10px; color: #666; line-height: 1.4;
   }
-  .dn-shop-name { font-size: 14px; font-weight: 700; color: #1a1a1a; margin-bottom: 4px; }
+  .dn-shop-name { font-size: 12px; font-weight: 700; color: #1a1a1a; margin-bottom: 2px; }
 
-  /* お届け先が異なる場合の納品書表示 */
+  /* 購入者情報ブロック（発送先とは別枠） */
   .dn-delivery-block {
-    background: #f8f0f0; border: 1px solid #e0c0c0;
-    border-radius: 4px; padding: 10px 12px; margin-bottom: 16px; font-size: 12px;
+    background: #f8f8f6; border: 1px solid #ddd;
+    border-radius: 4px; padding: 6px 10px; margin-bottom: 8px; font-size: 11px;
   }
-  .dn-delivery-label { font-size: 10px; font-weight: 700; color: #c04040; margin-bottom: 4px; }
-  .dn-delivery-name  { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
-  .dn-delivery-addr  { color: #444; line-height: 1.7; }
+  .dn-delivery-label { font-size: 9px; font-weight: 700; color: #c04040; margin-bottom: 2px; }
+  .dn-delivery-name  { font-size: 12px; font-weight: 700; margin-bottom: 1px; }
+  .dn-delivery-addr  { color: #444; line-height: 1.4; }
 
   @media print {
+    @page { size: A4; margin: 12mm; }
     body > *:not(.delivery-note-wrap) { display: none !important; }
-    .delivery-note-wrap { display: block !important; padding: 20px; }
+    .delivery-note-wrap { display: block !important; padding: 0; }
     .modal-overlay { display: none !important; }
   }
 
