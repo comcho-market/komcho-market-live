@@ -524,11 +524,7 @@
       <label class="form-label form-label-req">電話番号</label>
       <input class="form-input" type="tel" placeholder="090-0000-0000" inputmode="tel" id="buyerPhone">
     </div>
-    <label class="save-check-wrap">
-      <input type="checkbox" id="sameAsShipping" checked onchange="toggleSameAsShipping()" autocomplete="off">
-      <span class="save-check-label">📮 発送先住所と同じ</span>
-    </label>
-    <div id="buyerAddressFields" style="display:none;margin-top:12px;">
+    <div id="buyerAddressFields">
       <div class="form-field">
         <label class="form-label form-label-req">郵便番号</label>
         <input class="form-input" type="text" placeholder="000-0000" inputmode="numeric" maxlength="8" id="buyerPostal">
@@ -971,14 +967,15 @@
 
     await loadSavedAddresses();
 
-    // デフォルト住所の電話番号を、ご注文者情報の電話番号欄にも自動入力
-    if (savedAddresses.length > 0 && savedAddresses[0].phone) {
-      document.getElementById('buyerPhone').value = savedAddresses[0].phone;
+    // ご注文者情報は、選んだ発送先とは関係なく、常にご自身の登録住所（デフォルト）を自動入力する
+    if (savedAddresses.length > 0) {
+      const myDefault = savedAddresses[0];
+      document.getElementById('buyerPhone').value = myDefault.phone || '';
+      document.getElementById('buyerPostal').value = myDefault.postal_code || '';
+      document.getElementById('buyerPrefecture').value = myDefault.prefecture || '';
+      document.getElementById('buyerLine').value = myDefault.address_line || '';
+      document.getElementById('buyerBuilding').value = myDefault.building || '';
     }
-
-    // チェックボックスの見た目とフォーム表示状態を必ず一致させる（ブラウザの入力復元対策）
-    document.getElementById('sameAsShipping').checked = true;
-    toggleSameAsShipping();
 
     updateTotal(0);
   })();
@@ -997,11 +994,6 @@
     if (form.classList.contains('open')) {
       document.querySelectorAll('.address-option').forEach(o => o.classList.remove('selected'));
     }
-  }
-
-  function toggleSameAsShipping() {
-    document.getElementById('buyerAddressFields').style.display =
-      document.getElementById('sameAsShipping').checked ? 'none' : 'block';
   }
 
   // 支払い選択（今回はUIのみ。実際の決済処理は別タスクで対応）
@@ -1108,15 +1100,14 @@
       return;
     }
 
-    // ご注文者情報（常に発送先とは別で入力）
-    const sameAsShipping = document.getElementById('sameAsShipping').checked;
+    // ご注文者情報（発送先とは独立して、常に別で入力）
     const buyerInfo = {
       name: document.getElementById('buyerName').value.trim(),
       phone: document.getElementById('buyerPhone').value.trim(),
-      postal: sameAsShipping ? addressInfo.postal : document.getElementById('buyerPostal').value.trim(),
-      prefecture: sameAsShipping ? addressInfo.prefecture : document.getElementById('buyerPrefecture').value.trim(),
-      line: sameAsShipping ? addressInfo.line : document.getElementById('buyerLine').value.trim(),
-      building: sameAsShipping ? addressInfo.building : document.getElementById('buyerBuilding').value.trim()
+      postal: document.getElementById('buyerPostal').value.trim(),
+      prefecture: document.getElementById('buyerPrefecture').value.trim(),
+      line: document.getElementById('buyerLine').value.trim(),
+      building: document.getElementById('buyerBuilding').value.trim()
     };
     if (!buyerInfo.name) {
       alert('ご注文者情報（お名前）を入力してください');
@@ -1124,7 +1115,7 @@
       orderBtn.style.opacity = '1';
       return;
     }
-    if (!sameAsShipping && !buyerInfo.line) {
+    if (!buyerInfo.line) {
       alert('ご注文者情報（住所）を入力してください');
       orderBtn.disabled = false;
       orderBtn.style.opacity = '1';
