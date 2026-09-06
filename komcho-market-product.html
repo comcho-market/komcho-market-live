@@ -728,14 +728,31 @@
     return true;
   }
 
+  let isAddingToCart = false;
+
   document.getElementById('addToCartBtn').addEventListener('click', async () => {
+    if (isAddingToCart) return;
+    isAddingToCart = true;
+    const btn = document.getElementById('addToCartBtn');
+    btn.disabled = true;
     const ok = await addToCart();
     if (ok) showCartToast();
+    btn.disabled = false;
+    isAddingToCart = false;
   });
 
   document.getElementById('buyNowBtn').addEventListener('click', async () => {
+    if (isAddingToCart) return;
+    isAddingToCart = true;
+    const btn = document.getElementById('buyNowBtn');
+    btn.disabled = true;
     const ok = await addToCart();
-    if (ok) window.location.href = 'komcho-market-cart.html';
+    if (ok) {
+      window.location.href = 'komcho-market-cart.html';
+    } else {
+      btn.disabled = false;
+      isAddingToCart = false;
+    }
   });
 
   function showCartToast() {
