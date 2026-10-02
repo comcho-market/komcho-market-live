@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>運営管理 - こむちょマーケット</title>
+<style>
+  :root {
+    --bg:          #F8F5EF;
+    --bg-card:     #FFFFFF;
+    --green-dark:  #3D5A3E;
+    --green-mid:   #5A7A5B;
+    --green-light: #EAF0E8;
+    --gold:        #B8973A;
+    --text-main:   #2C2C2C;
+    --text-sub:    #6B6B6B;
+    --border:      #E2DDD5;
+    --radius-card: 12px;
+    --shadow-card: 0 2px 12px rgba(0,0,0,0.07);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Yu Gothic', 'Meiryo', sans-serif;
+    background: var(--bg);
+    color: var(--text-main);
+    max-width: 480px;
+    margin: 0 auto;
+    min-height: 100vh;
+    padding-bottom: 60px;
+  }
+  button { cursor: pointer; border: none; background: none; font-family: inherit; }
+  input { font-family: inherit; }
+
+  /* HEADER */
+  .header {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border);
+    padding: 16px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .header-title { font-size: 15px; font-weight: 700; }
+  .logout-btn {
+    font-size: 12px; color: var(--text-sub);
+    text-decoration: underline;
+  }
+
+  /* LOGIN SCREEN */
+  .login-wrap {
+    padding: 60px 24px;
+  }
+  .login-title {
+    font-size: 18px; font-weight: 700; text-align: center; margin-bottom: 24px;
+  }
+  .field { margin-bottom: 14px; }
+  .field-label { font-size: 12px; font-weight: 700; color: var(--text-sub); margin-bottom: 6px; display: block; }
+  .field-input {
+    width: 100%; padding: 12px 14px;
+    border: 1.5px solid var(--border); border-radius: 10px;
+    background: var(--bg-card); font-size: 14px; outline: none;
+  }
+  .field-input:focus { border-color: var(--green-dark); }
+  .login-btn {
+    width: 100%; background: var(--green-dark); color: #fff;
+    font-size: 14px; font-weight: 700; padding: 14px; border-radius: 10px;
+    margin-top: 8px;
+  }
+  .login-error {
+    font-size: 12px; color: #CC4444; background: #FFF0F0;
+    border: 1px solid #FFCCCC; border-radius: 8px; padding: 10px 12px;
+    margin-bottom: 14px; display: none;
+  }
+  .login-error.visible { display: block; }
+
+  /* SUMMARY */
+  .summary-bar {
+    padding: 14px 16px; background: var(--green-light);
+    font-size: 13px; font-weight: 700; color: var(--green-dark);
+  }
+
+  /* SHOP CARD */
+  .shop-list { padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+  .shop-card {
+    background: var(--bg-card); border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card); padding: 16px; border-left: 3px solid var(--gold);
+  }
+  .shop-card-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .shop-name { font-size: 15px; font-weight: 700; }
+  .shop-date { font-size: 11px; color: var(--text-sub); }
+  .shop-info-table {
+    width: 100%; border-collapse: collapse; font-size: 12.5px; margin-bottom: 12px;
+  }
+  .shop-info-table th {
+    text-align: left; color: var(--text-sub); font-weight: 600;
+    padding: 5px 8px 5px 0; vertical-align: top; white-space: nowrap; width: 80px;
+  }
+  .shop-info-table td { padding: 5px 0; }
+  .category-pills { display: flex; flex-wrap: wrap; gap: 5px; }
+  .category-pill {
+    font-size: 10.5px; background: var(--green-light); color: var(--green-dark);
+    border-radius: 20px; padding: 3px 9px; font-weight: 600;
+  }
+  .approve-btn {
+    width: 100%; background: var(--green-dark); color: #fff;
+    font-size: 13px; font-weight: 700; padding: 11px; border-radius: 10px;
+  }
+  .empty-state {
+    text-align: center; padding: 60px 16px; color: var(--text-sub); font-size: 13px;
+  }
+
+  #mainScreen { display: none; }
+</style>
+</head>
+<body>
+
+<!-- ログイン画面 -->
+<div id="loginScreen">
+  <div class="login-wrap">
+    <div class="login-title">🔐 運営管理ログイン</div>
+    <div class="login-error" id="loginError"></div>
+    <div class="field">
+      <label class="field-label">メールアドレス</label>
+      <input class="field-input" type="email" id="emailInput" autocomplete="username">
+    </div>
+    <div class="field">
+      <label class="field-label">パスワード</label>
+      <input class="field-input" type="password" id="pwInput" autocomplete="current-password">
+    </div>
+    <button class="login-btn" id="loginBtn">ログイン</button>
+  </div>
+</div>
+
+<!-- メイン画面 -->
+<div id="mainScreen">
+  <header class="header">
+    <div class="header-title">運営管理 - 出店者審査</div>
+    <button class="logout-btn" id="logoutBtn">ログアウト</button>
+  </header>
+
+  <div class="summary-bar" id="summaryBar">読み込み中...</div>
+
+  <div class="shop-list" id="shopList"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+  const SUPABASE_URL = 'https://uawhrpizzlchkvmzrjzo.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_FaOqUE1PDbo-fpT9KhkWaw__BShLngI';
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  const categoryLabels = {
+    fresh: '生鮮食品', deli: '惣菜', seasoning: '調味料', sweets: 'お菓子',
+    drink: '飲み物', daily: '日用品', oem: 'OEM委託あり'
+  };
+  const businessTypeLabels = { individual: '個人', corporate: '法人' };
+
+  // ===== 初期化：ログイン状態と運営者権限を確認 =====
+  (async function init() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (session) {
+      await checkAdminAndShow(session.user.id);
+    } else {
+      document.getElementById('loginScreen').style.display = 'block';
+    }
+  })();
+
+  async function checkAdminAndShow(userId) {
+    const { data: admin } = await supabaseClient
+      .from('admin_users')
+      .select('id')
+      .eq('id', userId)
+      .maybeSingle();
+
+    if (!admin) {
+      await supabaseClient.auth.signOut();
+      showLoginError('このアカウントには運営権限がありません。');
+      document.getElementById('loginScreen').style.display = 'block';
+      document.getElementById('mainScreen').style.display = 'none';
+      return;
+    }
+
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('mainScreen').style.display = 'block';
+    await loadPendingShops();
+  }
+
+  function showLoginError(msg) {
+    const el = document.getElementById('loginError');
+    el.textContent = msg;
+    el.classList.add('visible');
+  }
+
+  // ===== ログイン処理 =====
+  document.getElementById('loginBtn').addEventListener('click', async () => {
+    const email = document.getElementById('emailInput').value.trim();
+    const password = document.getElementById('pwInput').value;
+    if (!email || !password) {
+      showLoginError('メールアドレスとパスワードを入力してください。');
+      return;
+    }
+
+    const btn = document.getElementById('loginBtn');
+    btn.disabled = true;
+    btn.textContent = 'ログイン中...';
+
+    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+
+    btn.disabled = false;
+    btn.textContent = 'ログイン';
+
+    if (error) {
+      showLoginError('メールアドレスまたはパスワードが正しくありません。');
+      return;
+    }
+
+    document.getElementById('loginError').classList.remove('visible');
+    await checkAdminAndShow(data.user.id);
+  });
+
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
+    await supabaseClient.auth.signOut();
+    window.location.reload();
+  });
+
+  // ===== 審査待ちショップの取得・描画 =====
+  async function loadPendingShops() {
+    const list = document.getElementById('shopList');
+    const summary = document.getElementById('summaryBar');
+
+    const { data: shops, error } = await supabaseClient
+      .from('shops')
+      .select('*')
+      .eq('status', 'pending')
+      .order('created_at', { ascending: true });
+
+    if (error) {
+      console.error('出店者取得エラー:', error);
+      summary.textContent = '読み込みに失敗しました';
+      return;
+    }
+
+    summary.textContent = `📋 審査待ち：${shops.length}件`;
+
+    if (!shops || shops.length === 0) {
+      list.innerHTML = '<div class="empty-state">現在、審査待ちの出店者はいません。</div>';
+      return;
+    }
+
+    list.innerHTML = shops.map(shop => {
+      const dateStr = shop.created_at
+        ? new Date(shop.created_at).toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' })
+        : '-';
+      const categories = Array.isArray(shop.categories) ? shop.categories : [];
+      const categoryPills = categories.map(c => `<span class="category-pill">${categoryLabels[c] || c}</span>`).join('');
+
+      return `
+        <div class="shop-card" data-shop-id="${shop.id}">
+          <div class="shop-card-header">
+            <div class="shop-name">${shop.shop_name || '（店舗名未登録）'}</div>
+            <div class="shop-date">${dateStr}</div>
+          </div>
+          <table class="shop-info-table">
+            <tr><th>事業形態</th><td>${businessTypeLabels[shop.business_type] || shop.business_type || '-'}</td></tr>
+            <tr><th>代表者名</th><td>${shop.representative_name || '-'}</td></tr>
+            <tr><th>住所</th><td>〒${shop.postal_code || ''} ${shop.address || ''}</td></tr>
+            <tr><th>電話番号</th><td>${shop.phone || '-'}</td></tr>
+            <tr><th>カテゴリー</th><td><div class="category-pills">${categoryPills || '-'}</div></td></tr>
+          </table>
+          <button class="approve-btn" onclick="approveShop('${shop.id}')">承認する（出店を開始させる）</button>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // ===== 承認処理 =====
+  async function approveShop(shopId) {
+    if (!confirm('この出店者を承認しますか？承認すると、すぐに出店者側のショップ管理画面が使えるようになります。')) return;
+
+    const { error } = await supabaseClient
+      .from('shops')
+      .update({ status: 'active' })
+      .eq('id', shopId);
+
+    if (error) {
+      console.error('承認エラー:', error);
+      alert('承認に失敗しました：' + error.message);
+      return;
+    }
+
+    await loadPendingShops();
+  }
+</script>
+</body>
+</html>
