@@ -103,8 +103,14 @@
     font-size: 10.5px; background: var(--green-light); color: var(--green-dark);
     border-radius: 20px; padding: 3px 9px; font-weight: 600;
   }
+  .shop-card-actions { display: flex; gap: 8px; }
   .approve-btn {
-    width: 100%; background: var(--green-dark); color: #fff;
+    flex: 1; background: var(--green-dark); color: #fff;
+    font-size: 13px; font-weight: 700; padding: 11px; border-radius: 10px;
+  }
+  .reject-btn {
+    flex: 1; background: var(--bg-card); color: #CC4444;
+    border: 1.5px solid #CC4444;
     font-size: 13px; font-weight: 700; padding: 11px; border-radius: 10px;
   }
   .empty-state {
@@ -269,7 +275,10 @@
             <tr><th>電話番号</th><td>${shop.phone || '-'}</td></tr>
             <tr><th>カテゴリー</th><td><div class="category-pills">${categoryPills || '-'}</div></td></tr>
           </table>
-          <button class="approve-btn" onclick="approveShop('${shop.id}')">承認する（出店を開始させる）</button>
+          <div class="shop-card-actions">
+            <button class="approve-btn" onclick="approveShop('${shop.id}')">承認する</button>
+            <button class="reject-btn" onclick="rejectShop('${shop.id}')">却下する</button>
+          </div>
         </div>
       `;
     }).join('');
@@ -287,6 +296,24 @@
     if (error) {
       console.error('承認エラー:', error);
       alert('承認に失敗しました：' + error.message);
+      return;
+    }
+
+    await loadPendingShops();
+  }
+
+  // ===== 却下処理 =====
+  async function rejectShop(shopId) {
+    if (!confirm('この出店者を却下しますか？\n\n※却下しても、登録自体は削除されません。審査待ち一覧から外れるだけです。アカウントごと完全に削除したい場合は、別途Supabase側での対応が必要です。')) return;
+
+    const { error } = await supabaseClient
+      .from('shops')
+      .update({ status: 'rejected' })
+      .eq('id', shopId);
+
+    if (error) {
+      console.error('却下エラー:', error);
+      alert('却下処理に失敗しました：' + error.message);
       return;
     }
 

@@ -622,11 +622,18 @@ let currentShopInfo = null;
 
   const { data: shop, error: shopError } = await supabaseClient
     .from('shops')
-    .select('id, shop_name, address, phone')
+    .select('id, shop_name, address, phone, status')
     .eq('owner_id', session.user.id)
     .single();
 
   if (shopError || !shop) {
+    window.location.href = 'komcho-market-seller-login.html';
+    return;
+  }
+
+  if (shop.status === 'rejected') {
+    await supabaseClient.auth.signOut();
+    alert('今回はご期待に添えず、出店を見送らせていただきました。ご不明な点がございましたらお問い合わせください。');
     window.location.href = 'komcho-market-seller-login.html';
     return;
   }

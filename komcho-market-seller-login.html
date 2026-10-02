@@ -447,13 +447,20 @@
     // 出店者アカウント（shopsテーブルに紐づいているか）を確認
     const { data: shop } = await supabaseClient
       .from('shops')
-      .select('id')
+      .select('id, status')
       .eq('owner_id', data.user.id)
       .single();
 
     if (!shop) {
       await supabaseClient.auth.signOut();
       document.getElementById('loginError').textContent = 'このアカウントは出店者として登録されていません。';
+      document.getElementById('loginError').classList.add('visible');
+      return;
+    }
+
+    if (shop.status === 'rejected') {
+      await supabaseClient.auth.signOut();
+      document.getElementById('loginError').textContent = '今回はご期待に添えず、出店を見送らせていただきました。ご不明な点がございましたらお問い合わせください。';
       document.getElementById('loginError').classList.add('visible');
       return;
     }

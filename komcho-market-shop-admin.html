@@ -594,6 +594,13 @@
       return;
     }
 
+    if (shop.status === 'rejected') {
+      await supabaseClient.auth.signOut();
+      alert('今回はご期待に添えず、出店を見送らせていただきました。ご不明な点がございましたらお問い合わせください。');
+      window.location.href = 'komcho-market-seller-login.html';
+      return;
+    }
+
     currentShopId = shop.id;
     document.getElementById('shopNameField').value = shop.shop_name || '';
     document.getElementById('shopAddressField').value = shop.address || '';
