@@ -446,19 +446,10 @@
 <div class="gap"></div>
 
 <!-- NEWS -->
-<div class="section-block">
+<div class="section-block" id="newsBlock" style="display:none;">
   <div class="section-heading">お知らせ</div>
-  <div class="news-list">
-    <div class="news-item">
-      <div class="news-date">2026.6.10</div>
-      <div class="news-title">夏季休業のお知らせ（8/12〜8/16）</div>
-    </div>
-    <div class="news-item">
-      <div class="news-date">2026.6.1</div>
-      <div class="news-title">新商品 梅シロップの予約受付を開始しました</div>
-    </div>
+  <div class="news-list" id="newsListDisplay">
   </div>
-  <div class="news-more">もっと見る →</div>
 </div>
 
 <div class="gap"></div>
@@ -564,6 +555,7 @@
 
     loadShopProducts(shop.id);
     initFollowButton(shop.id);
+    loadShopNews(shop.id);
   })();
 
   // フォローボタンの初期化・トグル処理
@@ -632,6 +624,29 @@
       wishSet.add(id);
       btn.classList.add('active');
     }
+  }
+
+  // お知らせの取得・描画（登録が無ければセクションごと非表示）
+  async function loadShopNews(shopId) {
+    const { data, error } = await supabaseClient
+      .from('shop_news')
+      .select('*')
+      .eq('shop_id', shopId)
+      .order('news_date', { ascending: false })
+      .limit(5);
+
+    if (error || !data || data.length === 0) return;
+
+    document.getElementById('newsBlock').style.display = 'block';
+    document.getElementById('newsListDisplay').innerHTML = data.map(n => {
+      const dateLabel = n.news_date.replace(/-/g, '.');
+      return `
+        <div class="news-item">
+          <div class="news-date">${dateLabel}</div>
+          <div class="news-title">${n.title}</div>
+        </div>
+      `;
+    }).join('');
   }
 
   async function loadShopProducts(shopId) {

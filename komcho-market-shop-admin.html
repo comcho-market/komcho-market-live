@@ -470,20 +470,7 @@
 <div class="section-block">
   <div class="block-title">お知らせ</div>
   <div class="news-admin-list" id="newsList">
-    <div class="news-admin-item">
-      <div class="news-admin-item-header">
-        <input type="text" value="2026.6.10" placeholder="日付">
-        <button class="delete-btn" onclick="deleteNews(this)">×</button>
-      </div>
-      <input class="news-title-input" type="text" value="夏季休業のお知らせ（8/12〜8/16）" placeholder="お知らせ内容">
-    </div>
-    <div class="news-admin-item">
-      <div class="news-admin-item-header">
-        <input type="text" value="2026.6.1" placeholder="日付">
-        <button class="delete-btn" onclick="deleteNews(this)">×</button>
-      </div>
-      <input class="news-title-input" type="text" value="新商品 梅シロップの予約受付を開始しました" placeholder="お知らせ内容">
-    </div>
+    <p style="font-size:12px;color:var(--text-sub);padding:8px 0;">読み込み中...</p>
   </div>
   <button class="add-btn" onclick="addNews()">
     <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -630,6 +617,8 @@
     previewBtn.addEventListener('click', () => {
       window.open(`komcho-market-shop.html?id=${currentShopId}`, '_blank');
     });
+
+    loadNews();
 
     loadProducts();
   })();
@@ -787,24 +776,73 @@
     btn.closest('.kodawari-item').remove();
   }
 
-  // お知らせ追加
-  function addNews() {
+  // お知らせ一覧の取得・描画
+  async function loadNews() {
     const list = document.getElementById('newsList');
-    const today = new Date();
-    const dateStr = `${today.getFullYear()}.${today.getMonth()+1}.${today.getDate()}`;
-    const item = document.createElement('div');
-    item.className = 'news-admin-item';
-    item.innerHTML = `
-      <div class="news-admin-item-header">
-        <input type="text" value="${dateStr}" placeholder="日付">
-        <button class="delete-btn" onclick="deleteNews(this)">×</button>
+    const { data, error } = await supabaseClient
+      .from('shop_news')
+      .select('*')
+      .eq('shop_id', currentShopId)
+      .order('news_date', { ascending: false });
+
+    if (error) {
+      console.error('お知らせ取得エラー:', error);
+      list.innerHTML = '<p style="font-size:12px;color:var(--text-sub);padding:8px 0;">読み込みに失敗しました</p>';
+      return;
+    }
+
+    if (!data || data.length === 0) {
+      list.innerHTML = '';
+      return;
+    }
+
+    list.innerHTML = data.map(n => `
+      <div class="news-admin-item" data-news-id="${n.id}">
+        <div class="news-admin-item-header">
+          <input type="date" value="${n.news_date}" onchange="updateNewsDate('${n.id}', this.value)">
+          <button class="delete-btn" onclick="deleteNews('${n.id}', this)">×</button>
+        </div>
+        <input class="news-title-input" type="text" value="${n.title}" placeholder="お知らせ内容" onchange="updateNewsTitle('${n.id}', this.value)">
       </div>
-      <input class="news-title-input" type="text" placeholder="お知らせ内容を入力">
-    `;
-    list.appendChild(item);
-    item.querySelector('.news-title-input').focus();
+    `).join('');
   }
-  function deleteNews(btn) {
+
+  // お知らせ追加（即データベースに保存）
+  async function addNews() {
+    const today = new Date().toISOString().slice(0, 10);
+    const { data, error } = await supabaseClient
+      .from('shop_news')
+      .insert({ shop_id: currentShopId, title: '', news_date: today })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('お知らせ追加エラー:', error);
+      showToast('お知らせの追加に失敗しました');
+      return;
+    }
+
+    await loadNews();
+    const newItem = document.querySelector(`[data-news-id="${data.id}"] .news-title-input`);
+    if (newItem) newItem.focus();
+  }
+
+  // お知らせのタイトル・日付の更新
+  async function updateNewsTitle(id, title) {
+    const { error } = await supabaseClient.from('shop_news').update({ title: title.trim() }).eq('id', id);
+    if (error) { console.error('お知らせ更新エラー:', error); showToast('更新に失敗しました'); }
+  }
+  async function updateNewsDate(id, newsDate) {
+    const { error } = await supabaseClient.from('shop_news').update({ news_date: newsDate }).eq('id', id);
+    if (error) { console.error('お知らせ更新エラー:', error); showToast('更新に失敗しました'); }
+    else await loadNews();
+  }
+
+  // お知らせ削除
+  async function deleteNews(id, btn) {
+    if (!confirm('このお知らせを削除しますか？')) return;
+    const { error } = await supabaseClient.from('shop_news').delete().eq('id', id);
+    if (error) { console.error('お知らせ削除エラー:', error); showToast('削除に失敗しました'); return; }
     btn.closest('.news-admin-item').remove();
   }
 
