@@ -676,6 +676,7 @@ async function loadOrders() {
     shipping: o.shipping_fee || 0,
     subtotal: o.subtotal || 0,
     total: o.total || 0,
+    pointDiscount: o.point_discount || 0,
     carrier: o.carrier || '',
     tracking: o.tracking_number || ''
   }));
@@ -908,8 +909,8 @@ async function cancelOrderByShop(orderId) {
 // ===== 注文詳細モーダル =====
 function openDetail(orderId) {
   const order = orders.find(o => o.id === orderId);
-  const sub   = order.products.reduce((s, p) => s + p.price * p.qty, 0);
-  const total = sub + order.shipping;
+  const sub   = order.subtotal || order.products.reduce((s, p) => s + p.price * p.qty, 0);
+  const total = order.total || (sub + order.shipping);
 
   document.getElementById('detailModalTitle').textContent = `注文詳細 ${order.displayId}`;
 
@@ -967,7 +968,8 @@ function openDetail(orderId) {
       <div class="detail-price-rows">
         <div class="detail-price-row"><span>商品合計</span><span>¥${sub.toLocaleString()}</span></div>
         <div class="detail-price-row"><span>送料</span><span>¥${order.shipping.toLocaleString()}</span></div>
-        <div class="detail-price-row total"><span>合計</span><span>¥${total.toLocaleString()}</span></div>
+        ${order.pointDiscount > 0 ? `<div class="detail-price-row" style="color:#CC4444;"><span>ポイント利用</span><span>−¥${order.pointDiscount.toLocaleString()}</span></div>` : ''}
+        <div class="detail-price-row total"><span>合計（お支払い金額）</span><span>¥${total.toLocaleString()}</span></div>
       </div>
     </div>
     <button class="print-btn" onclick="printDeliveryNote('${orderId}')">
@@ -984,8 +986,8 @@ function openDetail(orderId) {
 // ===== 納品書印刷 =====
 function printDeliveryNote(orderId) {
   const order = orders.find(o => o.id === orderId);
-  const sub   = order.products.reduce((s, p) => s + p.price * p.qty, 0);
-  const total = sub + order.shipping;
+  const sub   = order.subtotal || order.products.reduce((s, p) => s + p.price * p.qty, 0);
+  const total = order.total || (sub + order.shipping);
   const today = new Date().toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
 
   // 購入者住所が発送先と同じ場合は「同上」表示
@@ -1029,6 +1031,7 @@ function printDeliveryNote(orderId) {
     <div class="dn-totals">
       <div class="dn-total-row"><span class="label">小計</span><span class="value">¥${sub.toLocaleString()}</span></div>
       <div class="dn-total-row"><span class="label">送料</span><span class="value">¥${order.shipping.toLocaleString()}</span></div>
+      ${order.pointDiscount > 0 ? `<div class="dn-total-row"><span class="label">ポイント利用</span><span class="value">−¥${order.pointDiscount.toLocaleString()}</span></div>` : ''}
       <hr class="dn-divider">
       <div class="dn-total-row grand"><span class="label">合計（税込）</span><span class="value">¥${total.toLocaleString()}</span></div>
     </div>
