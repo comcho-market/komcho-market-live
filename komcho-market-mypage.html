@@ -1052,7 +1052,7 @@
     const list = document.getElementById('orderHistoryList');
     const { data, error } = await supabaseClient
       .from('orders')
-      .select('id, status, total, created_at, points_earned, shops(shop_name), order_items(product_name, quantity)')
+      .select('id, status, total, created_at, points_earned, shops(shop_name), order_items(product_name, product_image, quantity)')
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
       .limit(3);
@@ -1075,6 +1075,9 @@
         ? `${items[0].product_name} ほか${items.length - 1}点`
         : (items[0]?.product_name || '');
       const thumbClass = mypageOrderThumbClasses[i % mypageOrderThumbClasses.length];
+      const thumbInner = items[0]?.product_image
+        ? `<img src="${items[0].product_image}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">`
+        : '🛍️';
 
       return `
         <a class="order-item" href="komcho-market-order-detail.html?id=${order.id}" style="text-decoration:none;color:inherit;display:block;">
@@ -1083,7 +1086,7 @@
             <div class="order-status ${order.status}">${statusLabel}</div>
           </div>
           <div class="order-products">
-            <div class="order-thumb ${thumbClass}">🛍️</div>
+            <div class="order-thumb ${thumbClass}" style="overflow:hidden;">${thumbInner}</div>
             <div class="order-info">
               <div class="order-shop">${order.shops?.shop_name || ''}</div>
               <div class="order-name">${nameLabel}</div>
