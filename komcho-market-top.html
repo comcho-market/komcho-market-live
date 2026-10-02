@@ -570,8 +570,9 @@
     const grid = document.getElementById('newArrivalsGrid');
     const { data: products, error } = await supabaseClient
       .from('products')
-      .select('*, shops(shop_name)')
+      .select('*, shops!inner(shop_name, status)')
       .eq('is_active', true)
+      .eq('shops.status', 'active')
       .order('created_at', { ascending: false })
       .limit(8);
 

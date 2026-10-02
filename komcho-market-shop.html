@@ -512,11 +512,18 @@
     const shopId = new URLSearchParams(window.location.search).get('id');
 
     let query = supabaseClient.from('shops').select('*');
-    query = shopId ? query.eq('id', shopId) : query.order('created_at', { ascending: false }).limit(1);
+    query = shopId
+      ? query.eq('id', shopId)
+      : query.eq('status', 'active').order('created_at', { ascending: false }).limit(1);
     const { data, error } = shopId ? await query.single() : await query;
     const shop = shopId ? data : (data && data[0]);
 
     if (error || !shop) return; // 取得できない場合は、これまで通りサンプル表示のまま
+
+    if (shop.status !== 'active') {
+      document.body.innerHTML = '<div style="padding:80px 24px;text-align:center;font-size:13px;color:var(--text-sub);">このショップは現在、公開されていません。</div>';
+      return;
+    }
 
     document.getElementById('shopNameDisplay').textContent = `「${shop.shop_name || ''}」`;
     document.getElementById('shopAddressDisplay').textContent = shop.address || '';

@@ -595,11 +595,16 @@
 
     const { data: p, error } = await supabaseClient
       .from('products')
-      .select('*, shops(id, shop_name, logo_url)')
+      .select('*, shops!inner(id, shop_name, logo_url, status)')
       .eq('id', productId)
       .single();
 
     if (error || !p) return;
+
+    if (p.shops.status !== 'active') {
+      document.body.innerHTML = '<div style="padding:80px 24px;text-align:center;font-size:13px;color:var(--text-sub);">この商品は現在、公開されていません。</div>';
+      return;
+    }
 
     // 写真スライダー（メイン＋追加写真）
     const photos = [p.image_url, ...(Array.isArray(p.images) ? p.images : [])].filter(Boolean);
