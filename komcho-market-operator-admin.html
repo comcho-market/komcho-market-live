@@ -54,6 +54,7 @@
   }
   .field { margin-bottom: 14px; }
   .field-label { font-size: 12px; font-weight: 700; color: var(--text-sub); margin-bottom: 6px; display: block; }
+  .field-label-req::after { content: ' *'; color: #CC4444; }
   .field-input {
     width: 100%; padding: 12px 14px;
     border: 1.5px solid var(--border); border-radius: 10px;
@@ -118,6 +119,113 @@
   }
 
   #mainScreen { display: none; }
+
+  /* タブ切り替え */
+  .tab-switch {
+    display: flex; gap: 8px; padding: 12px 16px 0;
+  }
+  .tab-switch-btn {
+    flex: 1; padding: 10px; font-size: 13px; font-weight: 700;
+    color: var(--text-sub); background: var(--bg-card);
+    border: 1.5px solid var(--border); border-radius: 10px;
+  }
+  .tab-switch-btn.active {
+    color: #fff; background: var(--green-dark); border-color: var(--green-dark);
+  }
+
+  /* レシピ管理 */
+  .recipe-admin-toolbar { padding: 16px 16px 0; }
+  .add-recipe-btn {
+    width: 100%; background: var(--green-dark); color: #fff;
+    font-size: 13px; font-weight: 700; padding: 12px; border-radius: 10px;
+  }
+  .recipe-post-list { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+  .recipe-post-card {
+    background: var(--bg-card); border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card); padding: 14px; display: flex; gap: 12px; align-items: center;
+  }
+  .recipe-post-thumb {
+    width: 56px; height: 56px; border-radius: 8px; object-fit: cover;
+    background: var(--green-light); flex-shrink: 0;
+  }
+  .recipe-post-info { flex: 1; min-width: 0; }
+  .recipe-post-title { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+  .recipe-post-meta { font-size: 11px; color: var(--text-sub); }
+  .recipe-post-actions { display: flex; gap: 6px; }
+  .rp-btn {
+    font-size: 11px; font-weight: 700; padding: 7px 10px; border-radius: 8px;
+    border: 1.5px solid var(--border); color: var(--text-main);
+  }
+  .rp-btn.danger { color: #CC4444; border-color: #CC4444; }
+
+  /* モーダル */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+    z-index: 300; align-items: flex-end; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-box {
+    background: var(--bg-card); width: 100%; max-width: 480px;
+    max-height: 88vh; overflow-y: auto; border-radius: 16px 16px 0 0;
+  }
+  .modal-header {
+    position: sticky; top: 0; background: var(--bg-card); z-index: 1;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px; border-bottom: 1px solid var(--border);
+  }
+  .modal-title { font-size: 15px; font-weight: 700; }
+  .modal-close { font-size: 20px; color: var(--text-sub); line-height: 1; }
+  .modal-body { padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+  .field-textarea {
+    width: 100%; min-height: 80px; padding: 12px 14px;
+    border: 1.5px solid var(--border); border-radius: 10px;
+    background: var(--bg-card); font-size: 14px; outline: none; resize: vertical;
+  }
+  .field-textarea:focus { border-color: var(--green-dark); }
+  .image-preview-wrap { margin-top: 8px; }
+  .image-preview {
+    width: 100%; max-height: 160px; object-fit: cover; border-radius: 10px;
+  }
+  .save-post-btn {
+    width: 100%; background: var(--green-dark); color: #fff;
+    font-size: 13px; font-weight: 700; padding: 13px; border-radius: 10px;
+  }
+
+  /* 料理一覧（投稿編集モーダル内） */
+  .dish-section { border-top: 1px solid var(--border); padding-top: 14px; margin-top: 4px; }
+  .dish-section-title { font-size: 13px; font-weight: 700; margin-bottom: 10px; }
+  .dish-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+  .dish-row {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--green-light); border-radius: 10px; padding: 8px 10px;
+  }
+  .dish-row-thumb { width: 36px; height: 36px; border-radius: 6px; object-fit: cover; flex-shrink: 0; background: #fff; }
+  .dish-row-name { flex: 1; font-size: 12.5px; font-weight: 700; }
+  .dish-row-actions { display: flex; gap: 4px; }
+  .dish-row-btn { font-size: 10.5px; font-weight: 700; padding: 5px 8px; border-radius: 6px; background: var(--bg-card); }
+  .dish-row-btn.danger { color: #CC4444; }
+  .add-dish-btn {
+    width: 100%; background: var(--bg-card); color: var(--green-dark);
+    border: 1.5px dashed var(--green-dark);
+    font-size: 12.5px; font-weight: 700; padding: 10px; border-radius: 10px;
+  }
+
+  /* 商品検索 */
+  .product-search-results {
+    margin-top: 6px; max-height: 160px; overflow-y: auto;
+    border: 1px solid var(--border); border-radius: 10px;
+  }
+  .product-search-item {
+    display: flex; align-items: center; gap: 8px; padding: 8px 10px;
+    border-bottom: 1px solid var(--border); font-size: 12px;
+  }
+  .product-search-item:last-child { border-bottom: none; }
+  .product-search-item img { width: 32px; height: 32px; border-radius: 6px; object-fit: cover; }
+  .selected-product {
+    margin-top: 8px; display: flex; align-items: center; gap: 8px;
+    background: var(--green-light); border-radius: 10px; padding: 8px 10px; font-size: 12.5px; font-weight: 700;
+  }
+  .selected-product img { width: 32px; height: 32px; border-radius: 6px; object-fit: cover; }
 </style>
 </head>
 <body>
@@ -142,13 +250,112 @@
 <!-- メイン画面 -->
 <div id="mainScreen">
   <header class="header">
-    <div class="header-title">運営管理 - 出店者審査</div>
+    <div class="header-title">運営管理</div>
     <button class="logout-btn" id="logoutBtn">ログアウト</button>
   </header>
 
-  <div class="summary-bar" id="summaryBar">読み込み中...</div>
+  <div class="tab-switch">
+    <button class="tab-switch-btn active" id="tabShops" onclick="switchTab('shops')">出店者審査</button>
+    <button class="tab-switch-btn" id="tabRecipes" onclick="switchTab('recipes')">レシピ管理</button>
+  </div>
 
-  <div class="shop-list" id="shopList"></div>
+  <!-- 出店者審査タブ -->
+  <div id="shopsTab">
+    <div class="summary-bar" id="summaryBar">読み込み中...</div>
+    <div class="shop-list" id="shopList"></div>
+  </div>
+
+  <!-- レシピ管理タブ -->
+  <div id="recipesTab" style="display:none;">
+    <div class="recipe-admin-toolbar">
+      <button class="add-recipe-btn" onclick="openPostEditor()">＋ 新しい投稿を作る</button>
+    </div>
+    <div class="recipe-post-list" id="recipePostList"></div>
+  </div>
+</div>
+
+<!-- 投稿編集モーダル -->
+<div class="modal-overlay" id="postModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title" id="postModalTitle">新しい投稿</div>
+      <button class="modal-close" onclick="closePostEditor()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label class="field-label">タイトル（例：秋の食卓）</label>
+        <input class="field-input" type="text" id="postTitleInput" placeholder="秋の食卓">
+      </div>
+      <div class="field">
+        <label class="field-label">食卓全体の写真</label>
+        <input type="file" id="postCoverInput" accept="image/*">
+        <div class="image-preview-wrap" id="postCoverPreviewWrap" style="display:none;">
+          <img id="postCoverPreview" class="image-preview">
+        </div>
+      </div>
+      <div class="field">
+        <label class="field-label">紹介文（任意）</label>
+        <textarea class="field-textarea" id="postIntroInput" placeholder="この季節の食卓について、ひとこと"></textarea>
+      </div>
+      <div class="field">
+        <label class="field-label">Instagramリンク（任意・全体の投稿用）</label>
+        <input class="field-input" type="url" id="postInstagramInput" placeholder="https://www.instagram.com/...">
+      </div>
+      <button class="save-post-btn" id="savePostBtn" onclick="savePost()">この投稿を保存する</button>
+
+      <div class="dish-section" id="dishSection" style="display:none;">
+        <div class="dish-section-title">料理一覧</div>
+        <div class="dish-list" id="dishList"></div>
+        <button class="add-dish-btn" onclick="openDishEditor()">＋ 料理を追加する</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 料理編集モーダル -->
+<div class="modal-overlay" id="dishModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title" id="dishModalTitle">料理を追加</div>
+      <button class="modal-close" onclick="closeDishEditor()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label class="field-label">料理名</label>
+        <input class="field-input" type="text" id="dishNameInput" placeholder="無添加味噌の豚汁">
+      </div>
+      <div class="field">
+        <label class="field-label">料理の写真</label>
+        <input type="file" id="dishImageInput" accept="image/*">
+        <div class="image-preview-wrap" id="dishImagePreviewWrap" style="display:none;">
+          <img id="dishImagePreview" class="image-preview">
+        </div>
+      </div>
+      <div class="field">
+        <label class="field-label">紹介文（任意）</label>
+        <textarea class="field-textarea" id="dishDescInput" placeholder="寒い日にぴったりの一品です"></textarea>
+      </div>
+      <div class="field">
+        <label class="field-label">材料（任意）</label>
+        <textarea class="field-textarea" id="dishIngredientsInput" placeholder="無添加味噌 大さじ2&#10;豚肉 100g&#10;大根 1/4本"></textarea>
+      </div>
+      <div class="field">
+        <label class="field-label">作り方（任意）</label>
+        <textarea class="field-textarea" id="dishInstructionsInput" placeholder="1. 野菜を切る&#10;2. 煮込む&#10;3. 味噌を溶く"></textarea>
+      </div>
+      <div class="field">
+        <label class="field-label field-label-req">使用した商品（必須）</label>
+        <input class="field-input" type="text" id="dishProductSearchInput" placeholder="商品名で検索" oninput="searchProductsForDish(this.value)">
+        <div class="product-search-results" id="productSearchResults"></div>
+        <div class="selected-product" id="selectedProductDisplay" style="display:none;"></div>
+      </div>
+      <div class="field">
+        <label class="field-label">Instagramリンク（任意・この料理単体の投稿用）</label>
+        <input class="field-input" type="url" id="dishInstagramInput" placeholder="https://www.instagram.com/...">
+      </div>
+      <button class="save-post-btn" onclick="saveDish()">この料理を保存する</button>
+    </div>
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -191,6 +398,15 @@
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('mainScreen').style.display = 'block';
     await loadPendingShops();
+  }
+
+  // ===== タブ切り替え =====
+  function switchTab(tab) {
+    document.getElementById('tabShops').classList.toggle('active', tab === 'shops');
+    document.getElementById('tabRecipes').classList.toggle('active', tab === 'recipes');
+    document.getElementById('shopsTab').style.display = tab === 'shops' ? 'block' : 'none';
+    document.getElementById('recipesTab').style.display = tab === 'recipes' ? 'block' : 'none';
+    if (tab === 'recipes') loadRecipePosts();
   }
 
   function showLoginError(msg) {
@@ -318,6 +534,402 @@
     }
 
     await loadPendingShops();
+  }
+
+  // ========================================
+  // レシピ管理
+  // ========================================
+  let recipePosts = [];
+  let currentPostId = null;     // 編集中の投稿ID（新規作成時はnull）
+  let currentPostDishes = [];   // 編集中の投稿に紐づく料理一覧
+  let currentDishId = null;     // 編集中の料理ID（新規追加時はnull）
+  let selectedProductForDish = null; // { id, name, image_url }
+  let postCoverFile = null;
+  let dishImageFile = null;
+
+  // ===== 投稿一覧の取得・描画 =====
+  async function loadRecipePosts() {
+    const list = document.getElementById('recipePostList');
+    const { data, error } = await supabaseClient
+      .from('recipe_posts')
+      .select('*, recipe_dishes(id)')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('レシピ投稿取得エラー:', error);
+      list.innerHTML = '<div class="empty-state">読み込みに失敗しました</div>';
+      return;
+    }
+
+    recipePosts = data || [];
+
+    if (recipePosts.length === 0) {
+      list.innerHTML = '<div class="empty-state">まだ投稿がありません。「＋ 新しい投稿を作る」から始めてください。</div>';
+      return;
+    }
+
+    list.innerHTML = recipePosts.map(post => {
+      const dateStr = new Date(post.created_at).toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
+      const dishCount = (post.recipe_dishes || []).length;
+      const thumbInner = post.cover_image
+        ? `<img src="${post.cover_image}" class="recipe-post-thumb">`
+        : `<div class="recipe-post-thumb"></div>`;
+      return `
+        <div class="recipe-post-card">
+          ${thumbInner}
+          <div class="recipe-post-info">
+            <div class="recipe-post-title">${post.title}</div>
+            <div class="recipe-post-meta">${dateStr}　料理${dishCount}点</div>
+          </div>
+          <div class="recipe-post-actions">
+            <button class="rp-btn" onclick="openPostEditor('${post.id}')">編集</button>
+            <button class="rp-btn danger" onclick="deletePost('${post.id}')">削除</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // ===== 投稿エディタを開く =====
+  async function openPostEditor(postId) {
+    currentPostId = postId || null;
+    postCoverFile = null;
+    document.getElementById('postTitleInput').value = '';
+    document.getElementById('postIntroInput').value = '';
+    document.getElementById('postInstagramInput').value = '';
+    document.getElementById('postCoverInput').value = '';
+    document.getElementById('postCoverPreviewWrap').style.display = 'none';
+    document.getElementById('dishSection').style.display = postId ? 'block' : 'none';
+
+    if (postId) {
+      document.getElementById('postModalTitle').textContent = '投稿を編集';
+      const post = recipePosts.find(p => p.id === postId);
+      if (post) {
+        document.getElementById('postTitleInput').value = post.title || '';
+        document.getElementById('postIntroInput').value = post.intro || '';
+        document.getElementById('postInstagramInput').value = post.instagram_url || '';
+        if (post.cover_image) {
+          document.getElementById('postCoverPreview').src = post.cover_image;
+          document.getElementById('postCoverPreviewWrap').style.display = 'block';
+        }
+      }
+      await loadDishesForPost(postId);
+    } else {
+      document.getElementById('postModalTitle').textContent = '新しい投稿';
+      currentPostDishes = [];
+    }
+
+    document.getElementById('postModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closePostEditor() {
+    document.getElementById('postModal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  document.getElementById('postCoverInput').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    postCoverFile = file;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      document.getElementById('postCoverPreview').src = ev.target.result;
+      document.getElementById('postCoverPreviewWrap').style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // ===== 投稿の保存（新規作成 or 更新） =====
+  async function savePost() {
+    const title = document.getElementById('postTitleInput').value.trim();
+    if (!title) { alert('タイトルを入力してください'); return; }
+
+    const btn = document.getElementById('savePostBtn');
+    btn.disabled = true;
+    btn.textContent = '保存中...';
+
+    let coverUrl = null;
+    if (currentPostId) {
+      const existing = recipePosts.find(p => p.id === currentPostId);
+      coverUrl = existing ? existing.cover_image : null;
+    }
+
+    if (postCoverFile) {
+      const uploaded = await uploadRecipeImage(postCoverFile, 'covers');
+      if (uploaded) coverUrl = uploaded;
+    }
+
+    const payload = {
+      title,
+      intro: document.getElementById('postIntroInput').value.trim(),
+      instagram_url: document.getElementById('postInstagramInput').value.trim() || null,
+      cover_image: coverUrl
+    };
+
+    let error, savedId;
+    if (currentPostId) {
+      ({ error } = await supabaseClient.from('recipe_posts').update(payload).eq('id', currentPostId));
+      savedId = currentPostId;
+    } else {
+      const { data, error: insertError } = await supabaseClient.from('recipe_posts').insert(payload).select().single();
+      error = insertError;
+      savedId = data?.id;
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'この投稿を保存する';
+
+    if (error) {
+      console.error('投稿保存エラー:', error);
+      alert('保存に失敗しました：' + error.message);
+      return;
+    }
+
+    currentPostId = savedId;
+    document.getElementById('dishSection').style.display = 'block';
+    document.getElementById('postModalTitle').textContent = '投稿を編集';
+    await loadDishesForPost(savedId);
+    await loadRecipePosts();
+    showToast('投稿を保存しました ✓');
+  }
+
+  // ===== 投稿の削除 =====
+  async function deletePost(postId) {
+    if (!confirm('この投稿を削除しますか？中の料理データもすべて削除されます。')) return;
+    const { error } = await supabaseClient.from('recipe_posts').delete().eq('id', postId);
+    if (error) {
+      console.error('投稿削除エラー:', error);
+      alert('削除に失敗しました：' + error.message);
+      return;
+    }
+    await loadRecipePosts();
+  }
+
+  // ===== 料理一覧の取得・描画（投稿編集モーダル内） =====
+  async function loadDishesForPost(postId) {
+    const { data, error } = await supabaseClient
+      .from('recipe_dishes')
+      .select('*, products(name, image_url)')
+      .eq('post_id', postId)
+      .order('sort_order', { ascending: true });
+
+    if (error) {
+      console.error('料理取得エラー:', error);
+      return;
+    }
+
+    currentPostDishes = data || [];
+    const list = document.getElementById('dishList');
+
+    if (currentPostDishes.length === 0) {
+      list.innerHTML = '<p style="font-size:12px;color:var(--text-sub);padding:4px 0;">まだ料理が登録されていません</p>';
+      return;
+    }
+
+    list.innerHTML = currentPostDishes.map(dish => {
+      const thumbInner = dish.image
+        ? `<img src="${dish.image}" class="dish-row-thumb">`
+        : `<div class="dish-row-thumb"></div>`;
+      return `
+        <div class="dish-row">
+          ${thumbInner}
+          <div class="dish-row-name">${dish.name}</div>
+          <div class="dish-row-actions">
+            <button class="dish-row-btn" onclick="openDishEditor('${dish.id}')">編集</button>
+            <button class="dish-row-btn danger" onclick="deleteDish('${dish.id}')">削除</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // ===== 料理エディタを開く =====
+  function openDishEditor(dishId) {
+    currentDishId = dishId || null;
+    dishImageFile = null;
+    selectedProductForDish = null;
+    document.getElementById('dishNameInput').value = '';
+    document.getElementById('dishDescInput').value = '';
+    document.getElementById('dishIngredientsInput').value = '';
+    document.getElementById('dishInstructionsInput').value = '';
+    document.getElementById('dishInstagramInput').value = '';
+    document.getElementById('dishImageInput').value = '';
+    document.getElementById('dishImagePreviewWrap').style.display = 'none';
+    document.getElementById('dishProductSearchInput').value = '';
+    document.getElementById('productSearchResults').innerHTML = '';
+    document.getElementById('selectedProductDisplay').style.display = 'none';
+
+    if (dishId) {
+      document.getElementById('dishModalTitle').textContent = '料理を編集';
+      const dish = currentPostDishes.find(d => d.id === dishId);
+      if (dish) {
+        document.getElementById('dishNameInput').value = dish.name || '';
+        document.getElementById('dishDescInput').value = dish.description || '';
+        document.getElementById('dishIngredientsInput').value = dish.ingredients || '';
+        document.getElementById('dishInstructionsInput').value = dish.instructions || '';
+        document.getElementById('dishInstagramInput').value = dish.instagram_url || '';
+        if (dish.image) {
+          document.getElementById('dishImagePreview').src = dish.image;
+          document.getElementById('dishImagePreviewWrap').style.display = 'block';
+        }
+        if (dish.product_id && dish.products) {
+          selectedProductForDish = { id: dish.product_id, name: dish.products.name, image_url: dish.products.image_url };
+          renderSelectedProduct();
+        }
+      }
+    } else {
+      document.getElementById('dishModalTitle').textContent = '料理を追加';
+    }
+
+    document.getElementById('dishModal').classList.add('open');
+  }
+
+  function closeDishEditor() {
+    document.getElementById('dishModal').classList.remove('open');
+  }
+
+  document.getElementById('dishImageInput').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    dishImageFile = file;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      document.getElementById('dishImagePreview').src = ev.target.result;
+      document.getElementById('dishImagePreviewWrap').style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // ===== 商品検索（料理に紐づける商品を選ぶ） =====
+  let productSearchTimer = null;
+  function searchProductsForDish(keyword) {
+    clearTimeout(productSearchTimer);
+    const resultsEl = document.getElementById('productSearchResults');
+    if (!keyword || keyword.trim().length === 0) {
+      resultsEl.innerHTML = '';
+      return;
+    }
+    productSearchTimer = setTimeout(async () => {
+      const { data, error } = await supabaseClient
+        .from('products')
+        .select('id, name, image_url')
+        .ilike('name', `%${keyword.trim()}%`)
+        .limit(8);
+
+      if (error || !data || data.length === 0) {
+        resultsEl.innerHTML = '<div class="product-search-item">見つかりませんでした</div>';
+        return;
+      }
+
+      resultsEl.innerHTML = data.map(p => {
+        const thumb = p.image_url ? `<img src="${p.image_url}">` : '';
+        return `<div class="product-search-item" onclick='selectProductForDish(${JSON.stringify(p)})'>${thumb}<span>${p.name}</span></div>`;
+      }).join('');
+    }, 300);
+  }
+
+  function selectProductForDish(product) {
+    selectedProductForDish = product;
+    document.getElementById('productSearchResults').innerHTML = '';
+    document.getElementById('dishProductSearchInput').value = '';
+    renderSelectedProduct();
+  }
+
+  function renderSelectedProduct() {
+    const el = document.getElementById('selectedProductDisplay');
+    if (!selectedProductForDish) { el.style.display = 'none'; return; }
+    const thumb = selectedProductForDish.image_url ? `<img src="${selectedProductForDish.image_url}">` : '';
+    el.innerHTML = `${thumb}<span>✓ ${selectedProductForDish.name}</span>`;
+    el.style.display = 'flex';
+  }
+
+  // ===== 料理の保存 =====
+  async function saveDish() {
+    if (!currentPostId) { alert('先に投稿を保存してください'); return; }
+    const name = document.getElementById('dishNameInput').value.trim();
+    if (!name) { alert('料理名を入力してください'); return; }
+    if (!selectedProductForDish) { alert('使用した商品を選択してください'); return; }
+
+    let imageUrl = null;
+    if (currentDishId) {
+      const existing = currentPostDishes.find(d => d.id === currentDishId);
+      imageUrl = existing ? existing.image : null;
+    }
+    if (dishImageFile) {
+      const uploaded = await uploadRecipeImage(dishImageFile, 'dishes');
+      if (uploaded) imageUrl = uploaded;
+    }
+
+    const payload = {
+      post_id: currentPostId,
+      name,
+      image: imageUrl,
+      description: document.getElementById('dishDescInput').value.trim(),
+      ingredients: document.getElementById('dishIngredientsInput').value.trim(),
+      instructions: document.getElementById('dishInstructionsInput').value.trim(),
+      product_id: selectedProductForDish.id,
+      instagram_url: document.getElementById('dishInstagramInput').value.trim() || null
+    };
+
+    let error;
+    if (currentDishId) {
+      ({ error } = await supabaseClient.from('recipe_dishes').update(payload).eq('id', currentDishId));
+    } else {
+      payload.sort_order = currentPostDishes.length;
+      ({ error } = await supabaseClient.from('recipe_dishes').insert(payload));
+    }
+
+    if (error) {
+      console.error('料理保存エラー:', error);
+      alert('保存に失敗しました：' + error.message);
+      return;
+    }
+
+    closeDishEditor();
+    await loadDishesForPost(currentPostId);
+    await loadRecipePosts();
+  }
+
+  // ===== 料理の削除 =====
+  async function deleteDish(dishId) {
+    if (!confirm('この料理を削除しますか？')) return;
+    const { error } = await supabaseClient.from('recipe_dishes').delete().eq('id', dishId);
+    if (error) {
+      console.error('料理削除エラー:', error);
+      alert('削除に失敗しました：' + error.message);
+      return;
+    }
+    await loadDishesForPost(currentPostId);
+    await loadRecipePosts();
+  }
+
+  // ===== 画像アップロード共通処理 =====
+  async function uploadRecipeImage(file, folder) {
+    const ext = file.name.split('.').pop();
+    const path = `${folder}/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+    const { error } = await supabaseClient.storage.from('recipe-images').upload(path, file, { upsert: true });
+    if (error) {
+      console.error('画像アップロードエラー:', error);
+      alert('画像のアップロードに失敗しました：' + error.message);
+      return null;
+    }
+    const { data } = supabaseClient.storage.from('recipe-images').getPublicUrl(path);
+    return data.publicUrl + '?t=' + Date.now();
+  }
+
+  // ===== 簡易トースト =====
+  function showToast(msg) {
+    let toast = document.getElementById('opToast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'opToast';
+      toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--green-dark);color:#fff;font-size:13px;font-weight:600;padding:10px 24px;border-radius:20px;z-index:500;white-space:nowrap;opacity:0;transition:opacity 0.2s;';
+      document.body.appendChild(toast);
+    }
+    toast.textContent = msg;
+    requestAnimationFrame(() => { toast.style.opacity = '1'; });
+    setTimeout(() => { toast.style.opacity = '0'; }, 1800);
   }
 </script>
 </body>
