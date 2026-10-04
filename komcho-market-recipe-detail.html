@@ -33,7 +33,7 @@
   .header-title { font-size: 15px; font-weight: 700; }
   .header-spacer { width: 32px; }
 
-  .cover-photo { width: 100%; aspect-ratio: 4/3; object-fit: cover; background: var(--green-light); display: block; }
+  .cover-photo { width: 100%; height: auto; background: var(--green-light); display: block; }
 
   .post-header { padding: 20px 20px 16px; }
   .post-title { font-size: 19px; font-weight: 700; line-height: 1.5; margin-bottom: 8px; }
@@ -206,7 +206,9 @@
 
     const dateStr = new Date(post.created_at).toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
 
-    const coverHtml = post.cover_image ? `<img class="cover-photo" src="${post.cover_image}" alt="${post.title}">` : '';
+    const coverHtml = post.cover_image
+      ? `<img class="cover-photo" src="${post.cover_image}" alt="${post.title}">`
+      : '<div class="cover-photo" style="min-height:160px;"></div>';
     const igHtml = post.instagram_url
       ? `<a class="ig-link" href="${post.instagram_url}" target="_blank" rel="noopener">${igIcon}Instagramで見る</a>`
       : '';

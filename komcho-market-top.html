@@ -375,12 +375,14 @@
   <img src="images/hero.jpg" alt="こむちょマーケット" style="width:100%;height:100%;object-fit:cover;object-position:center 75%;display:block;">
 </div>
 
-<a href="komcho-market-recipes.html" style="text-decoration:none;display:block;margin:16px 16px 0;background:var(--green-dark);border-radius:12px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;">
-  <div>
-    <div style="font-size:10px;color:rgba(255,255,255,0.65);letter-spacing:0.1em;margin-bottom:3px;">RECIPE</div>
-    <div style="font-size:13px;color:#fff;font-weight:700;">こむちょの食卓をのぞいてみる</div>
+<a id="recipeBanner" href="komcho-market-recipes.html" style="text-decoration:none;display:block;margin:16px 16px 0;background:var(--green-dark);border-radius:12px;overflow:hidden;position:relative;">
+  <div style="padding:14px 18px;display:flex;align-items:center;justify-content:space-between;">
+    <div>
+      <div style="font-size:10px;color:rgba(255,255,255,0.65);letter-spacing:0.1em;margin-bottom:3px;">RECIPE</div>
+      <div style="font-size:13px;color:#fff;font-weight:700;">こむちょの食卓をのぞいてみる</div>
+    </div>
+    <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2;flex-shrink:0;"><polyline points="9 18 15 12 9 6"/></svg>
   </div>
-  <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2;flex-shrink:0;"><polyline points="9 18 15 12 9 6"/></svg>
 </a>
 
 <div class="tagline">こだわり・無添加・ちょいす</div>
@@ -560,6 +562,23 @@
       btn.classList.add('active');
     }
   }
+
+  // レシピバナーに最新投稿の写真を表示
+  (async function loadRecipeBanner() {
+    const { data } = await supabaseClient
+      .from('recipe_posts')
+      .select('id, cover_image')
+      .order('created_at', { ascending: false })
+      .limit(1);
+
+    if (data && data[0] && data[0].cover_image) {
+      const banner = document.getElementById('recipeBanner');
+      banner.href = `komcho-market-recipe-detail.html?id=${data[0].id}`;
+      banner.style.backgroundImage = `linear-gradient(to top, rgba(61,90,62,0.9), rgba(61,90,62,0.4)), url('${data[0].cover_image}')`;
+      banner.style.backgroundSize = 'cover';
+      banner.style.backgroundPosition = 'center';
+    }
+  })();
 
   (async function loadNewArrivals() {
     const { data: { session } } = await supabaseClient.auth.getSession();

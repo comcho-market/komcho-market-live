@@ -303,10 +303,11 @@
       </div>
       <button class="save-post-btn" id="savePostBtn" onclick="savePost()">この投稿を保存する</button>
 
-      <div class="dish-section" id="dishSection" style="display:none;">
+      <div class="dish-section" id="dishSection">
         <div class="dish-section-title">料理一覧</div>
+        <p id="dishSectionNotice" style="font-size:12px;color:var(--text-sub);padding:4px 0 10px;">先に上の「この投稿を保存する」を押してください。保存すると、ここから料理を追加できるようになります。</p>
         <div class="dish-list" id="dishList"></div>
-        <button class="add-dish-btn" onclick="openDishEditor()">＋ 料理を追加する</button>
+        <button class="add-dish-btn" id="addDishBtn" onclick="openDishEditor()" style="display:none;">＋ 料理を追加する</button>
       </div>
     </div>
   </div>
@@ -599,7 +600,8 @@
     document.getElementById('postInstagramInput').value = '';
     document.getElementById('postCoverInput').value = '';
     document.getElementById('postCoverPreviewWrap').style.display = 'none';
-    document.getElementById('dishSection').style.display = postId ? 'block' : 'none';
+    document.getElementById('dishSectionNotice').style.display = postId ? 'none' : 'block';
+    document.getElementById('addDishBtn').style.display = postId ? 'block' : 'none';
 
     if (postId) {
       document.getElementById('postModalTitle').textContent = '投稿を編集';
@@ -687,7 +689,8 @@
     }
 
     currentPostId = savedId;
-    document.getElementById('dishSection').style.display = 'block';
+    document.getElementById('dishSectionNotice').style.display = 'none';
+    document.getElementById('addDishBtn').style.display = 'block';
     document.getElementById('postModalTitle').textContent = '投稿を編集';
     await loadDishesForPost(savedId);
     await loadRecipePosts();
@@ -803,6 +806,8 @@
 
   // ===== 商品検索（料理に紐づける商品を選ぶ） =====
   let productSearchTimer = null;
+  let lastProductSearchResults = [];
+
   function searchProductsForDish(keyword) {
     clearTimeout(productSearchTimer);
     const resultsEl = document.getElementById('productSearchResults');
@@ -818,16 +823,26 @@
         .limit(8);
 
       if (error || !data || data.length === 0) {
+        lastProductSearchResults = [];
         resultsEl.innerHTML = '<div class="product-search-item">見つかりませんでした</div>';
         return;
       }
 
-      resultsEl.innerHTML = data.map(p => {
+      lastProductSearchResults = data;
+      resultsEl.innerHTML = data.map((p, i) => {
         const thumb = p.image_url ? `<img src="${p.image_url}">` : '';
-        return `<div class="product-search-item" onclick='selectProductForDish(${JSON.stringify(p)})'>${thumb}<span>${p.name}</span></div>`;
+        return `<div class="product-search-item" data-idx="${i}">${thumb}<span>${p.name}</span></div>`;
       }).join('');
     }, 300);
   }
+
+  // イベント委譲：検索結果クリックで商品を選択（商品名に特殊文字が含まれても安全）
+  document.getElementById('productSearchResults').addEventListener('click', (e) => {
+    const item = e.target.closest('.product-search-item');
+    if (!item || !item.dataset.idx) return;
+    const product = lastProductSearchResults[parseInt(item.dataset.idx)];
+    if (product) selectProductForDish(product);
+  });
 
   function selectProductForDish(product) {
     selectedProductForDish = product;
