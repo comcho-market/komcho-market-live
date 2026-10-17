@@ -834,7 +834,8 @@
     stripeElements = stripe.elements({
       mode: 'payment',
       amount: Math.max(Math.round(amount), 50),
-      currency: 'jpy'
+      currency: 'jpy',
+      captureMethod: 'manual' // サーバー側PaymentIntent（オーソリのみ）と設定を一致させる
     });
     const paymentElement = stripeElements.create('payment');
     paymentElement.mount('#paymentElement');
