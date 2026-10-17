@@ -612,71 +612,13 @@
       お支払い方法
     </div>
 
-    <div class="payment-options" id="paymentOptions">
-      <div class="payment-option selected" onclick="selectPayment(this, false)">
-        <div class="radio-circle"></div>
-        <div class="card-icon visa">VISA</div>
-        <div class="payment-option-info">
-          <div class="payment-brand">Visa <span class="payment-default-badge">メイン</span></div>
-          <div class="payment-number">**** **** **** 4242</div>
-        </div>
-      </div>
-      <div class="payment-option" onclick="selectPayment(this, false)">
-        <div class="radio-circle"></div>
-        <div class="card-icon master">MC</div>
-        <div class="payment-option-info">
-          <div class="payment-brand">Mastercard</div>
-          <div class="payment-number">**** **** **** 8765</div>
-        </div>
-      </div>
-      <div class="payment-option" id="newCardOption" onclick="selectPayment(this, true)">
-        <div class="radio-circle"></div>
-        <div class="card-icon new">NEW</div>
-        <div class="payment-option-info">
-          <div class="payment-brand">新しいカードで支払う</div>
-        </div>
-      </div>
-    </div>
+    <!-- Stripe Payment Element（カード情報入力） -->
+    <div id="paymentElement"></div>
+    <div id="paymentMessage" style="display:none; color:#CC4444; font-size:12px; margin-top:10px; line-height:1.6;"></div>
 
-    <!-- 新しいカード入力フォーム -->
-    <div class="new-card-form" id="newCardForm">
-      <div class="form-field">
-        <label class="form-label form-label-req">カード番号</label>
-        <div class="card-number-wrap">
-          <input class="form-input" type="text" placeholder="0000 0000 0000 0000"
-            inputmode="numeric" maxlength="19" oninput="formatCardNumber(this)">
-          <span class="card-type-icon" id="cardTypeIcon"></span>
-        </div>
-      </div>
-      <div class="form-field">
-        <label class="form-label form-label-req">カード名義（半角）</label>
-        <input class="form-input" type="text" placeholder="HANAKO YAMADA" style="text-transform:uppercase;">
-      </div>
-      <div class="form-row">
-        <div class="form-field">
-          <label class="form-label form-label-req">有効期限</label>
-          <input class="form-input" type="text" placeholder="MM / YY"
-            inputmode="numeric" maxlength="7" oninput="formatExpiry(this)">
-        </div>
-        <div class="form-field">
-          <label class="form-label form-label-req">セキュリティコード</label>
-          <div class="card-number-wrap">
-            <input class="form-input" type="password" placeholder="000" inputmode="numeric" maxlength="4" id="cvvInput">
-            <button class="pw-toggle" onclick="toggleCvv()" type="button">
-              <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-            </button>
-          </div>
-        </div>
-      </div>
-      <div class="stripe-note">
-        <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        カード情報はStripeが暗号化して管理します。
-      </div>
-      <!-- カード保存チェック -->
-      <label class="save-check-wrap">
-        <input type="checkbox" id="saveCard" checked>
-        <span class="save-check-label">💳 このカードを保存して次回から使う</span>
-      </label>
+    <div class="stripe-note" style="margin-top:14px;">
+      <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      カード情報はStripeが暗号化して管理します。このマーケットやお店がカード番号を直接見ることはありません。
     </div>
   </div>
 
@@ -808,6 +750,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://js.stripe.com/v3/"></script>
 <script>
   const SUPABASE_URL = 'https://uawhrpizzlchkvmzrjzo.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_FaOqUE1PDbo-fpT9KhkWaw__BShLngI';
@@ -881,6 +824,32 @@
   let baseTotal = 0;
 
   const checkoutThumbClasses = ['g1', 'g2', 'g3'];
+
+  // ===== Stripe =====
+  const STRIPE_PUBLISHABLE_KEY = 'pk_test_51UQKUdBrC1xck3ha4NM6gx6Y40m7IoApjmZkai1DpKgk4QM3hxlydCqkx7YmUa9qrWMQidYB5yMQ61Ejb3QcQSIX00UUjO4nbz';
+  const stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
+  let stripeElements = null;
+
+  async function setupStripeElements(amount) {
+    stripeElements = stripe.elements({
+      mode: 'payment',
+      amount: Math.max(Math.round(amount), 50),
+      currency: 'jpy'
+    });
+    const paymentElement = stripeElements.create('payment');
+    paymentElement.mount('#paymentElement');
+  }
+
+  function showPaymentError(message) {
+    const box = document.getElementById('paymentMessage');
+    box.textContent = message;
+    box.style.display = 'block';
+  }
+  function hidePaymentError() {
+    const box = document.getElementById('paymentMessage');
+    box.style.display = 'none';
+    box.textContent = '';
+  }
 
   (async function initCheckout() {
     const { data: { session } } = await supabaseClient.auth.getSession();
@@ -978,6 +947,7 @@
     }
 
     updateTotal(0);
+    await setupStripeElements(baseTotal);
   })();
 
   // 住所選択
@@ -994,14 +964,6 @@
     if (form.classList.contains('open')) {
       document.querySelectorAll('.address-option').forEach(o => o.classList.remove('selected'));
     }
-  }
-
-  // 支払い選択（今回はUIのみ。実際の決済処理は別タスクで対応）
-  function selectPayment(el, isNew) {
-    document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
-    el.classList.add('selected');
-    const form = document.getElementById('newCardForm');
-    form.classList.toggle('open', isNew);
   }
 
   // 全部使うボタン
@@ -1040,27 +1002,11 @@
     document.getElementById('ctaTotal').textContent = '¥' + total.toLocaleString();
     document.getElementById('earnPt').textContent = earnPt + 'pt';
     document.getElementById('ctaPointNote').textContent = '🌿 ' + earnPt + 'pt 獲得予定';
-  }
 
-  // カード番号フォーマット
-  function formatCardNumber(input) {
-    let val = input.value.replace(/\D/g, '').substring(0, 16);
-    input.value = val.replace(/(\d{4})/g, '$1 ').trim();
-    const icon = document.getElementById('cardTypeIcon');
-    if (val.startsWith('4')) icon.textContent = 'VISA';
-    else if (/^5[1-5]/.test(val)) icon.textContent = 'MC';
-    else icon.textContent = '';
-  }
-
-  function formatExpiry(input) {
-    let val = input.value.replace(/\D/g, '');
-    if (val.length >= 3) val = val.substring(0,2) + ' / ' + val.substring(2,4);
-    input.value = val;
-  }
-
-  function toggleCvv() {
-    const input = document.getElementById('cvvInput');
-    input.type = input.type === 'password' ? 'text' : 'password';
+    // Stripe Elementsに表示中の金額も合わせて更新（ポイント利用で変わるため）
+    if (stripeElements) {
+      stripeElements.update({ amount: Math.max(total, 50) });
+    }
   }
 
   // 注文確定
@@ -1068,6 +1014,7 @@
     const orderBtn = document.querySelector('.order-btn');
     orderBtn.disabled = true;
     orderBtn.style.opacity = '0.6';
+    hidePaymentError();
 
     await saveNewAddressIfNeeded();
 
@@ -1126,6 +1073,59 @@
     const total = Math.max(0, baseTotal - pointsUsed);
     const earnPt = Math.floor(total / 200);
 
+    // ===== Stripe決済（オーソリ取得のみ。売上確定は発送処理時） =====
+
+    // 入力内容の検証
+    const { error: submitError } = await stripeElements.submit();
+    if (submitError) {
+      showPaymentError(submitError.message || 'カード情報を確認してください');
+      orderBtn.disabled = false;
+      orderBtn.style.opacity = '1';
+      return;
+    }
+
+    // サーバー側で最終金額のPaymentIntentを作成（manual capture）
+    let clientSecret, paymentIntentId;
+    try {
+      const piRes = await fetch('/api/create-payment-intent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: total, shopId, userId: currentUserId })
+      });
+      const piData = await piRes.json();
+      if (!piRes.ok) throw new Error(piData.error || '決済準備に失敗しました');
+      clientSecret = piData.clientSecret;
+      paymentIntentId = piData.paymentIntentId;
+    } catch (err) {
+      console.error('PaymentIntent作成エラー:', err);
+      showPaymentError(err.message || '決済準備に失敗しました。もう一度お試しください。');
+      orderBtn.disabled = false;
+      orderBtn.style.opacity = '1';
+      return;
+    }
+
+    // カードのオーソリを取得（この時点ではまだ課金されない）
+    const { error: confirmError, paymentIntent } = await stripe.confirmPayment({
+      elements: stripeElements,
+      clientSecret,
+      confirmParams: { return_url: window.location.href },
+      redirect: 'if_required'
+    });
+
+    if (confirmError) {
+      console.error('決済確認エラー:', confirmError);
+      showPaymentError(confirmError.message || 'カード決済に失敗しました');
+      orderBtn.disabled = false;
+      orderBtn.style.opacity = '1';
+      return;
+    }
+    if (!paymentIntent || (paymentIntent.status !== 'requires_capture' && paymentIntent.status !== 'succeeded')) {
+      showPaymentError('決済の確認に失敗しました。もう一度お試しください。');
+      orderBtn.disabled = false;
+      orderBtn.style.opacity = '1';
+      return;
+    }
+
     // 注文を作成
     const { data: order, error: orderError } = await supabaseClient
       .from('orders')
@@ -1150,13 +1150,25 @@
         delivery_prefecture: buyerInfo.prefecture,
         delivery_line: buyerInfo.line,
         delivery_building: buyerInfo.building,
-        payment_method: 'card'
+        payment_method: 'card',
+        payment_intent_id: paymentIntentId,
+        payment_status: 'authorized'
       })
       .select()
       .single();
 
     if (orderError || !order) {
       console.error('注文作成エラー:', orderError);
+      // カードのオーソリは取れているが注文保存に失敗したので、お客様に課金が残らないよう取り消す
+      try {
+        await fetch('/api/cancel-payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ paymentIntentId })
+        });
+      } catch (cancelErr) {
+        console.error('オーソリ取消エラー:', cancelErr);
+      }
       alert('注文の作成に失敗しました：' + (orderError?.message || ''));
       orderBtn.disabled = false;
       orderBtn.style.opacity = '1';

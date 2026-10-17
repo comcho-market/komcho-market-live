@@ -685,7 +685,9 @@ async function loadOrders() {
     total: o.total || 0,
     pointDiscount: o.point_discount || 0,
     carrier: o.carrier || '',
-    tracking: o.tracking_number || ''
+    tracking: o.tracking_number || '',
+    paymentIntentId: o.payment_intent_id || '',
+    paymentStatus: o.payment_status || ''
   }));
 
   const monthLabel = new Date().toLocaleDateString('ja-JP', { year: 'numeric', month: 'long' });
@@ -824,10 +826,30 @@ async function submitShipping() {
   if (!tracking) { showToast('追跡番号を入力してください'); return; }
 
   const carrierLabel = carrierNames[carrier] || carrier;
+  const order = orders.find(o => o.id === currentShipOrderId);
+
+  // オーソリ（仮売上）をここで確定（capture）。ここで初めてお客様に実際に課金される。
+  let paymentStatus = order?.paymentStatus || '';
+  if (order?.paymentIntentId && paymentStatus !== 'captured') {
+    try {
+      const res = await fetch('/api/capture-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paymentIntentId: order.paymentIntentId })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || '決済の確定に失敗しました');
+      paymentStatus = 'captured';
+    } catch (err) {
+      console.error('決済確定エラー:', err);
+      showToast('決済の確定に失敗しました：' + err.message);
+      return;
+    }
+  }
 
   const { error } = await supabaseClient
     .from('orders')
-    .update({ status: 'shipped', carrier: carrierLabel, tracking_number: tracking })
+    .update({ status: 'shipped', carrier: carrierLabel, tracking_number: tracking, payment_status: paymentStatus })
     .eq('id', currentShipOrderId);
 
   if (error) {
@@ -836,10 +858,10 @@ async function submitShipping() {
     return;
   }
 
-  const order = orders.find(o => o.id === currentShipOrderId);
   order.status   = 'shipped';
   order.carrier  = carrierLabel;
   order.tracking = tracking;
+  order.paymentStatus = paymentStatus;
 
   closeModal('shipModal');
   updateBadges();
@@ -851,9 +873,12 @@ async function submitShipping() {
 async function approveCancel(orderId) {
   if (!confirm('このキャンセル依頼を承認しますか？注文がキャンセル済みになります。')) return;
 
+  const order = orders.find(o => o.id === orderId);
+  const paymentStatus = await releaseAuthorizationIfNeeded(order);
+
   const { error } = await supabaseClient
     .from('orders')
-    .update({ status: 'cancelled' })
+    .update({ status: 'cancelled', payment_status: paymentStatus })
     .eq('id', orderId);
 
   if (error) {
@@ -862,11 +887,32 @@ async function approveCancel(orderId) {
     return;
   }
 
-  const order = orders.find(o => o.id === orderId);
   order.status = 'cancelled';
+  order.paymentStatus = paymentStatus;
   updateBadges();
   renderOrders(currentStatus);
-  showToast('キャンセルを承認しました');
+  showToast('キャンセルを承認しました（決済手数料はかかりません）');
+}
+
+// 発送前キャンセル時、オーソリ（仮売上）を取り消す。すでにcapture済みなら何もしない（別途返金対応）。
+async function releaseAuthorizationIfNeeded(order) {
+  if (!order?.paymentIntentId || order.paymentStatus === 'captured') {
+    return order?.paymentStatus || '';
+  }
+  try {
+    const res = await fetch('/api/cancel-payment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ paymentIntentId: order.paymentIntentId })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || '決済の取り消しに失敗しました');
+    return 'cancelled';
+  } catch (err) {
+    console.error('オーソリ取消エラー:', err);
+    // 取消に失敗しても注文のキャンセル自体は進める（決済側は手動確認が必要）
+    return order.paymentStatus || '';
+  }
 }
 
 // ===== キャンセル依頼の却下（注文を新規注文に戻す） =====
@@ -895,9 +941,12 @@ async function declineCancel(orderId) {
 async function cancelOrderByShop(orderId) {
   if (!confirm('この注文をキャンセルしますか？お客様には注文詳細画面でキャンセル済みと表示されます。')) return;
 
+  const order = orders.find(o => o.id === orderId);
+  const paymentStatus = await releaseAuthorizationIfNeeded(order);
+
   const { error } = await supabaseClient
     .from('orders')
-    .update({ status: 'cancelled' })
+    .update({ status: 'cancelled', payment_status: paymentStatus })
     .eq('id', orderId);
 
   if (error) {
@@ -906,11 +955,11 @@ async function cancelOrderByShop(orderId) {
     return;
   }
 
-  const order = orders.find(o => o.id === orderId);
   order.status = 'cancelled';
+  order.paymentStatus = paymentStatus;
   updateBadges();
   renderOrders(currentStatus);
-  showToast('注文をキャンセルしました');
+  showToast('注文をキャンセルしました（決済手数料はかかりません）');
 }
 
 // ===== 注文詳細モーダル =====
