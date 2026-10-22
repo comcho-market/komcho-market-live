@@ -541,6 +541,22 @@
   </div>
 </div>
 
+<div class="gap"></div>
+
+<!-- ⑧ 決済設定（Stripe） -->
+<div class="section-block">
+  <div class="block-title">決済設定（お支払いの受け取り）</div>
+  <p class="field-hint" style="margin-bottom:14px;">お客様からのお支払いを受け取るために、Stripe（決済サービス）に口座情報・本人確認情報を登録していただきます。</p>
+
+  <div id="stripeStatusBadge" style="display:flex;align-items:center;gap:8px;padding:12px 14px;border-radius:10px;background:var(--bg);margin-bottom:14px;font-size:13px;font-weight:700;">
+    読み込み中...
+  </div>
+
+  <button id="stripeConnectBtn" class="add-btn" style="display:none;" onclick="startStripeOnboarding()">
+    Stripeで受け取り口座を登録する
+  </button>
+</div>
+
 <!-- 運営サポート -->
 <div class="gap"></div>
 <div style="margin:0 16px 20px;">
@@ -565,6 +581,8 @@
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   let currentShopId = null;
+  let currentShop = null;
+  let currentUserEmail = null;
 
   function renderKodawariList(values) {
     const list = document.getElementById('kodawariList');
@@ -602,6 +620,8 @@
     }
 
     currentShopId = shop.id;
+    currentShop = shop;
+    currentUserEmail = session.user.email;
     document.getElementById('shopNameField').value = shop.shop_name || '';
     document.getElementById('shopAddressField').value = shop.address || '';
     document.getElementById('shopPhoneField').value = shop.phone || '';
@@ -628,7 +648,118 @@
     loadNews();
 
     loadProducts();
+
+    initStripeConnect();
   })();
+
+  // ===== Stripe Connect（出店者の受け取り口座） =====
+  async function initStripeConnect() {
+    // Stripeのオンボーディングから戻ってきた直後は、最新の状態を取得して反映する
+    if (currentShop.stripe_account_id) {
+      await refreshStripeStatus(currentShop.stripe_account_id);
+    } else {
+      renderStripeStatus(null);
+    }
+  }
+
+  async function refreshStripeStatus(accountId) {
+    try {
+      const res = await fetch('/api/connect-account-status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ accountId })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || '状態の取得に失敗しました');
+
+      await supabaseClient.from('shops').update({
+        stripe_charges_enabled: data.chargesEnabled,
+        stripe_payouts_enabled: data.payoutsEnabled,
+        stripe_details_submitted: data.detailsSubmitted
+      }).eq('id', currentShopId);
+
+      currentShop.stripe_charges_enabled = data.chargesEnabled;
+      currentShop.stripe_payouts_enabled = data.payoutsEnabled;
+      currentShop.stripe_details_submitted = data.detailsSubmitted;
+      renderStripeStatus(data);
+    } catch (err) {
+      console.error('Stripeステータス取得エラー:', err);
+      renderStripeStatus(null, true);
+    }
+  }
+
+  function renderStripeStatus(data, failedToLoad) {
+    const badge = document.getElementById('stripeStatusBadge');
+    const btn = document.getElementById('stripeConnectBtn');
+
+    if (!currentShop.stripe_account_id) {
+      badge.style.background = 'var(--bg)';
+      badge.style.color = 'var(--text-sub)';
+      badge.innerHTML = '⚪️ 未登録：お支払いを受け取るには登録が必要です';
+      btn.style.display = 'flex';
+      btn.textContent = 'Stripeで受け取り口座を登録する';
+      return;
+    }
+
+    if (failedToLoad) {
+      badge.style.background = 'var(--bg)';
+      badge.style.color = 'var(--text-sub)';
+      badge.innerHTML = '状態の確認に失敗しました。時間をおいて再度お試しください。';
+      btn.style.display = 'flex';
+      btn.textContent = '登録状況を確認する';
+      return;
+    }
+
+    if (data && data.chargesEnabled && data.payoutsEnabled) {
+      badge.style.background = 'var(--green-light)';
+      badge.style.color = 'var(--green-dark)';
+      badge.innerHTML = '🟢 登録完了：お支払いを受け取れる状態です';
+      btn.style.display = 'none';
+    } else {
+      badge.style.background = '#FFF3DC';
+      badge.style.color = '#9A6B00';
+      badge.innerHTML = '🟡 登録中：本人確認が完了していません';
+      btn.style.display = 'flex';
+      btn.textContent = '登録を続ける';
+    }
+  }
+
+  async function startStripeOnboarding() {
+    const btn = document.getElementById('stripeConnectBtn');
+    btn.disabled = true;
+    const originalText = btn.textContent;
+    btn.textContent = '処理中...';
+
+    try {
+      const returnUrl = window.location.origin + window.location.pathname;
+      const res = await fetch('/api/create-connect-account', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          shopId: currentShopId,
+          accountId: currentShop.stripe_account_id || null,
+          email: currentUserEmail,
+          returnUrl,
+          refreshUrl: returnUrl
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Stripeアカウントの作成に失敗しました');
+
+      // 新規アカウントの場合はIDを保存しておく
+      if (!currentShop.stripe_account_id) {
+        await supabaseClient.from('shops').update({ stripe_account_id: data.accountId }).eq('id', currentShopId);
+        currentShop.stripe_account_id = data.accountId;
+      }
+
+      window.location.href = data.url;
+    } catch (err) {
+      console.error('Stripeオンボーディング開始エラー:', err);
+      showToast('登録を開始できませんでした：' + err.message);
+      btn.disabled = false;
+      btn.textContent = originalText;
+    }
+  }
 
   // 商品一覧を読み込んで表示
   const productThumbClasses = ['g1', 'g2', 'g3', 'g4'];
