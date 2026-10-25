@@ -555,6 +555,8 @@
   <button id="stripeConnectBtn" class="add-btn" style="display:none;" onclick="startStripeOnboarding()">
     Stripeで受け取り口座を登録する
   </button>
+
+  <div id="feeRateInfo" style="margin-top:14px;font-size:12.5px;color:var(--text-sub);display:none;"></div>
 </div>
 
 <!-- 運営サポート -->
@@ -659,6 +661,19 @@
       await refreshStripeStatus(currentShop.stripe_account_id);
     } else {
       renderStripeStatus(null);
+    }
+    renderFeeRateInfo();
+  }
+
+  // 運営が承認時に固定したシステム手数料率を表示する（参考情報のみ）
+  function renderFeeRateInfo() {
+    const el = document.getElementById('feeRateInfo');
+    if (typeof currentShop.fee_rate === 'number') {
+      const percent = Math.round(currentShop.fee_rate * 1000) / 10;
+      el.textContent = `現在のシステム手数料率：${percent}%（決済手数料3.6%は別途差し引かれます）`;
+      el.style.display = 'block';
+    } else {
+      el.style.display = 'none';
     }
   }
 

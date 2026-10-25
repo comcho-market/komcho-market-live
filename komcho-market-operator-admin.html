@@ -502,12 +502,31 @@
   }
 
   // ===== 承認処理 =====
+  // 承認と同時に、その店舗のシステム手数料率を確定（固定）する。
+  // 以後このショップの売上計算は、ここで決めた率で固定されるので、必ず現在の規約通りの番号を選ぶこと。
   async function approveShop(shopId) {
-    if (!confirm('この出店者を承認しますか？承認すると、すぐに出店者側のショップ管理画面が使えるようになります。')) return;
+    const feeInput = prompt(
+      'この出店者のシステム手数料率を入力してください（半角数字、%なし）\n' +
+      '　先着15店舗　→ 5\n' +
+      '　オープン前登録　→ 8\n' +
+      '　オープン後登録　→ 10\n\n' +
+      '※ここで決めた率は、このショップについて今後ずっと固定されます。',
+      '10'
+    );
+    if (feeInput === null) return; // キャンセル
+
+    const feePercent = Number(feeInput);
+    if (!Number.isFinite(feePercent) || feePercent < 0 || feePercent > 100) {
+      alert('手数料率は0〜100の数字で入力してください。');
+      return;
+    }
+    const feeRate = feePercent / 100;
+
+    if (!confirm(`この出店者を手数料率${feePercent}%で承認しますか？承認すると、すぐに出店者側のショップ管理画面が使えるようになります。`)) return;
 
     const { error } = await supabaseClient
       .from('shops')
-      .update({ status: 'active' })
+      .update({ status: 'active', fee_rate: feeRate })
       .eq('id', shopId);
 
     if (error) {

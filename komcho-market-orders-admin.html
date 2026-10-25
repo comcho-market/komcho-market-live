@@ -523,6 +523,11 @@
       <div class="summary-card-value"><span id="shippedCount">0</span><span>件</span></div>
       <div class="summary-card-sub">今月累計</div>
     </div>
+    <div class="summary-card">
+      <div class="summary-card-label">振込予定額（未払い）</div>
+      <div class="summary-card-value">¥<span id="pendingPayoutAmount">0</span></div>
+      <div class="summary-card-sub">手数料差引後・¥1万円以上で翌月振込</div>
+    </div>
   </div>
 </div>
 
@@ -622,7 +627,7 @@ let currentShopInfo = null;
 
   const { data: shop, error: shopError } = await supabaseClient
     .from('shops')
-    .select('id, shop_name, address, phone, status')
+    .select('id, shop_name, address, phone, status, fee_rate')
     .eq('owner_id', session.user.id)
     .single();
 
@@ -641,7 +646,63 @@ let currentShopInfo = null;
   currentShopInfo = shop;
 
   await loadOrders();
+  await loadEarningsSummary();
 })();
+
+// ===== 売上帳簿（振込予定額）の取得 =====
+// 発送確定（capture）した注文ごとに、システム手数料・決済手数料を差し引いた金額が
+// shop_earnings に積み上がる。ここではまだ振り込まれていない（status='pending'）分を合計表示するだけで、
+// 実際の振込（Stripe Transfer）処理は別途実装予定。
+async function loadEarningsSummary() {
+  const { data, error } = await supabaseClient
+    .from('shop_earnings')
+    .select('net_amount, status')
+    .eq('shop_id', currentShopId)
+    .eq('status', 'pending');
+
+  const totalEl = document.getElementById('pendingPayoutAmount');
+  if (!totalEl) return;
+
+  if (error) {
+    console.error('売上帳簿取得エラー:', error);
+    totalEl.textContent = '-';
+    return;
+  }
+
+  const total = (data || []).reduce((s, row) => s + (row.net_amount || 0), 0);
+  totalEl.textContent = total.toLocaleString();
+}
+
+// ===== 発送確定した注文の取り分を帳簿（shop_earnings）に記録 =====
+// gross（店舗の取り分の基準額）はポイント割引前の金額（subtotal+送料）。
+// ポイント割引分は運営負担のため、店舗の取り分には影響させない。
+// stripe_fee_amount はStripeが実際に決済した金額（割引後のtotal）に対する手数料として計算。
+async function recordShopEarning(order) {
+  const feeRate = (currentShopInfo && typeof currentShopInfo.fee_rate === 'number') ? currentShopInfo.fee_rate : 0.10;
+  const gross = Math.round((order.subtotal || 0) + (order.shipping || 0));
+  const chargedTotal = Math.round(order.total || gross);
+  const systemFeeAmount = Math.round(gross * feeRate);
+  const stripeFeeAmount = Math.round(chargedTotal * 0.036);
+  const netAmount = gross - systemFeeAmount - stripeFeeAmount;
+
+  const { error } = await supabaseClient.from('shop_earnings').insert({
+    shop_id: currentShopId,
+    order_id: order.id,
+    gross_amount: gross,
+    fee_rate: feeRate,
+    system_fee_amount: systemFeeAmount,
+    stripe_fee_amount: stripeFeeAmount,
+    net_amount: netAmount,
+    status: 'pending'
+  });
+
+  if (error) {
+    // 注文自体は発送済みとして正常に進める。帳簿の記録だけ失敗した場合はログに残すのみ（二重記録防止のため、order_idにunique制約あり）。
+    console.error('売上帳簿の記録エラー:', error);
+  } else {
+    await loadEarningsSummary();
+  }
+}
 
 async function loadOrders() {
   const { data, error } = await supabaseClient
@@ -830,6 +891,7 @@ async function submitShipping() {
 
   // オーソリ（仮売上）をここで確定（capture）。ここで初めてお客様に実際に課金される。
   let paymentStatus = order?.paymentStatus || '';
+  let justCaptured = false;
   if (order?.paymentIntentId && paymentStatus !== 'captured') {
     try {
       const res = await fetch('/api/capture-payment', {
@@ -840,6 +902,7 @@ async function submitShipping() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || '決済の確定に失敗しました');
       paymentStatus = 'captured';
+      justCaptured = true;
     } catch (err) {
       console.error('決済確定エラー:', err);
       showToast('決済の確定に失敗しました：' + err.message);
@@ -862,6 +925,10 @@ async function submitShipping() {
   order.carrier  = carrierLabel;
   order.tracking = tracking;
   order.paymentStatus = paymentStatus;
+
+  if (justCaptured) {
+    await recordShopEarning(order);
+  }
 
   closeModal('shipModal');
   updateBadges();
