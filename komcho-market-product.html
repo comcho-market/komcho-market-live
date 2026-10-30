@@ -581,6 +581,24 @@
     return getGuestCart().reduce((s, c) => s + c.quantity, 0);
   }
 
+  // カゴ件数バッジ（ヘッダー・下部ナビ）の更新
+  // ※この関数はloadProduct()から呼ばれるため、必ず同じ<script>内の先頭側（他のscriptタグより前）に置くこと。
+  //   別のscriptタグに置くと、未ログイン時にawaitのタイミング次第でこの関数が未定義のまま呼ばれ、
+  //   ReferenceErrorでloadProduct()全体が止まり、商品名などが更新されない不具合が発生する。
+  async function updateCartBadges(userId) {
+    let total;
+    if (userId) {
+      const { data } = await supabaseClient.from('cart_items').select('quantity').eq('user_id', userId);
+      total = (data || []).reduce((sum, item) => sum + item.quantity, 0);
+    } else {
+      total = guestCartCount();
+    }
+    document.querySelectorAll('.cart-badge').forEach(el => {
+      el.textContent = total;
+      el.style.display = total > 0 ? 'flex' : 'none';
+    });
+  }
+
   let current = 0;
   let total = 1;
   const inner = document.getElementById('sliderInner');
@@ -795,21 +813,6 @@
     }
     requestAnimationFrame(() => { toast.style.opacity = '1'; });
     setTimeout(() => { toast.style.opacity = '0'; }, 1600);
-  }
-
-  // カゴ件数バッジ（ヘッダー・下部ナビ）の更新
-  async function updateCartBadges(userId) {
-    let total;
-    if (userId) {
-      const { data } = await supabaseClient.from('cart_items').select('quantity').eq('user_id', userId);
-      total = (data || []).reduce((sum, item) => sum + item.quantity, 0);
-    } else {
-      total = guestCartCount();
-    }
-    document.querySelectorAll('.cart-badge').forEach(el => {
-      el.textContent = total;
-      el.style.display = total > 0 ? 'flex' : 'none';
-    });
   }
 </script>
 </body>
