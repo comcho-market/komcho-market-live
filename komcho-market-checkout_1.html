@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>注文手続き - こむちょマーケット</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 48 48%27%3E%3Crect width=%2748%27 height=%2748%27 rx=%2710%27 fill=%27%233D5A3E%27/%3E%3Cg transform=%27translate(24,24) scale(0.55)%27%3E%3Cpath d=%27M -26 7 C -17 -17 5 -24 24 -10 C 12 5 -2 19 -21 24%27 fill=%27none%27 stroke=%27%23F8F5EF%27 stroke-width=%275%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/%3E%3C/g%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg:          #F8F5EF;
+    --bg-card:     #FFFFFF;
+    --green-dark:  #3D5A3E;
+    --green-mid:   #5A7A5B;
+    --green-light: #EAF0E8;
+    --gold:        #B8973A;
+    --text-main:   #2C2C2C;
+    --text-sub:    #6B6B6B;
+    --border:      #E2DDD5;
+    --radius-card: 12px;
+    --shadow-card: 0 2px 12px rgba(0,0,0,0.07);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Yu Gothic', 'Meiryo', sans-serif;
+    background: var(--bg);
+    color: var(--text-main);
+    max-width: 430px;
+    margin: 0 auto;
+    min-height: 100vh;
+    padding-bottom: 120px;
+  }
+  button { cursor: pointer; border: none; background: none; font-family: inherit; }
+  input, textarea { font-family: inherit; }
+
+  /* HEADER */
+  .header {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px;
+  }
+  .header-back svg {
+    width: 22px; height: 22px;
+    stroke: var(--text-main); fill: none;
+    stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .header-logo {
+    display: flex; align-items: center; gap: 7px;
+  }
+  .header-logo .logo-icon {
+    width: 24px; height: 19px; flex-shrink: 0;
+  }
+  .header-logo .logo-icon path {
+    fill: none; stroke: var(--green-dark);
+    stroke-width: 3; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .header-logo .logo-text {
+    font-size: 15px; font-weight: 700; letter-spacing: 0.04em;
+    color: var(--text-main);
+  }
+  .header-step {
+    font-size: 12px; color: var(--text-sub); font-weight: 500;
+  }
+
+  /* STEP BAR */
+  .step-bar {
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 16px;
+    display: flex; align-items: center; justify-content: center; gap: 0;
+  }
+  .step-item {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    flex: 1;
+  }
+  .step-circle {
+    width: 24px; height: 24px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700;
+    background: var(--border); color: var(--text-sub);
+  }
+  .step-circle.active { background: var(--green-dark); color: #fff; }
+  .step-circle.done { background: var(--green-mid); color: #fff; }
+  .step-label { font-size: 10px; color: var(--text-sub); }
+  .step-label.active { color: var(--green-dark); font-weight: 700; }
+  .step-line {
+    flex: 0 0 24px; height: 1px;
+    background: var(--border);
+    margin-bottom: 14px;
+  }
+  .step-line.done { background: var(--green-mid); }
+
+  /* GAP */
+  .gap { height: 8px; background: var(--bg); }
+
+  /* SECTION BLOCK */
+  .section-block {
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 16px;
+  }
+  .block-title {
+    font-size: 14px; font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .block-title svg {
+    width: 16px; height: 16px;
+    stroke: var(--green-dark); fill: none;
+    stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .block-title::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+
+  /* ADDRESS OPTIONS */
+  .address-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+  .address-option {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 12px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-card);
+    background: var(--bg); cursor: pointer;
+    transition: all 0.15s;
+  }
+  .address-option.selected {
+    border-color: var(--green-dark);
+    background: var(--green-light);
+  }
+  .radio-circle {
+    width: 18px; height: 18px; border-radius: 50%;
+    border: 1.5px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 2px; transition: all 0.15s;
+  }
+  .address-option.selected .radio-circle {
+    border-color: var(--green-dark); background: var(--green-dark);
+  }
+  .address-option.selected .radio-circle::after {
+    content: ''; width: 6px; height: 6px;
+    border-radius: 50%; background: #fff;
+  }
+  .address-option-body { flex: 1; }
+  .address-option-name { font-size: 13px; font-weight: 700; margin-bottom: 3px; }
+  .address-option-text { font-size: 12px; color: var(--text-main); line-height: 1.6; }
+  .address-default-badge {
+    font-size: 9px; font-weight: 700;
+    background: var(--green-dark); color: #fff;
+    border-radius: 10px; padding: 2px 7px;
+    margin-left: 6px; vertical-align: middle;
+  }
+
+  /* ADD ADDRESS */
+  .add-address-toggle {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; color: var(--green-dark); font-weight: 600;
+    cursor: pointer; padding: 4px 0;
+  }
+  .add-address-toggle svg {
+    width: 18px; height: 18px;
+    stroke: var(--green-dark); fill: none;
+    stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .new-address-form {
+    margin-top: 14px;
+    display: none;
+    flex-direction: column; gap: 12px;
+  }
+  .new-address-form.open { display: flex; }
+
+  /* FORM FIELDS */
+  .form-field { display: flex; flex-direction: column; gap: 5px; }
+  .form-label {
+    font-size: 12px; font-weight: 600; color: var(--text-sub);
+  }
+  .form-label-req::after {
+    content: '必須';
+    font-size: 10px; color: #fff; background: var(--green-dark);
+    border-radius: 4px; padding: 1px 5px; margin-left: 6px;
+    font-weight: 600; vertical-align: middle;
+  }
+  .form-input {
+    width: 100%;
+    border: 1.5px solid var(--border); border-radius: 8px;
+    padding: 11px 12px; font-size: 14px; color: var(--text-main);
+    background: var(--bg); outline: none; -webkit-appearance: none;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .form-input:focus { border-color: var(--green-dark); background: #fff; }
+  .form-row { display: flex; gap: 10px; }
+  .form-row .form-field { flex: 1; }
+
+  /* SAVE CHECKBOX */
+  .save-check-wrap {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 14px;
+    background: var(--green-light);
+    border-radius: 8px; margin-top: 4px;
+    cursor: pointer;
+  }
+  .save-check-wrap input[type="checkbox"] {
+    width: 16px; height: 16px;
+    accent-color: var(--green-dark); cursor: pointer;
+  }
+  .save-check-label { font-size: 13px; color: var(--green-dark); font-weight: 600; cursor: pointer; }
+
+  /* PAYMENT OPTIONS */
+  .payment-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+  .payment-option {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-card);
+    background: var(--bg); cursor: pointer; transition: all 0.15s;
+  }
+  .payment-option.selected {
+    border-color: var(--green-dark); background: var(--green-light);
+  }
+  .payment-option .radio-circle { margin-top: 0; }
+  .card-icon {
+    width: 38px; height: 24px; border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700; flex-shrink: 0;
+  }
+  .card-icon.visa   { background: #1A1F71; color: #fff; }
+  .card-icon.master { background: #EB001B; color: #fff; }
+  .card-icon.new    { background: var(--border); color: var(--text-sub); font-size: 9px; }
+  .payment-option-info { flex: 1; }
+  .payment-brand { font-size: 13px; font-weight: 600; }
+  .payment-number { font-size: 11px; color: var(--text-sub); margin-top: 1px; }
+  .payment-default-badge {
+    font-size: 9px; font-weight: 700;
+    background: var(--green-light); color: var(--green-dark);
+    border-radius: 10px; padding: 2px 8px;
+  }
+  .payment-option.selected .payment-default-badge {
+    background: rgba(255,255,255,0.6);
+  }
+
+  /* NEW CARD FORM */
+  .new-card-form {
+    display: none; flex-direction: column; gap: 12px;
+    margin-top: 14px; padding-top: 14px;
+    border-top: 1px solid var(--border);
+  }
+  .new-card-form.open { display: flex; }
+  .card-number-wrap { position: relative; }
+  .card-type-icon {
+    position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+    font-size: 11px; font-weight: 700; color: var(--text-sub);
+  }
+  .pw-toggle {
+    position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+    cursor: pointer; padding: 4px;
+  }
+  .pw-toggle svg {
+    width: 16px; height: 16px; stroke: var(--text-sub); fill: none;
+    stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .stripe-note {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 11px; color: var(--text-sub);
+    background: var(--bg); border-radius: 8px; padding: 9px 12px;
+  }
+  .stripe-note svg {
+    width: 13px; height: 13px; stroke: var(--text-sub); fill: none;
+    stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0;
+  }
+
+  /* POINT USE */
+  .point-use-block {
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-card);
+    background: var(--bg);
+    overflow: hidden;
+  }
+  .point-use-top {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px;
+  }
+  .point-use-left { display: flex; flex-direction: column; gap: 3px; }
+  .point-use-title-sm { font-size: 13px; font-weight: 700; color: var(--text-main); }
+  .point-use-balance { font-size: 11px; color: var(--text-sub); }
+  .point-use-balance strong { color: var(--green-dark); }
+  .point-all-btn {
+    font-size: 11px; font-weight: 700;
+    color: var(--green-dark);
+    border: 1px solid var(--green-dark);
+    border-radius: 20px; padding: 5px 12px;
+    background: var(--bg-card); cursor: pointer;
+    white-space: nowrap;
+  }
+  .point-input-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 0 14px 14px;
+  }
+  .point-input-wrap { flex: 1; position: relative; }
+  .point-input {
+    width: 100%;
+    border: 1.5px solid var(--border); border-radius: 8px;
+    padding: 10px 36px 10px 12px;
+    font-size: 16px; font-weight: 700; color: var(--text-main);
+    background: #fff; outline: none; -webkit-appearance: none;
+    font-family: inherit; transition: border-color 0.15s;
+  }
+  .point-input:focus { border-color: var(--green-dark); }
+  .point-input-unit {
+    position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+    font-size: 12px; font-weight: 600; color: var(--text-sub);
+  }
+  .point-input-note { font-size: 11px; color: var(--text-sub); white-space: nowrap; }
+  .point-discount-preview {
+    background: var(--green-light);
+    padding: 8px 14px;
+    font-size: 12px; color: var(--green-dark); font-weight: 600;
+    display: none;
+  }
+  .point-discount-preview.visible { display: block; }
+
+  /* ORDER SUMMARY */
+  .order-items { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+  .order-item-row {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .order-item-thumb {
+    width: 48px; height: 48px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; flex-shrink: 0;
+  }
+  .order-item-thumb.g1 { background: linear-gradient(135deg,#f0e8d0,#d8c8a0); }
+  .order-item-thumb.g2 { background: linear-gradient(135deg,#e0e8d0,#b8c890); }
+  .order-item-thumb.g3 { background: linear-gradient(135deg,#f4ead8,#d4c0a0); }
+  .order-item-info { flex: 1; }
+  .order-item-name { font-size: 12px; font-weight: 600; line-height: 1.4; }
+  .order-item-meta { font-size: 11px; color: var(--text-sub); margin-top: 2px; }
+  .order-item-price { font-size: 13px; font-weight: 700; white-space: nowrap; }
+
+  .summary-rows { display: flex; flex-direction: column; gap: 8px; }
+  .summary-row {
+    display: flex; justify-content: space-between;
+    font-size: 13px; color: var(--text-sub);
+  }
+  .summary-row.discount { color: #CC4444; }
+  .summary-row.total {
+    font-size: 18px; font-weight: 700; color: var(--text-main);
+    padding-top: 12px; margin-top: 4px;
+    border-top: 1.5px solid var(--border);
+  }
+  .summary-row.point-earn {
+    font-size: 11px; color: var(--green-dark);
+    background: var(--green-light); border-radius: 8px;
+    padding: 8px 12px; margin-top: 6px;
+  }
+
+  /* BOTTOM CTA */
+  .bottom-cta {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 430px;
+    background: var(--bg-card); border-top: 1px solid var(--border);
+    padding: 12px 16px 24px; z-index: 150;
+  }
+  .cta-total-row {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 10px;
+  }
+  .cta-total-label { font-size: 13px; color: var(--text-sub); }
+  .cta-total-amount { font-size: 20px; font-weight: 700; color: var(--text-main); }
+  .cta-total-sub { font-size: 11px; color: var(--green-dark); font-weight: 600; }
+  .order-btn {
+    width: 100%; height: 52px; border-radius: 26px;
+    background: var(--green-dark); color: #fff;
+    font-size: 16px; font-weight: 700; letter-spacing: 0.04em;
+    cursor: pointer; border: none; transition: opacity 0.15s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .order-btn:active { opacity: 0.85; }
+  .order-btn svg {
+    width: 18px; height: 18px; stroke: #fff; fill: none;
+    stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .order-note {
+    text-align: center; font-size: 10px; color: var(--text-sub);
+    margin-top: 8px; line-height: 1.5;
+  }
+
+  /* COMPLETE SCREEN */
+  .complete-screen {
+    display: none; padding: 48px 24px 40px;
+    flex-direction: column; align-items: center;
+    text-align: center; min-height: 80vh; justify-content: center;
+  }
+  .complete-screen.visible { display: flex; }
+  .complete-icon {
+    width: 80px; height: 80px; border-radius: 50%;
+    background: var(--green-light);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 24px;
+  }
+  .complete-icon svg {
+    width: 36px; height: 36px; stroke: var(--green-dark); fill: none;
+    stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .complete-title { font-size: 22px; font-weight: 700; margin-bottom: 10px; }
+  .complete-sub {
+    font-size: 13px; color: var(--text-sub);
+    line-height: 1.9; margin-bottom: 28px;
+  }
+  .complete-order-card {
+    width: 100%; background: var(--bg);
+    border: 1px solid var(--border); border-radius: var(--radius-card);
+    padding: 16px; margin-bottom: 28px; text-align: left;
+  }
+  .complete-order-row {
+    display: flex; justify-content: space-between;
+    font-size: 13px; padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .complete-order-row:last-child { border-bottom: none; }
+  .complete-order-row .label { color: var(--text-sub); }
+  .complete-order-row .value { font-weight: 600; }
+  .complete-point-card {
+    width: 100%; background: var(--green-dark);
+    border-radius: var(--radius-card); padding: 16px 18px;
+    color: #fff; margin-bottom: 28px; text-align: left;
+  }
+  .complete-point-label { font-size: 11px; color: rgba(255,255,255,0.7); margin-bottom: 4px; }
+  .complete-point-value { font-size: 24px; font-weight: 700; margin-bottom: 2px; }
+  .complete-point-note { font-size: 11px; color: rgba(255,255,255,0.6); }
+  .complete-btn {
+    width: 100%; height: 50px; border-radius: 25px;
+    background: var(--green-dark); color: #fff;
+    font-size: 15px; font-weight: 700; cursor: pointer; border: none;
+    margin-bottom: 12px;
+  }
+  .complete-btn-sub {
+    font-size: 13px; color: var(--green-mid); cursor: pointer;
+    text-decoration: underline;
+  }
+
+  /* GUEST REGISTER PROMPT */
+  .guest-prompt {
+    width: 100%; background: #FFF9EC;
+    border: 1px solid #E8D898; border-radius: var(--radius-card);
+    padding: 16px 18px; margin-bottom: 24px; text-align: left;
+  }
+  .guest-prompt-title {
+    font-size: 13px; font-weight: 700; margin-bottom: 6px;
+  }
+  .guest-prompt-text {
+    font-size: 12px; color: var(--text-sub); line-height: 1.7; margin-bottom: 12px;
+  }
+  .guest-prompt-btn {
+    display: block; width: 100%; height: 44px; border-radius: 22px;
+    background: var(--green-dark); color: #fff;
+    font-size: 13px; font-weight: 700; cursor: pointer; border: none;
+  }
+  /* ============ DESKTOP (≥900px) ============ */
+  @media (min-width: 900px) {
+    body { max-width: 720px; padding-bottom: 40px; }
+    .header { padding: 16px 32px; }
+
+    .bottom-cta {
+      left: auto; right: 32px; transform: none;
+      width: 300px; max-width: 300px;
+      border-top: none; border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.14);
+      bottom: 24px; padding: 18px 20px 20px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <button class="header-back" onclick="history.back()">
+    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
+  <a class="header-logo" href="komcho-market-top.html">
+    <svg class="logo-icon" viewBox="0 0 60 48">
+      <path transform="translate(30,24)" d="M -26 7 C -17 -17 5 -24 24 -10 C 12 5 -2 19 -21 24"/>
+    </svg>
+    <span class="logo-text">こむちょマーケット</span>
+  </a>
+  <div class="header-step" id="headerShopName">店舗名</div>
+</header>
+
+<!-- STEP BAR -->
+<div class="step-bar">
+  <div class="step-item">
+    <div class="step-circle active">1</div>
+    <div class="step-label active">注文内容</div>
+  </div>
+  <div class="step-line"></div>
+  <div class="step-item">
+    <div class="step-circle">2</div>
+    <div class="step-label">確認</div>
+  </div>
+  <div class="step-line"></div>
+  <div class="step-item">
+    <div class="step-circle">3</div>
+    <div class="step-label">完了</div>
+  </div>
+</div>
+
+<!-- ===== 注文フォーム ===== -->
+<div id="checkoutForm">
+
+  <div class="gap"></div>
+
+  <!-- ① ご注文者情報 -->
+  <div class="section-block">
+    <div class="block-title">
+      <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      ご注文者情報
+    </div>
+    <div class="form-field">
+      <label class="form-label form-label-req">お名前</label>
+      <input class="form-input" type="text" placeholder="山田 花子" id="buyerName">
+    </div>
+    <div class="form-field">
+      <label class="form-label form-label-req">電話番号</label>
+      <input class="form-input" type="tel" placeholder="090-0000-0000" inputmode="tel" id="buyerPhone">
+    </div>
+    <div class="form-field" id="buyerEmailField" style="display:none;">
+      <label class="form-label form-label-req">メールアドレス</label>
+      <input class="form-input" type="email" placeholder="example@email.com" inputmode="email" id="buyerEmail">
+      <div class="field-hint" style="font-size:11px;color:var(--text-sub);margin-top:4px;">注文内容の確認に使用します</div>
+    </div>
+    <div id="buyerAddressFields">
+      <div class="form-field">
+        <label class="form-label form-label-req">郵便番号</label>
+        <input class="form-input" type="text" placeholder="000-0000" inputmode="numeric" maxlength="8" id="buyerPostal">
+      </div>
+      <div class="form-field">
+        <label class="form-label form-label-req">都道府県</label>
+        <input class="form-input" type="text" placeholder="京都府" id="buyerPrefecture">
+      </div>
+      <div class="form-field">
+        <label class="form-label form-label-req">市区町村・番地</label>
+        <input class="form-input" type="text" placeholder="京都市中京区○○町1-2-3" id="buyerLine">
+      </div>
+      <div class="form-field">
+        <label class="form-label">建物名・部屋番号（任意）</label>
+        <input class="form-input" type="text" placeholder="○○マンション 101号室" id="buyerBuilding">
+      </div>
+    </div>
+  </div>
+
+  <div class="gap"></div>
+
+  <!-- ② 発送先住所 -->
+  <div class="section-block">
+    <div class="block-title">
+      <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      発送先住所
+    </div>
+
+    <!-- 登録済み住所（会員のみ表示） -->
+    <div class="address-options" id="addressOptions">
+      <div style="padding:8px 0; font-size:12px; color:var(--text-sub);">読み込み中...</div>
+    </div>
+
+    <!-- 新しい住所を追加 -->
+    <div class="add-address-toggle" onclick="toggleNewAddress()">
+      <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      別の住所に届ける
+    </div>
+
+    <div class="new-address-form" id="newAddressForm">
+      <div class="form-row">
+        <div class="form-field">
+          <label class="form-label form-label-req">姓</label>
+          <input class="form-input" type="text" placeholder="山田" id="newAddrLastName">
+        </div>
+        <div class="form-field">
+          <label class="form-label form-label-req">名</label>
+          <input class="form-input" type="text" placeholder="花子" id="newAddrFirstName">
+        </div>
+      </div>
+      <div class="form-field">
+        <label class="form-label form-label-req">郵便番号</label>
+        <input class="form-input" type="text" placeholder="000-0000" inputmode="numeric" maxlength="8" id="newAddrPostal">
+      </div>
+      <div class="form-field">
+        <label class="form-label form-label-req">都道府県</label>
+        <input class="form-input" type="text" placeholder="京都府" id="newAddrPrefecture">
+      </div>
+      <div class="form-field">
+        <label class="form-label form-label-req">市区町村・番地</label>
+        <input class="form-input" type="text" placeholder="京都市中京区○○町1-2-3" id="newAddrLine">
+      </div>
+      <div class="form-field">
+        <label class="form-label">建物名・部屋番号（任意）</label>
+        <input class="form-input" type="text" placeholder="○○マンション 101号室" id="newAddrBuilding">
+      </div>
+      <div class="form-field">
+        <label class="form-label form-label-req">電話番号</label>
+        <input class="form-input" type="tel" placeholder="090-0000-0000" inputmode="tel" id="newAddrPhone">
+      </div>
+      <!-- 住所保存チェック（会員のみ表示） -->
+      <label class="save-check-wrap" id="saveAddressWrap">
+        <input type="checkbox" id="saveAddress" checked>
+        <span class="save-check-label">🏠 この住所を保存して次回から使う</span>
+      </label>
+    </div>
+  </div>
+
+  <div class="gap"></div>
+
+  <!-- ② お支払い方法 -->
+  <div class="section-block">
+    <div class="block-title">
+      <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+      お支払い方法
+    </div>
+
+    <!-- Stripe Payment Element（カード情報入力） -->
+    <div id="paymentElement"></div>
+    <div id="paymentMessage" style="display:none; color:#CC4444; font-size:12px; margin-top:10px; line-height:1.6;"></div>
+
+    <div class="stripe-note" style="margin-top:14px;">
+      <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      カード情報はStripeが暗号化して管理します。このマーケットやお店がカード番号を直接見ることはありません。
+    </div>
+  </div>
+
+  <div class="gap"></div>
+
+  <!-- ③ ポイント利用（会員のみ表示） -->
+  <div class="section-block" id="pointSection">
+    <div class="block-title">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      ポイント利用
+    </div>
+    <div class="point-use-block">
+      <div class="point-use-top">
+        <div class="point-use-left">
+          <div class="point-use-title-sm">🌿 使用するポイントを入力</div>
+          <div class="point-use-balance">残高：<strong id="pointBalanceDisplay">0pt</strong>（1pt＝1円）</div>
+        </div>
+        <button class="point-all-btn" onclick="useAllPoint()">全部使う</button>
+      </div>
+      <div class="point-input-row">
+        <div class="point-input-wrap">
+          <input class="point-input" type="number" id="pointInput"
+            placeholder="0" min="0" max="0" inputmode="numeric"
+            oninput="onPointInput()">
+          <span class="point-input-unit">pt</span>
+        </div>
+        <div class="point-input-note" id="pointInputNote">上限：0pt</div>
+      </div>
+      <div class="point-discount-preview" id="pointDiscountPreview">
+        ✓ 1,240円分のポイントを使用します
+      </div>
+    </div>
+  </div>
+
+  <div class="gap"></div>
+
+  <!-- ④ 注文内容確認 -->
+  <div class="section-block">
+    <div class="block-title">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      注文内容
+    </div>
+
+    <div class="order-items" id="orderItemsList">
+      <div style="padding:8px 0; font-size:12px; color:var(--text-sub);">読み込み中...</div>
+    </div>
+
+    <div class="summary-rows">
+      <div class="summary-row">
+        <span>商品合計</span>
+        <span id="subtotalDisplay">¥0</span>
+      </div>
+      <div class="summary-row">
+        <span id="shippingLabelDisplay">送料</span>
+        <span id="shippingDisplay">¥0</span>
+      </div>
+      <div class="summary-row discount" id="pointDiscountRow" style="display:none;">
+        <span>ポイント利用</span>
+        <span id="pointDiscountAmount">−¥0</span>
+      </div>
+      <div class="summary-row total">
+        <span>お支払い合計</span>
+        <span id="grandTotal">¥0</span>
+      </div>
+      <div class="summary-row point-earn" id="pointEarnRow">
+        🌿 この注文で <strong id="earnPt">0pt</strong> 獲得予定
+      </div>
+    </div>
+  </div>
+
+  <div class="gap"></div>
+
+</div>
+
+<!-- ===== 注文完了画面 ===== -->
+<div class="complete-screen" id="completeScreen">
+  <div class="complete-icon">
+    <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+  </div>
+  <div class="complete-title">ご注文ありがとうございます！</div>
+  <div class="complete-sub" id="completeSub">
+    店舗に注文が送られました。<br>
+    発送準備ができ次第、メールでお知らせします。
+  </div>
+
+  <div class="complete-order-card">
+    <div class="complete-order-row">
+      <span class="label">注文番号</span>
+      <span class="value" id="completeOrderNo">#----</span>
+    </div>
+    <div class="complete-order-row">
+      <span class="label">お支払い金額</span>
+      <span class="value" id="completeTotal">¥6,000</span>
+    </div>
+    <div class="complete-order-row">
+      <span class="label">お届け先</span>
+      <span class="value" id="completeAddress">-</span>
+    </div>
+    <div class="complete-order-row">
+      <span class="label">配送方法</span>
+      <span class="value" id="completeShippingLabel">-</span>
+    </div>
+  </div>
+
+  <div class="complete-point-card" id="completePointCard">
+    <div class="complete-point-label">🌿 獲得ポイント</div>
+    <div class="complete-point-value" id="completeEarnPt">+30pt</div>
+    <div class="complete-point-note">次回のお買い物に使えます（1pt＝1円）</div>
+  </div>
+
+  <button class="complete-btn" onclick="goHome()">ショッピングを続ける</button>
+  <span class="complete-btn-sub" onclick="goOrders()">注文履歴を確認する</span>
+</div>
+
+<!-- BOTTOM CTA（フォーム表示中のみ） -->
+<div class="bottom-cta" id="bottomCta">
+  <div class="cta-total-row">
+    <div>
+      <div class="cta-total-label">お支払い合計</div>
+      <div class="cta-total-sub" id="ctaPointNote">🌿 30pt 獲得予定</div>
+    </div>
+    <div class="cta-total-amount" id="ctaTotal">¥6,000</div>
+  </div>
+  <button class="order-btn" onclick="placeOrder()">
+    <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+    注文を確定する
+  </button>
+  <div class="order-note">「注文を確定する」を押すと購入が確定します</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+  const SUPABASE_URL = 'https://uawhrpizzlchkvmzrjzo.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_FaOqUE1PDbo-fpT9KhkWaw__BShLngI';
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  // ===== ゲスト用カート（未ログインのお客様はブラウザのlocalStorageにカートを保存） =====
+  const GUEST_CART_KEY = 'komchoGuestCart';
+  function getGuestCart() {
+    try { return JSON.parse(localStorage.getItem(GUEST_CART_KEY)) || []; } catch (e) { return []; }
+  }
+  function setGuestCart(cart) {
+    try { localStorage.setItem(GUEST_CART_KEY, JSON.stringify(cart)); } catch (e) {}
+  }
+  function removeFromGuestCart(productIds) {
+    const cart = getGuestCart().filter(c => !productIds.includes(c.product_id));
+    setGuestCart(cart);
+  }
+
+  let savedAddresses = [];
+
+  // 登録済み住所の読み込み
+  async function loadSavedAddresses() {
+    const wrap = document.getElementById('addressOptions');
+
+    const { data: addresses } = await supabaseClient
+      .from('addresses')
+      .select('*')
+      .eq('user_id', currentUserId)
+      .order('is_default', { ascending: false })
+      .order('created_at', { ascending: true });
+
+    savedAddresses = addresses || [];
+
+    if (savedAddresses.length === 0) {
+      wrap.innerHTML = '';
+      document.getElementById('newAddressForm').classList.add('open');
+      return;
+    }
+
+    wrap.innerHTML = savedAddresses.map((addr, i) => `
+      <div class="address-option ${i === 0 ? 'selected' : ''}" onclick="selectAddress(this)" data-address-id="${addr.id}">
+        <div class="radio-circle"></div>
+        <div class="address-option-body">
+          <div class="address-option-name">${addr.name} ${addr.is_default ? '<span class="address-default-badge">デフォルト</span>' : ''}</div>
+          <div class="address-option-text">〒${addr.postal_code || ''}<br>${addr.prefecture || ''}${addr.address_line || ''}${addr.building ? '<br>' + addr.building : ''}<br>${addr.phone || ''}</div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // 新しい住所をデータベースに保存（チェック済みの場合）
+  async function saveNewAddressIfNeeded() {
+    const form = document.getElementById('newAddressForm');
+    if (!form.classList.contains('open')) return;
+    if (!document.getElementById('saveAddress').checked) return;
+
+    const lastName = document.getElementById('newAddrLastName').value.trim();
+    const firstName = document.getElementById('newAddrFirstName').value.trim();
+    const addressLine = document.getElementById('newAddrLine').value.trim();
+    if (!lastName || !addressLine) return;
+
+    await supabaseClient.from('addresses').insert({
+      user_id: currentUserId,
+      name: (lastName + ' ' + firstName).trim(),
+      postal_code: document.getElementById('newAddrPostal').value.trim(),
+      prefecture: document.getElementById('newAddrPrefecture').value.trim(),
+      address_line: addressLine,
+      building: document.getElementById('newAddrBuilding').value.trim(),
+      phone: document.getElementById('newAddrPhone').value.trim(),
+      is_default: savedAddresses.length === 0
+    });
+  }
+</script>
+
+<script>
+  let currentUserId = null;
+  let shopId = null;
+  let shopInfo = null;
+  let cartRows = [];
+  let subtotal = 0;
+  let shippingFee = 0;
+  let shippingLabel = '通常便';
+  let pointBalance = 0;
+  let baseTotal = 0;
+
+  const checkoutThumbClasses = ['g1', 'g2', 'g3'];
+
+  // ===== Stripe =====
+  const STRIPE_PUBLISHABLE_KEY = 'pk_test_51UQKUdBrC1xck3ha4NM6gx6Y40m7IoApjmZkai1DpKgk4QM3hxlydCqkx7YmUa9qrWMQidYB5yMQ61Ejb3QcQSIX00UUjO4nbz';
+  const stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
+  let stripeElements = null;
+
+  async function setupStripeElements(amount) {
+    stripeElements = stripe.elements({
+      mode: 'payment',
+      amount: Math.max(Math.round(amount), 50),
+      currency: 'jpy',
+      captureMethod: 'manual' // サーバー側PaymentIntent（オーソリのみ）と設定を一致させる
+    });
+    const paymentElement = stripeElements.create('payment');
+    paymentElement.mount('#paymentElement');
+  }
+
+  function showPaymentError(message) {
+    const box = document.getElementById('paymentMessage');
+    box.textContent = message;
+    box.style.display = 'block';
+  }
+  function hidePaymentError() {
+    const box = document.getElementById('paymentMessage');
+    box.style.display = 'none';
+    box.textContent = '';
+  }
+
+  (async function initCheckout() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    currentUserId = session ? session.user.id : null;
+
+    shopId = new URLSearchParams(window.location.search).get('shop');
+    if (!shopId) {
+      window.location.href = 'komcho-market-cart.html';
+      return;
+    }
+
+    if (currentUserId) {
+      // 会員情報（お名前）を自動入力
+      const { data: profile } = await supabaseClient.from('profiles').select('name').eq('id', currentUserId).single();
+      if (profile?.name) document.getElementById('buyerName').value = profile.name;
+
+      // カゴの中身（この店舗分のみ）を取得
+      const { data: cart, error } = await supabaseClient
+        .from('cart_items')
+        .select('id, quantity, products(id, name, price, image_url, shipping_free, shipping_method, shops(id, shop_name, shipping_normal, shipping_cold, free_shipping_threshold))')
+        .eq('user_id', currentUserId);
+
+      if (error || !cart) {
+        alert('カゴの読み込みに失敗しました');
+        window.location.href = 'komcho-market-cart.html';
+        return;
+      }
+      cartRows = cart.filter(r => r.products && r.products.shops && r.products.shops.id === shopId);
+    } else {
+      // ゲスト：localStorageのカートから、この店舗分の商品を取得
+      document.getElementById('buyerEmailField').style.display = 'block';
+      document.getElementById('pointSection').style.display = 'none';
+      document.getElementById('saveAddressWrap').style.display = 'none';
+
+      const guestCart = getGuestCart();
+      if (guestCart.length === 0) {
+        window.location.href = 'komcho-market-cart.html';
+        return;
+      }
+      const { data: products, error } = await supabaseClient
+        .from('products')
+        .select('id, name, price, image_url, shipping_free, shipping_method, shops(id, shop_name, shipping_normal, shipping_cold, free_shipping_threshold)')
+        .in('id', guestCart.map(c => c.product_id));
+
+      if (error || !products) {
+        alert('カゴの読み込みに失敗しました');
+        window.location.href = 'komcho-market-cart.html';
+        return;
+      }
+      cartRows = guestCart
+        .map(c => {
+          const product = products.find(p => p.id === c.product_id);
+          if (!product || !product.shops || product.shops.id !== shopId) return null;
+          return { id: c.product_id, quantity: c.quantity, products: product };
+        })
+        .filter(Boolean);
+    }
+
+    if (cartRows.length === 0) {
+      window.location.href = 'komcho-market-cart.html';
+      return;
+    }
+
+    shopInfo = cartRows[0].products.shops;
+    document.getElementById('headerShopName').textContent = shopInfo.shop_name || '';
+    document.getElementById('completeSub').innerHTML = `${shopInfo.shop_name || 'こちら'}に注文が送られました。<br>発送準備ができ次第、メールでお知らせします。`;
+
+    // 送料計算（カゴページと同じロジック）
+    subtotal = cartRows.reduce((s, r) => s + (r.products.price || 0) * r.quantity, 0);
+    const hasCold = cartRows.some(r => r.products.shipping_method === 'cold' || r.products.shipping_method === 'frozen');
+    const allFree = cartRows.every(r => r.products.shipping_free);
+    const threshold = shopInfo.free_shipping_threshold;
+    const overThreshold = threshold != null && subtotal >= threshold;
+    const isFree = allFree || overThreshold;
+    const baseShipping = hasCold ? (shopInfo.shipping_cold ?? 1000) : (shopInfo.shipping_normal ?? 800);
+    shippingFee = isFree ? 0 : baseShipping;
+    shippingLabel = hasCold ? 'クール便（冷蔵・冷凍）' : '通常便';
+    baseTotal = subtotal + shippingFee;
+
+    // 商品明細を描画
+    document.getElementById('orderItemsList').innerHTML = cartRows.map((r, i) => {
+      const p = r.products;
+      const thumbClass = checkoutThumbClasses[i % checkoutThumbClasses.length];
+      const thumbInner = p.image_url
+        ? `<img src="${p.image_url}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">`
+        : '🛍️';
+      return `
+        <div class="order-item-row">
+          <div class="order-item-thumb ${thumbClass}" style="overflow:hidden;">${thumbInner}</div>
+          <div class="order-item-info">
+            <div class="order-item-name">${p.name}</div>
+            <div class="order-item-meta">数量：${r.quantity}</div>
+          </div>
+          <div class="order-item-price">¥${(p.price * r.quantity).toLocaleString()}</div>
+        </div>
+      `;
+    }).join('');
+
+    document.getElementById('subtotalDisplay').textContent = '¥' + subtotal.toLocaleString();
+    document.getElementById('shippingLabelDisplay').textContent = `送料（${shippingLabel}）`;
+    document.getElementById('shippingDisplay').textContent = isFree ? '無料' : '¥' + shippingFee.toLocaleString();
+
+    if (currentUserId) {
+      // ポイント残高
+      const { data: profilePoints } = await supabaseClient.from('profiles').select('points').eq('id', currentUserId).single();
+      pointBalance = profilePoints?.points || 0;
+      const maxPoint = Math.min(pointBalance, baseTotal);
+      document.getElementById('pointBalanceDisplay').textContent = pointBalance.toLocaleString() + 'pt';
+      document.getElementById('pointInput').max = maxPoint;
+      document.getElementById('pointInputNote').textContent = '上限：' + maxPoint.toLocaleString() + 'pt';
+
+      await loadSavedAddresses();
+
+      // ご注文者情報は、選んだ発送先とは関係なく、常にご自身の登録住所（デフォルト）を自動入力する
+      if (savedAddresses.length > 0) {
+        const myDefault = savedAddresses[0];
+        document.getElementById('buyerPhone').value = myDefault.phone || '';
+        document.getElementById('buyerPostal').value = myDefault.postal_code || '';
+        document.getElementById('buyerPrefecture').value = myDefault.prefecture || '';
+        document.getElementById('buyerLine').value = myDefault.address_line || '';
+        document.getElementById('buyerBuilding').value = myDefault.building || '';
+      }
+    } else {
+      // ゲスト：保存済み住所はないので、新しい住所の入力フォームを常に開いておく
+      pointBalance = 0;
+      document.getElementById('addressOptions').innerHTML = '';
+      document.getElementById('newAddressForm').classList.add('open');
+    }
+
+    updateTotal(0);
+    await setupStripeElements(baseTotal);
+  })();
+
+  // 住所選択
+  function selectAddress(el) {
+    document.querySelectorAll('.address-option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    document.getElementById('newAddressForm').classList.remove('open');
+  }
+
+  // 新住所フォーム開閉
+  function toggleNewAddress() {
+    const form = document.getElementById('newAddressForm');
+    form.classList.toggle('open');
+    if (form.classList.contains('open')) {
+      document.querySelectorAll('.address-option').forEach(o => o.classList.remove('selected'));
+    }
+  }
+
+  // 全部使うボタン
+  function useAllPoint() {
+    const max = Math.min(pointBalance, baseTotal);
+    document.getElementById('pointInput').value = max;
+    onPointInput();
+  }
+
+  // ポイント入力
+  function onPointInput() {
+    const input = document.getElementById('pointInput');
+    let val = parseInt(input.value) || 0;
+    const max = Math.min(pointBalance, baseTotal);
+    if (val < 0) val = 0;
+    if (val > max) { val = max; input.value = max; }
+
+    const preview = document.getElementById('pointDiscountPreview');
+    if (val > 0) {
+      preview.classList.add('visible');
+      preview.textContent = `✓ ${val.toLocaleString()}円分のポイントを使用します`;
+    } else {
+      preview.classList.remove('visible');
+    }
+    updateTotal(val);
+  }
+
+  function updateTotal(discount) {
+    discount = discount || 0;
+    const total = Math.max(0, baseTotal - discount);
+    const earnPt = Math.floor(total / 200);
+
+    document.getElementById('pointDiscountRow').style.display = discount > 0 ? 'flex' : 'none';
+    document.getElementById('pointDiscountAmount').textContent = '−¥' + discount.toLocaleString();
+    document.getElementById('grandTotal').textContent = '¥' + total.toLocaleString();
+    document.getElementById('ctaTotal').textContent = '¥' + total.toLocaleString();
+    document.getElementById('earnPt').textContent = earnPt + 'pt';
+    document.getElementById('ctaPointNote').textContent = '🌿 ' + earnPt + 'pt 獲得予定';
+
+    // Stripe Elementsに表示中の金額も合わせて更新（ポイント利用で変わるため）
+    if (stripeElements) {
+      stripeElements.update({ amount: Math.max(total, 50) });
+    }
+  }
+
+  // 注文確定
+  async function placeOrder() {
+    const orderBtn = document.querySelector('.order-btn');
+    orderBtn.disabled = true;
+    orderBtn.style.opacity = '0.6';
+    hidePaymentError();
+
+    if (currentUserId) await saveNewAddressIfNeeded();
+
+    // 配送先情報を取得（既存住所選択 or 新規フォーム）
+    const selectedOption = document.querySelector('.address-option.selected');
+    let addressInfo;
+    if (selectedOption) {
+      const addr = savedAddresses.find(a => a.id === selectedOption.dataset.addressId);
+      addressInfo = addr ? {
+        name: addr.name, postal: addr.postal_code, prefecture: addr.prefecture,
+        line: addr.address_line, building: addr.building, phone: addr.phone
+      } : null;
+    } else {
+      const lastName = document.getElementById('newAddrLastName').value.trim();
+      const firstName = document.getElementById('newAddrFirstName').value.trim();
+      addressInfo = {
+        name: (lastName + ' ' + firstName).trim(),
+        postal: document.getElementById('newAddrPostal').value.trim(),
+        prefecture: document.getElementById('newAddrPrefecture').value.trim(),
+        line: document.getElementById('newAddrLine').value.trim(),
+        building: document.getElementById('newAddrBuilding').value.trim(),
+        phone: document.getElementById('newAddrPhone').value.trim()
+      };
+    }
+
+    if (!addressInfo || !addressInfo.name || !addressInfo.line) {
+      alert('発送先住所を入力してください');
+      orderBtn.disabled = false;
+      orderBtn.style.opacity = '1';
+      return;
+    }
+
+    // ご注文者情報（発送先とは独立して、常に別で入力）
+    const buyerInfo = {
+      name: document.getElementById('buyerName').value.trim(),
+      phone: document.getElementById('buyerPhone').value.trim(),
+      postal: document.getElementById('buyerPostal').value.trim(),
+      prefecture: document.getElementById('buyerPrefecture').value.trim(),
+      line: document.getElementById('buyerLine').value.trim(),
+      building: document.getElementById('buyerBuilding').value.trim()
+    };
+    if (!buyerInfo.name) {
+      alert('ご注文者情報（お名前）を入力してください');
+      orderBtn.disabled = false;
+      orderBtn.style.opacity = '1';
+      return;
+    }
+    if (!buyerInfo.line) {
+      alert('ご注文者情報（住所）を入力してください');
+      orderBtn.disabled = false;
+      orderBtn.style.opacity = '1';
+      return;
+    }
+
+    // ゲストの場合はメールアドレスが必須（会員登録の代わりに、注文内容の確認・連絡用）
+    let guestEmail = '';
+    if (!currentUserId) {
+      guestEmail = document.getElementById('buyerEmail').value.trim();
+      if (!guestEmail || !guestEmail.includes('@')) {
+        alert('メールアドレスを正しく入力してください');
+        orderBtn.disabled = false;
+        orderBtn.style.opacity = '1';
+        return;
+      }
+    }
+
+    const pointsUsed = currentUserId ? (parseInt(document.getElementById('pointInput').value) || 0) : 0;
+    const total = Math.max(0, baseTotal - pointsUsed);
+    const earnPt = currentUserId ? Math.floor(total / 200) : 0;
+
+    // ===== Stripe決済（オーソリ取得のみ。売上確定は発送処理時） =====
+
+    // 入力内容の検証
+    const { error: submitError } = await stripeElements.submit();
+    if (submitError) {
+      showPaymentError(submitError.message || 'カード情報を確認してください');
+      orderBtn.disabled = false;
+      orderBtn.style.opacity = '1';
+      return;
+    }
+
+    // サーバー側で最終金額のPaymentIntentを作成（manual capture）
+    let clientSecret, paymentIntentId;
+    try {
+      const piRes = await fetch('/api/create-payment-intent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: total, shopId, userId: currentUserId })
+      });
+      const piData = await piRes.json();
+      if (!piRes.ok) throw new Error(piData.error || '決済準備に失敗しました');
+      clientSecret = piData.clientSecret;
+      paymentIntentId = piData.paymentIntentId;
+    } catch (err) {
+      console.error('PaymentIntent作成エラー:', err);
+      showPaymentError(err.message || '決済準備に失敗しました。もう一度お試しください。');
+      orderBtn.disabled = false;
+      orderBtn.style.opacity = '1';
+      return;
+    }
+
+    // カードのオーソリを取得（この時点ではまだ課金されない）
+    const { error: confirmError, paymentIntent } = await stripe.confirmPayment({
+      elements: stripeElements,
+      clientSecret,
+      confirmParams: { return_url: window.location.href },
+      redirect: 'if_required'
+    });
+
+    if (confirmError) {
+      console.error('決済確認エラー:', confirmError);
+      showPaymentError(confirmError.message || 'カード決済に失敗しました');
+      orderBtn.disabled = false;
+      orderBtn.style.opacity = '1';
+      return;
+    }
+    if (!paymentIntent || (paymentIntent.status !== 'requires_capture' && paymentIntent.status !== 'succeeded')) {
+      showPaymentError('決済の確認に失敗しました。もう一度お試しください。');
+      orderBtn.disabled = false;
+      orderBtn.style.opacity = '1';
+      return;
+    }
+
+    // 注文を作成
+    let order, orderError;
+    if (currentUserId) {
+      ({ data: order, error: orderError } = await supabaseClient
+        .from('orders')
+        .insert({
+          user_id: currentUserId,
+          shop_id: shopId,
+          status: 'new',
+          subtotal: subtotal,
+          shipping_fee: shippingFee,
+          point_discount: pointsUsed,
+          total: total,
+          points_earned: earnPt,
+          address_name: addressInfo.name,
+          address_postal: addressInfo.postal,
+          address_prefecture: addressInfo.prefecture,
+          address_line: addressInfo.line,
+          address_building: addressInfo.building,
+          address_phone: addressInfo.phone,
+          delivery_name: buyerInfo.name,
+          delivery_phone: buyerInfo.phone,
+          delivery_postal: buyerInfo.postal,
+          delivery_prefecture: buyerInfo.prefecture,
+          delivery_line: buyerInfo.line,
+          delivery_building: buyerInfo.building,
+          payment_method: 'card',
+          payment_intent_id: paymentIntentId,
+          payment_status: 'authorized'
+        })
+        .select()
+        .single());
+    } else {
+      // ゲスト注文：DB側のRPC関数（create_guest_order）経由で注文＋注文明細をまとめて作成する。
+      // 未ログインの一般利用者に、注文テーブルへの直接の書き込み権限を広げずに済むようにするため。
+      const guestItems = cartRows.map(r => ({
+        product_id: r.products.id,
+        product_name: r.products.name,
+        product_image: r.products.image_url,
+        price: r.products.price,
+        quantity: r.quantity
+      }));
+      const { data: guestOrderId, error: rpcError } = await supabaseClient.rpc('create_guest_order', {
+        p_shop_id: shopId,
+        p_subtotal: subtotal,
+        p_shipping_fee: shippingFee,
+        p_total: total,
+        p_address_name: addressInfo.name,
+        p_address_postal: addressInfo.postal,
+        p_address_prefecture: addressInfo.prefecture,
+        p_address_line: addressInfo.line,
+        p_address_building: addressInfo.building,
+        p_address_phone: addressInfo.phone,
+        p_delivery_name: buyerInfo.name,
+        p_delivery_phone: buyerInfo.phone,
+        p_delivery_postal: buyerInfo.postal,
+        p_delivery_prefecture: buyerInfo.prefecture,
+        p_delivery_line: buyerInfo.line,
+        p_delivery_building: buyerInfo.building,
+        p_guest_email: guestEmail,
+        p_payment_intent_id: paymentIntentId,
+        p_payment_status: 'authorized',
+        p_items: guestItems
+      });
+      order = guestOrderId ? { id: guestOrderId } : null;
+      orderError = rpcError;
+    }
+
+    if (orderError || !order) {
+      console.error('注文作成エラー:', orderError);
+      // カードのオーソリは取れているが注文保存に失敗したので、お客様に課金が残らないよう取り消す
+      try {
+        await fetch('/api/cancel-payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ paymentIntentId })
+        });
+      } catch (cancelErr) {
+        console.error('オーソリ取消エラー:', cancelErr);
+      }
+      alert('注文の作成に失敗しました：' + (orderError?.message || ''));
+      orderBtn.disabled = false;
+      orderBtn.style.opacity = '1';
+      return;
+    }
+
+    if (currentUserId) {
+      // 注文明細を作成
+      const orderItemsPayload = cartRows.map(r => ({
+        order_id: order.id,
+        product_id: r.products.id,
+        product_name: r.products.name,
+        product_image: r.products.image_url,
+        price: r.products.price,
+        quantity: r.quantity
+      }));
+      const { error: itemsError } = await supabaseClient.from('order_items').insert(orderItemsPayload);
+      if (itemsError) {
+        console.error('注文明細作成エラー:', itemsError);
+      }
+
+      // カゴから該当商品を削除
+      const cartIds = cartRows.map(r => r.id);
+      await supabaseClient.from('cart_items').delete().in('id', cartIds);
+
+      // ポイントを更新（使用分を引き、獲得分を足す）
+      await supabaseClient.from('profiles')
+        .update({ points: pointBalance - pointsUsed + earnPt })
+        .eq('id', currentUserId);
+    } else {
+      // ゲストのローカルカートから、該当商品を削除（注文明細はRPC内で既に作成済み）
+      removeFromGuestCart(cartRows.map(r => r.id));
+      document.getElementById('completePointCard').style.display = 'none';
+      document.querySelector('.complete-btn-sub').style.display = 'none';
+    }
+
+    // 完了画面表示
+    document.getElementById('completeOrderNo').textContent = '#' + order.id.slice(0, 8).toUpperCase();
+    document.getElementById('completeTotal').textContent = '¥' + total.toLocaleString();
+    document.getElementById('completeAddress').textContent = `${addressInfo.prefecture || ''}${addressInfo.line || ''}`;
+    document.getElementById('completeShippingLabel').textContent = shippingLabel;
+    document.getElementById('completeEarnPt').textContent = '+' + earnPt + 'pt';
+
+    document.querySelectorAll('.step-circle').forEach((el, i) => {
+      el.className = 'step-circle ' + (i < 2 ? 'done' : 'active');
+    });
+    document.querySelectorAll('.step-label').forEach((el, i) => {
+      el.className = 'step-label ' + (i === 2 ? 'active' : '');
+    });
+    document.querySelectorAll('.step-line').forEach(el => el.classList.add('done'));
+
+    document.getElementById('checkoutForm').style.display = 'none';
+    document.getElementById('bottomCta').style.display = 'none';
+    document.getElementById('completeScreen').classList.add('visible');
+    window.scrollTo({ top: 0 });
+  }
+
+  function goHome() { window.location.href = 'komcho-market-top.html'; }
+  function goOrders() { window.location.href = 'komcho-market-orders.html'; }
+</script>
+</body>
+</html>

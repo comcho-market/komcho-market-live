@@ -562,6 +562,25 @@
   const SUPABASE_KEY = 'sb_publishable_FaOqUE1PDbo-fpT9KhkWaw__BShLngI';
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+  // ===== ゲスト用カート（未ログインのお客様はブラウザのlocalStorageにカートを保存） =====
+  const GUEST_CART_KEY = 'komchoGuestCart';
+  function getGuestCart() {
+    try { return JSON.parse(localStorage.getItem(GUEST_CART_KEY)) || []; } catch (e) { return []; }
+  }
+  function setGuestCart(cart) {
+    try { localStorage.setItem(GUEST_CART_KEY, JSON.stringify(cart)); } catch (e) {}
+  }
+  function addToGuestCart(productId, qty) {
+    const cart = getGuestCart();
+    const existing = cart.find(c => c.product_id === productId);
+    if (existing) existing.quantity += qty;
+    else cart.push({ product_id: productId, quantity: qty });
+    setGuestCart(cart);
+  }
+  function guestCartCount() {
+    return getGuestCart().reduce((s, c) => s + c.quantity, 0);
+  }
+
   let current = 0;
   let total = 1;
   const inner = document.getElementById('sliderInner');
@@ -590,8 +609,8 @@
         .eq('product_id', productId)
         .maybeSingle();
       if (fav) document.getElementById('wishBtn').classList.add('active');
-      updateCartBadges(currentUserId);
     }
+    updateCartBadges(currentUserId);
 
     const { data: p, error } = await supabaseClient
       .from('products')
@@ -704,8 +723,9 @@
   async function addToCart() {
     if (!currentProductId) return;
     if (!currentUserId) {
-      window.location.href = 'komcho-market-login.html';
-      return false;
+      addToGuestCart(currentProductId, 1);
+      updateCartBadges(null);
+      return true;
     }
     const { data: existing } = await supabaseClient
       .from('cart_items')
@@ -775,9 +795,13 @@
 
   // カゴ件数バッジ（ヘッダー・下部ナビ）の更新
   async function updateCartBadges(userId) {
-    if (!userId) return;
-    const { data } = await supabaseClient.from('cart_items').select('quantity').eq('user_id', userId);
-    const total = (data || []).reduce((sum, item) => sum + item.quantity, 0);
+    let total;
+    if (userId) {
+      const { data } = await supabaseClient.from('cart_items').select('quantity').eq('user_id', userId);
+      total = (data || []).reduce((sum, item) => sum + item.quantity, 0);
+    } else {
+      total = guestCartCount();
+    }
     document.querySelectorAll('.cart-badge').forEach(el => {
       el.textContent = total;
       el.style.display = total > 0 ? 'flex' : 'none';

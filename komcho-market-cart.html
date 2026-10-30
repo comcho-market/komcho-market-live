@@ -473,34 +473,66 @@
   const SUPABASE_KEY = 'sb_publishable_FaOqUE1PDbo-fpT9KhkWaw__BShLngI';
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+  // ===== ゲスト用カート（未ログインのお客様はブラウザのlocalStorageにカートを保存） =====
+  const GUEST_CART_KEY = 'komchoGuestCart';
+  function getGuestCart() {
+    try { return JSON.parse(localStorage.getItem(GUEST_CART_KEY)) || []; } catch (e) { return []; }
+  }
+  function setGuestCart(cart) {
+    try { localStorage.setItem(GUEST_CART_KEY, JSON.stringify(cart)); } catch (e) {}
+  }
+
   let currentUserId = null;
   const cartThumbClasses = ['g1', 'g2', 'g3', 'g4'];
 
   (async function initCart() {
     const { data: { session } } = await supabaseClient.auth.getSession();
-    if (!session) {
-      window.location.href = 'komcho-market-login.html';
-      return;
-    }
-    currentUserId = session.user.id;
+    currentUserId = session ? session.user.id : null;
     await loadCart();
   })();
 
   async function loadCart() {
     const container = document.getElementById('cartShopBlocks');
-    const { data, error } = await supabaseClient
-      .from('cart_items')
-      .select('id, quantity, products(id, name, price, image_url, shipping_free, shipping_method, shops(id, shop_name, logo_url, shipping_normal, shipping_cold, free_shipping_threshold))')
-      .eq('user_id', currentUserId)
-      .order('created_at', { ascending: false });
+    let items;
 
-    if (error) {
-      console.error('カゴ取得エラー:', error);
-      container.innerHTML = '<p style="text-align:center;padding:40px 16px;font-size:13px;color:var(--text-sub);">読み込みに失敗しました</p>';
-      return;
+    if (currentUserId) {
+      const { data, error } = await supabaseClient
+        .from('cart_items')
+        .select('id, quantity, products(id, name, price, image_url, shipping_free, shipping_method, shops(id, shop_name, logo_url, shipping_normal, shipping_cold, free_shipping_threshold))')
+        .eq('user_id', currentUserId)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('カゴ取得エラー:', error);
+        container.innerHTML = '<p style="text-align:center;padding:40px 16px;font-size:13px;color:var(--text-sub);">読み込みに失敗しました</p>';
+        return;
+      }
+      items = (data || []).filter(row => row.products && row.products.shops);
+    } else {
+      const guestCart = getGuestCart();
+      if (guestCart.length === 0) {
+        items = [];
+      } else {
+        const { data, error } = await supabaseClient
+          .from('products')
+          .select('id, name, price, image_url, shipping_free, shipping_method, shops(id, shop_name, logo_url, shipping_normal, shipping_cold, free_shipping_threshold)')
+          .in('id', guestCart.map(c => c.product_id));
+
+        if (error) {
+          console.error('カゴ取得エラー:', error);
+          container.innerHTML = '<p style="text-align:center;padding:40px 16px;font-size:13px;color:var(--text-sub);">読み込みに失敗しました</p>';
+          return;
+        }
+        items = guestCart
+          .map(c => {
+            const product = (data || []).find(p => p.id === c.product_id);
+            if (!product || !product.shops) return null;
+            return { id: c.product_id, quantity: c.quantity, products: product };
+          })
+          .filter(Boolean);
+      }
     }
 
-    const items = (data || []).filter(row => row.products && row.products.shops);
     updateCartBadgesUI(items.reduce((s, i) => s + i.quantity, 0));
 
     if (items.length === 0) {
@@ -621,8 +653,15 @@
     if (newQty < 1) { deleteItem(cartId); return; }
     if (newQty > 99) return;
 
-    const { error } = await supabaseClient.from('cart_items').update({ quantity: newQty }).eq('id', cartId);
-    if (error) { console.error('数量更新エラー:', error); alert('更新に失敗しました：' + error.message); return; }
+    if (currentUserId) {
+      const { error } = await supabaseClient.from('cart_items').update({ quantity: newQty }).eq('id', cartId);
+      if (error) { console.error('数量更新エラー:', error); alert('更新に失敗しました：' + error.message); return; }
+    } else {
+      const cart = getGuestCart();
+      const row = cart.find(c => c.product_id === cartId);
+      if (row) row.quantity = newQty;
+      setGuestCart(cart);
+    }
 
     await loadCart();
   }
@@ -630,8 +669,12 @@
   // 削除
   async function deleteItem(cartId) {
     if (!confirm('この商品をカゴから削除しますか？')) return;
-    const { error } = await supabaseClient.from('cart_items').delete().eq('id', cartId);
-    if (error) { console.error('削除エラー:', error); alert('削除に失敗しました：' + error.message); return; }
+    if (currentUserId) {
+      const { error } = await supabaseClient.from('cart_items').delete().eq('id', cartId);
+      if (error) { console.error('削除エラー:', error); alert('削除に失敗しました：' + error.message); return; }
+    } else {
+      setGuestCart(getGuestCart().filter(c => c.product_id !== cartId));
+    }
     showToast('商品を削除しました');
     await loadCart();
   }
