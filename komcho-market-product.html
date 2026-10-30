@@ -618,7 +618,11 @@
       .eq('id', productId)
       .single();
 
-    if (error || !p) return;
+    if (error || !p) {
+      console.error('[loadProduct] 商品の取得に失敗しました:', error);
+      document.body.innerHTML = '<div style="padding:80px 24px;text-align:center;font-size:13px;color:var(--text-sub);">商品の読み込みに失敗しました。<br>お手数ですが再度お試しください。</div>';
+      return;
+    }
 
     if (p.shops.status !== 'active') {
       document.body.innerHTML = '<div style="padding:80px 24px;text-align:center;font-size:13px;color:var(--text-sub);">この商品は現在、公開されていません。</div>';
