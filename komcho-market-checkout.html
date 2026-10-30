@@ -524,6 +524,11 @@
       <label class="form-label form-label-req">電話番号</label>
       <input class="form-input" type="tel" placeholder="090-0000-0000" inputmode="tel" id="buyerPhone">
     </div>
+    <div class="form-field" id="buyerEmailField" style="display:none;">
+      <label class="form-label form-label-req">メールアドレス</label>
+      <input class="form-input" type="email" placeholder="example@email.com" inputmode="email" id="buyerEmail">
+      <div class="field-hint" style="font-size:11px;color:var(--text-sub);margin-top:4px;">注文内容の確認に使用します</div>
+    </div>
     <div id="buyerAddressFields">
       <div class="form-field">
         <label class="form-label form-label-req">郵便番号</label>
@@ -595,8 +600,8 @@
         <label class="form-label form-label-req">電話番号</label>
         <input class="form-input" type="tel" placeholder="090-0000-0000" inputmode="tel" id="newAddrPhone">
       </div>
-      <!-- 住所保存チェック -->
-      <label class="save-check-wrap">
+      <!-- 住所保存チェック（会員のみ表示） -->
+      <label class="save-check-wrap" id="saveAddressWrap">
         <input type="checkbox" id="saveAddress" checked>
         <span class="save-check-label">🏠 この住所を保存して次回から使う</span>
       </label>
@@ -624,8 +629,8 @@
 
   <div class="gap"></div>
 
-  <!-- ③ ポイント利用 -->
-  <div class="section-block">
+  <!-- ③ ポイント利用（会員のみ表示） -->
+  <div class="section-block" id="pointSection">
     <div class="block-title">
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
       ポイント利用
@@ -756,6 +761,19 @@
   const SUPABASE_KEY = 'sb_publishable_FaOqUE1PDbo-fpT9KhkWaw__BShLngI';
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+  // ===== ゲスト用カート（未ログインのお客様はブラウザのlocalStorageにカートを保存） =====
+  const GUEST_CART_KEY = 'komchoGuestCart';
+  function getGuestCart() {
+    try { return JSON.parse(localStorage.getItem(GUEST_CART_KEY)) || []; } catch (e) { return []; }
+  }
+  function setGuestCart(cart) {
+    try { localStorage.setItem(GUEST_CART_KEY, JSON.stringify(cart)); } catch (e) {}
+  }
+  function removeFromGuestCart(productIds) {
+    const cart = getGuestCart().filter(c => !productIds.includes(c.product_id));
+    setGuestCart(cart);
+  }
+
   let savedAddresses = [];
 
   // 登録済み住所の読み込み
@@ -854,15 +872,7 @@
 
   (async function initCheckout() {
     const { data: { session } } = await supabaseClient.auth.getSession();
-    if (!session) {
-      window.location.href = 'komcho-market-login.html';
-      return;
-    }
-    currentUserId = session.user.id;
-
-    // 会員情報（お名前）を自動入力
-    const { data: profile } = await supabaseClient.from('profiles').select('name').eq('id', currentUserId).single();
-    if (profile?.name) document.getElementById('buyerName').value = profile.name;
+    currentUserId = session ? session.user.id : null;
 
     shopId = new URLSearchParams(window.location.search).get('shop');
     if (!shopId) {
@@ -870,19 +880,53 @@
       return;
     }
 
-    // カゴの中身（この店舗分のみ）を取得
-    const { data: cart, error } = await supabaseClient
-      .from('cart_items')
-      .select('id, quantity, products(id, name, price, image_url, shipping_free, shipping_method, shops(id, shop_name, shipping_normal, shipping_cold, free_shipping_threshold))')
-      .eq('user_id', currentUserId);
+    if (currentUserId) {
+      // 会員情報（お名前）を自動入力
+      const { data: profile } = await supabaseClient.from('profiles').select('name').eq('id', currentUserId).single();
+      if (profile?.name) document.getElementById('buyerName').value = profile.name;
 
-    if (error || !cart) {
-      alert('カゴの読み込みに失敗しました');
-      window.location.href = 'komcho-market-cart.html';
-      return;
+      // カゴの中身（この店舗分のみ）を取得
+      const { data: cart, error } = await supabaseClient
+        .from('cart_items')
+        .select('id, quantity, products(id, name, price, image_url, shipping_free, shipping_method, shops(id, shop_name, shipping_normal, shipping_cold, free_shipping_threshold))')
+        .eq('user_id', currentUserId);
+
+      if (error || !cart) {
+        alert('カゴの読み込みに失敗しました');
+        window.location.href = 'komcho-market-cart.html';
+        return;
+      }
+      cartRows = cart.filter(r => r.products && r.products.shops && r.products.shops.id === shopId);
+    } else {
+      // ゲスト：localStorageのカートから、この店舗分の商品を取得
+      document.getElementById('buyerEmailField').style.display = 'block';
+      document.getElementById('pointSection').style.display = 'none';
+      document.getElementById('saveAddressWrap').style.display = 'none';
+
+      const guestCart = getGuestCart();
+      if (guestCart.length === 0) {
+        window.location.href = 'komcho-market-cart.html';
+        return;
+      }
+      const { data: products, error } = await supabaseClient
+        .from('products')
+        .select('id, name, price, image_url, shipping_free, shipping_method, shops(id, shop_name, shipping_normal, shipping_cold, free_shipping_threshold)')
+        .in('id', guestCart.map(c => c.product_id));
+
+      if (error || !products) {
+        alert('カゴの読み込みに失敗しました');
+        window.location.href = 'komcho-market-cart.html';
+        return;
+      }
+      cartRows = guestCart
+        .map(c => {
+          const product = products.find(p => p.id === c.product_id);
+          if (!product || !product.shops || product.shops.id !== shopId) return null;
+          return { id: c.product_id, quantity: c.quantity, products: product };
+        })
+        .filter(Boolean);
     }
 
-    cartRows = cart.filter(r => r.products && r.products.shops && r.products.shops.id === shopId);
     if (cartRows.length === 0) {
       window.location.href = 'komcho-market-cart.html';
       return;
@@ -927,24 +971,31 @@
     document.getElementById('shippingLabelDisplay').textContent = `送料（${shippingLabel}）`;
     document.getElementById('shippingDisplay').textContent = isFree ? '無料' : '¥' + shippingFee.toLocaleString();
 
-    // ポイント残高
-    const { data: profilePoints } = await supabaseClient.from('profiles').select('points').eq('id', currentUserId).single();
-    pointBalance = profilePoints?.points || 0;
-    const maxPoint = Math.min(pointBalance, baseTotal);
-    document.getElementById('pointBalanceDisplay').textContent = pointBalance.toLocaleString() + 'pt';
-    document.getElementById('pointInput').max = maxPoint;
-    document.getElementById('pointInputNote').textContent = '上限：' + maxPoint.toLocaleString() + 'pt';
+    if (currentUserId) {
+      // ポイント残高
+      const { data: profilePoints } = await supabaseClient.from('profiles').select('points').eq('id', currentUserId).single();
+      pointBalance = profilePoints?.points || 0;
+      const maxPoint = Math.min(pointBalance, baseTotal);
+      document.getElementById('pointBalanceDisplay').textContent = pointBalance.toLocaleString() + 'pt';
+      document.getElementById('pointInput').max = maxPoint;
+      document.getElementById('pointInputNote').textContent = '上限：' + maxPoint.toLocaleString() + 'pt';
 
-    await loadSavedAddresses();
+      await loadSavedAddresses();
 
-    // ご注文者情報は、選んだ発送先とは関係なく、常にご自身の登録住所（デフォルト）を自動入力する
-    if (savedAddresses.length > 0) {
-      const myDefault = savedAddresses[0];
-      document.getElementById('buyerPhone').value = myDefault.phone || '';
-      document.getElementById('buyerPostal').value = myDefault.postal_code || '';
-      document.getElementById('buyerPrefecture').value = myDefault.prefecture || '';
-      document.getElementById('buyerLine').value = myDefault.address_line || '';
-      document.getElementById('buyerBuilding').value = myDefault.building || '';
+      // ご注文者情報は、選んだ発送先とは関係なく、常にご自身の登録住所（デフォルト）を自動入力する
+      if (savedAddresses.length > 0) {
+        const myDefault = savedAddresses[0];
+        document.getElementById('buyerPhone').value = myDefault.phone || '';
+        document.getElementById('buyerPostal').value = myDefault.postal_code || '';
+        document.getElementById('buyerPrefecture').value = myDefault.prefecture || '';
+        document.getElementById('buyerLine').value = myDefault.address_line || '';
+        document.getElementById('buyerBuilding').value = myDefault.building || '';
+      }
+    } else {
+      // ゲスト：保存済み住所はないので、新しい住所の入力フォームを常に開いておく
+      pointBalance = 0;
+      document.getElementById('addressOptions').innerHTML = '';
+      document.getElementById('newAddressForm').classList.add('open');
     }
 
     updateTotal(0);
@@ -1017,7 +1068,7 @@
     orderBtn.style.opacity = '0.6';
     hidePaymentError();
 
-    await saveNewAddressIfNeeded();
+    if (currentUserId) await saveNewAddressIfNeeded();
 
     // 配送先情報を取得（既存住所選択 or 新規フォーム）
     const selectedOption = document.querySelector('.address-option.selected');
@@ -1070,9 +1121,21 @@
       return;
     }
 
-    const pointsUsed = parseInt(document.getElementById('pointInput').value) || 0;
+    // ゲストの場合はメールアドレスが必須（会員登録の代わりに、注文内容の確認・連絡用）
+    let guestEmail = '';
+    if (!currentUserId) {
+      guestEmail = document.getElementById('buyerEmail').value.trim();
+      if (!guestEmail || !guestEmail.includes('@')) {
+        alert('メールアドレスを正しく入力してください');
+        orderBtn.disabled = false;
+        orderBtn.style.opacity = '1';
+        return;
+      }
+    }
+
+    const pointsUsed = currentUserId ? (parseInt(document.getElementById('pointInput').value) || 0) : 0;
     const total = Math.max(0, baseTotal - pointsUsed);
-    const earnPt = Math.floor(total / 200);
+    const earnPt = currentUserId ? Math.floor(total / 200) : 0;
 
     // ===== Stripe決済（オーソリ取得のみ。売上確定は発送処理時） =====
 
@@ -1128,35 +1191,72 @@
     }
 
     // 注文を作成
-    const { data: order, error: orderError } = await supabaseClient
-      .from('orders')
-      .insert({
-        user_id: currentUserId,
-        shop_id: shopId,
-        status: 'new',
-        subtotal: subtotal,
-        shipping_fee: shippingFee,
-        point_discount: pointsUsed,
-        total: total,
-        points_earned: earnPt,
-        address_name: addressInfo.name,
-        address_postal: addressInfo.postal,
-        address_prefecture: addressInfo.prefecture,
-        address_line: addressInfo.line,
-        address_building: addressInfo.building,
-        address_phone: addressInfo.phone,
-        delivery_name: buyerInfo.name,
-        delivery_phone: buyerInfo.phone,
-        delivery_postal: buyerInfo.postal,
-        delivery_prefecture: buyerInfo.prefecture,
-        delivery_line: buyerInfo.line,
-        delivery_building: buyerInfo.building,
-        payment_method: 'card',
-        payment_intent_id: paymentIntentId,
-        payment_status: 'authorized'
-      })
-      .select()
-      .single();
+    let order, orderError;
+    if (currentUserId) {
+      ({ data: order, error: orderError } = await supabaseClient
+        .from('orders')
+        .insert({
+          user_id: currentUserId,
+          shop_id: shopId,
+          status: 'new',
+          subtotal: subtotal,
+          shipping_fee: shippingFee,
+          point_discount: pointsUsed,
+          total: total,
+          points_earned: earnPt,
+          address_name: addressInfo.name,
+          address_postal: addressInfo.postal,
+          address_prefecture: addressInfo.prefecture,
+          address_line: addressInfo.line,
+          address_building: addressInfo.building,
+          address_phone: addressInfo.phone,
+          delivery_name: buyerInfo.name,
+          delivery_phone: buyerInfo.phone,
+          delivery_postal: buyerInfo.postal,
+          delivery_prefecture: buyerInfo.prefecture,
+          delivery_line: buyerInfo.line,
+          delivery_building: buyerInfo.building,
+          payment_method: 'card',
+          payment_intent_id: paymentIntentId,
+          payment_status: 'authorized'
+        })
+        .select()
+        .single());
+    } else {
+      // ゲスト注文：DB側のRPC関数（create_guest_order）経由で注文＋注文明細をまとめて作成する。
+      // 未ログインの一般利用者に、注文テーブルへの直接の書き込み権限を広げずに済むようにするため。
+      const guestItems = cartRows.map(r => ({
+        product_id: r.products.id,
+        product_name: r.products.name,
+        product_image: r.products.image_url,
+        price: r.products.price,
+        quantity: r.quantity
+      }));
+      const { data: guestOrderId, error: rpcError } = await supabaseClient.rpc('create_guest_order', {
+        p_shop_id: shopId,
+        p_subtotal: subtotal,
+        p_shipping_fee: shippingFee,
+        p_total: total,
+        p_address_name: addressInfo.name,
+        p_address_postal: addressInfo.postal,
+        p_address_prefecture: addressInfo.prefecture,
+        p_address_line: addressInfo.line,
+        p_address_building: addressInfo.building,
+        p_address_phone: addressInfo.phone,
+        p_delivery_name: buyerInfo.name,
+        p_delivery_phone: buyerInfo.phone,
+        p_delivery_postal: buyerInfo.postal,
+        p_delivery_prefecture: buyerInfo.prefecture,
+        p_delivery_line: buyerInfo.line,
+        p_delivery_building: buyerInfo.building,
+        p_guest_email: guestEmail,
+        p_payment_intent_id: paymentIntentId,
+        p_payment_status: 'authorized',
+        p_items: guestItems
+      });
+      order = guestOrderId ? { id: guestOrderId } : null;
+      orderError = rpcError;
+    }
 
     if (orderError || !order) {
       console.error('注文作成エラー:', orderError);
@@ -1176,28 +1276,35 @@
       return;
     }
 
-    // 注文明細を作成
-    const orderItemsPayload = cartRows.map(r => ({
-      order_id: order.id,
-      product_id: r.products.id,
-      product_name: r.products.name,
-      product_image: r.products.image_url,
-      price: r.products.price,
-      quantity: r.quantity
-    }));
-    const { error: itemsError } = await supabaseClient.from('order_items').insert(orderItemsPayload);
-    if (itemsError) {
-      console.error('注文明細作成エラー:', itemsError);
+    if (currentUserId) {
+      // 注文明細を作成
+      const orderItemsPayload = cartRows.map(r => ({
+        order_id: order.id,
+        product_id: r.products.id,
+        product_name: r.products.name,
+        product_image: r.products.image_url,
+        price: r.products.price,
+        quantity: r.quantity
+      }));
+      const { error: itemsError } = await supabaseClient.from('order_items').insert(orderItemsPayload);
+      if (itemsError) {
+        console.error('注文明細作成エラー:', itemsError);
+      }
+
+      // カゴから該当商品を削除
+      const cartIds = cartRows.map(r => r.id);
+      await supabaseClient.from('cart_items').delete().in('id', cartIds);
+
+      // ポイントを更新（使用分を引き、獲得分を足す）
+      await supabaseClient.from('profiles')
+        .update({ points: pointBalance - pointsUsed + earnPt })
+        .eq('id', currentUserId);
+    } else {
+      // ゲストのローカルカートから、該当商品を削除（注文明細はRPC内で既に作成済み）
+      removeFromGuestCart(cartRows.map(r => r.id));
+      document.getElementById('completePointCard').style.display = 'none';
+      document.querySelector('.complete-btn-sub').style.display = 'none';
     }
-
-    // カゴから該当商品を削除
-    const cartIds = cartRows.map(r => r.id);
-    await supabaseClient.from('cart_items').delete().in('id', cartIds);
-
-    // ポイントを更新（使用分を引き、獲得分を足す）
-    await supabaseClient.from('profiles')
-      .update({ points: pointBalance - pointsUsed + earnPt })
-      .eq('id', currentUserId);
 
     // 完了画面表示
     document.getElementById('completeOrderNo').textContent = '#' + order.id.slice(0, 8).toUpperCase();
