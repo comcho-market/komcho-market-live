@@ -570,6 +570,10 @@
     </div>
 
     <div class="new-address-form" id="newAddressForm">
+      <label class="save-check-wrap" id="sameAsBuyerWrap">
+        <input type="checkbox" id="sameAsBuyerCheck">
+        <span class="save-check-label">📋 ご注文者情報と同じ住所に送る</span>
+      </label>
       <div class="form-row">
         <div class="form-field">
           <label class="form-label form-label-req">姓</label>
@@ -1016,6 +1020,55 @@
     if (form.classList.contains('open')) {
       document.querySelectorAll('.address-option').forEach(o => o.classList.remove('selected'));
     }
+  }
+
+  // ===== 「ご注文者情報と同じ住所に送る」チェック =====
+  // お名前は「姓 名」のスペース区切りを想定し、姓・名に分割してコピーする
+  function splitBuyerName(fullName) {
+    const trimmed = (fullName || '').trim();
+    if (!trimmed) return { last: '', first: '' };
+    const parts = trimmed.split(/[\s　]+/);
+    return { last: parts[0] || '', first: parts.slice(1).join(' ') || '' };
+  }
+
+  const SAME_AS_BUYER_FIELDS = ['newAddrPostal', 'newAddrPrefecture', 'newAddrLine', 'newAddrBuilding', 'newAddrPhone'];
+  const BUYER_SOURCE_FIELDS = ['buyerName', 'buyerPhone', 'buyerPostal', 'buyerPrefecture', 'buyerLine', 'buyerBuilding'];
+
+  function applyBuyerToAddress() {
+    const { last, first } = splitBuyerName(document.getElementById('buyerName').value);
+    document.getElementById('newAddrLastName').value = last;
+    document.getElementById('newAddrFirstName').value = first;
+    document.getElementById('newAddrPostal').value = document.getElementById('buyerPostal').value;
+    document.getElementById('newAddrPrefecture').value = document.getElementById('buyerPrefecture').value;
+    document.getElementById('newAddrLine').value = document.getElementById('buyerLine').value;
+    document.getElementById('newAddrBuilding').value = document.getElementById('buyerBuilding').value;
+    document.getElementById('newAddrPhone').value = document.getElementById('buyerPhone').value;
+  }
+
+  function setAddressFieldsLocked(locked) {
+    ['newAddrLastName', 'newAddrFirstName', ...SAME_AS_BUYER_FIELDS].forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.readOnly = locked;
+      el.style.background = locked ? '#f5f2ea' : '';
+      el.style.color = locked ? 'var(--text-sub)' : '';
+    });
+  }
+
+  const sameAsBuyerCheck = document.getElementById('sameAsBuyerCheck');
+  if (sameAsBuyerCheck) {
+    sameAsBuyerCheck.addEventListener('change', () => {
+      if (sameAsBuyerCheck.checked) {
+        applyBuyerToAddress();
+        setAddressFieldsLocked(true);
+      } else {
+        setAddressFieldsLocked(false);
+      }
+    });
+    BUYER_SOURCE_FIELDS.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('input', () => { if (sameAsBuyerCheck.checked) applyBuyerToAddress(); });
+    });
   }
 
   // 全部使うボタン
