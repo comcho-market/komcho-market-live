@@ -523,7 +523,7 @@
 
     const { data: rows, error } = await supabaseClient
       .from('shop_earnings')
-      .select('id, shop_id, net_amount, shops!inner(shop_name, stripe_account_id, stripe_payouts_enabled)')
+      .select('id, shop_id, net_amount, shops!inner(shop_name, stripe_account_id, stripe_payouts_enabled, early_payout_requested_at)')
       .eq('status', 'pending');
 
     if (error) {
@@ -541,6 +541,7 @@
           shopName: r.shops?.shop_name || '（店舗名未登録）',
           stripeAccountId: r.shops?.stripe_account_id || null,
           payoutsEnabled: !!r.shops?.stripe_payouts_enabled,
+          earlyRequestedAt: r.shops?.early_payout_requested_at || null,
           total: 0,
           earningIds: []
         };
@@ -550,10 +551,14 @@
     });
 
     payoutGroupsCache = byShop;
-    const groups = Object.values(byShop).sort((a, b) => b.total - a.total);
-    const payableCount = groups.filter(g => g.total >= PAYOUT_THRESHOLD).length;
+    const groups = Object.values(byShop).sort((a, b) => {
+      // 早期申請ありを先頭に、その中・それ以外それぞれ金額が多い順
+      if (!!a.earlyRequestedAt !== !!b.earlyRequestedAt) return a.earlyRequestedAt ? -1 : 1;
+      return b.total - a.total;
+    });
+    const payableCount = groups.filter(g => g.total >= PAYOUT_THRESHOLD || g.earlyRequestedAt).length;
 
-    summary.textContent = `💰 振込対象（¥${PAYOUT_THRESHOLD.toLocaleString()}以上）：${payableCount}件`;
+    summary.textContent = `💰 振込対象（¥${PAYOUT_THRESHOLD.toLocaleString()}以上・早期申請分含む）：${payableCount}件`;
 
     if (groups.length === 0) {
       list.innerHTML = '<div class="empty-state">未払いの売上はありません。</div>';
@@ -562,13 +567,18 @@
 
     list.innerHTML = groups.map(g => {
       const reachedThreshold = g.total >= PAYOUT_THRESHOLD;
-      const canTransfer = reachedThreshold && g.payoutsEnabled && g.stripeAccountId;
+      const isEarlyRequest = !!g.earlyRequestedAt && !reachedThreshold;
+      const canTransfer = (reachedThreshold || isEarlyRequest) && g.payoutsEnabled && g.stripeAccountId;
 
       let noteHtml = '';
-      if (!reachedThreshold) {
+      if (isEarlyRequest) {
+        const dateStr = new Date(g.earlyRequestedAt).toLocaleDateString('ja-JP', { month: 'long', day: 'numeric' });
+        noteHtml = `<div class="shop-date" style="color:var(--gold); font-weight:700;">⚡ ${dateStr}に早期振込の申請あり（手数料は出店者側で了承済み）</div>`;
+      } else if (!reachedThreshold) {
         noteHtml = `<div class="shop-date">¥${PAYOUT_THRESHOLD.toLocaleString()}未満のため翌月繰越</div>`;
-      } else if (!g.payoutsEnabled || !g.stripeAccountId) {
-        noteHtml = `<div class="shop-date" style="color:#CC4444;">⚠️ Stripeの受け取り設定が未完了のため振込できません</div>`;
+      }
+      if ((reachedThreshold || isEarlyRequest) && (!g.payoutsEnabled || !g.stripeAccountId)) {
+        noteHtml += `<div class="shop-date" style="color:#CC4444;">⚠️ Stripeの受け取り設定が未完了のため振込できません</div>`;
       }
 
       return `
@@ -622,6 +632,12 @@
       } else {
         alert('振込が完了しました ✓');
       }
+
+      // 早期申請フラグが立っていた場合はリセット（次回また必要なら再申請してもらう）
+      if (g.earlyRequestedAt) {
+        await supabaseClient.from('shops').update({ early_payout_requested_at: null }).eq('id', g.shopId);
+      }
+
       await loadPayouts();
     } catch (err) {
       console.error('振込エラー:', err);

@@ -531,6 +531,12 @@
   </div>
 </div>
 
+<!-- ¥1万円未満でも早期振込を希望する場合の申請 -->
+<div id="earlyPayoutBanner" style="display:none; margin:0 16px 16px; padding:14px 16px; background:var(--bg-card); border-radius:var(--radius-card); box-shadow:var(--shadow-card);">
+  <div id="earlyPayoutText" style="font-size:12.5px; color:var(--text-sub); line-height:1.7; margin-bottom:10px;"></div>
+  <button id="earlyPayoutBtn" onclick="requestEarlyPayout()" style="width:100%; height:42px; border-radius:21px; background:var(--green-dark); color:#fff; font-size:13px; font-weight:700;">⚡ 今すぐ振込を申請する（手数料がかかります）</button>
+</div>
+
 <!-- FILTER TABS -->
 <div class="filter-tabs">
   <div class="filter-tab new-tab active" onclick="filterOrders('new', this)">
@@ -627,7 +633,7 @@ let currentShopInfo = null;
 
   const { data: shop, error: shopError } = await supabaseClient
     .from('shops')
-    .select('id, shop_name, address, phone, status, fee_rate')
+    .select('id, shop_name, address, phone, status, fee_rate, early_payout_requested_at')
     .eq('owner_id', session.user.id)
     .single();
 
@@ -671,6 +677,57 @@ async function loadEarningsSummary() {
 
   const total = (data || []).reduce((s, row) => s + (row.net_amount || 0), 0);
   totalEl.textContent = total.toLocaleString();
+  updateEarlyPayoutBanner(total);
+}
+
+// ===== ¥1万円未満でも早期振込を希望する場合の申請バナー表示 =====
+const EARLY_PAYOUT_THRESHOLD = 10000;
+function updateEarlyPayoutBanner(total) {
+  const banner = document.getElementById('earlyPayoutBanner');
+  const text = document.getElementById('earlyPayoutText');
+  const btn = document.getElementById('earlyPayoutBtn');
+  if (!banner) return;
+
+  if (!total || total <= 0 || total >= EARLY_PAYOUT_THRESHOLD) {
+    banner.style.display = 'none';
+    return;
+  }
+
+  banner.style.display = 'block';
+
+  if (currentShopInfo && currentShopInfo.early_payout_requested_at) {
+    text.textContent = '早期振込を申請済みです。運営側で確認後、振り込みいたします。';
+    btn.style.display = 'none';
+  } else {
+    text.textContent = `¥${EARLY_PAYOUT_THRESHOLD.toLocaleString()}に届いていませんが、手数料（1回450円＋振込額の0.25%）がかかっても今すぐ振り込んでほしい場合はこちらから申請できます。`;
+    btn.style.display = 'block';
+  }
+}
+
+// ===== 早期振込の申請 =====
+async function requestEarlyPayout() {
+  if (!confirm('¥10,000未満ですが、手数料（1回450円＋振込額の0.25%）がかかることをご了承の上、早期振込を申請しますか？')) return;
+
+  const btn = document.getElementById('earlyPayoutBtn');
+  if (btn) { btn.disabled = true; btn.textContent = '申請中…'; }
+
+  const nowIso = new Date().toISOString();
+  const { error } = await supabaseClient
+    .from('shops')
+    .update({ early_payout_requested_at: nowIso })
+    .eq('id', currentShopId);
+
+  if (btn) { btn.disabled = false; btn.textContent = '⚡ 今すぐ振込を申請する（手数料がかかります）'; }
+
+  if (error) {
+    console.error('早期振込申請エラー:', error);
+    showToast('申請に失敗しました：' + error.message);
+    return;
+  }
+
+  currentShopInfo.early_payout_requested_at = nowIso;
+  showToast('振込を申請しました ✓');
+  await loadEarningsSummary();
 }
 
 // ===== 発送確定した注文の取り分を帳簿（shop_earnings）に記録 =====
