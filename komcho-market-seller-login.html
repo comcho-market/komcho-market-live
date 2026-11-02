@@ -491,12 +491,28 @@
   function closeModalOutside(e) {
     if (e.target === document.getElementById('forgotModal')) closeForgotModal();
   }
-  function sendReset() {
+  async function sendReset() {
     const email = document.getElementById('forgotEmail').value.trim();
     if (!email) {
       document.getElementById('forgotEmail').style.borderColor = '#CC4444';
       return;
     }
+    document.getElementById('forgotEmail').style.borderColor = '';
+
+    const btn = document.querySelector('#forgotForm .modal-submit-btn');
+    if (btn) { btn.disabled = true; btn.textContent = '送信中…'; }
+
+    const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+      redirectTo: 'https://komcho-market-live.vercel.app/komcho-market-reset-password.html'
+    });
+
+    if (btn) { btn.disabled = false; btn.textContent = '再設定メールを送る'; }
+
+    if (error) {
+      alert('メールの送信に失敗しました：' + error.message);
+      return;
+    }
+
     document.getElementById('forgotForm').style.display = 'none';
     document.getElementById('forgotSent').style.display = 'block';
   }
