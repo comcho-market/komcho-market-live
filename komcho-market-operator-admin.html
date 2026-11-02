@@ -256,6 +256,7 @@
 
   <div class="tab-switch">
     <button class="tab-switch-btn active" id="tabShops" onclick="switchTab('shops')">出店者審査</button>
+    <button class="tab-switch-btn" id="tabPayouts" onclick="switchTab('payouts')">振込管理</button>
     <button class="tab-switch-btn" id="tabRecipes" onclick="switchTab('recipes')">レシピ管理</button>
   </div>
 
@@ -263,6 +264,12 @@
   <div id="shopsTab">
     <div class="summary-bar" id="summaryBar">読み込み中...</div>
     <div class="shop-list" id="shopList"></div>
+  </div>
+
+  <!-- 振込管理タブ -->
+  <div id="payoutsTab" style="display:none;">
+    <div class="summary-bar" id="payoutSummaryBar">読み込み中...</div>
+    <div class="shop-list" id="payoutList"></div>
   </div>
 
   <!-- レシピ管理タブ -->
@@ -404,10 +411,13 @@
   // ===== タブ切り替え =====
   function switchTab(tab) {
     document.getElementById('tabShops').classList.toggle('active', tab === 'shops');
+    document.getElementById('tabPayouts').classList.toggle('active', tab === 'payouts');
     document.getElementById('tabRecipes').classList.toggle('active', tab === 'recipes');
     document.getElementById('shopsTab').style.display = tab === 'shops' ? 'block' : 'none';
+    document.getElementById('payoutsTab').style.display = tab === 'payouts' ? 'block' : 'none';
     document.getElementById('recipesTab').style.display = tab === 'recipes' ? 'block' : 'none';
     if (tab === 'recipes') loadRecipePosts();
+    if (tab === 'payouts') loadPayouts();
   }
 
   function showLoginError(msg) {
@@ -499,6 +509,125 @@
         </div>
       `;
     }).join('');
+  }
+
+  // ===== 振込管理：未払いの売上（¥10,000以上）を一覧表示し、Stripe Transferで実際に振り込む =====
+  const PAYOUT_THRESHOLD = 10000;
+  let payoutGroupsCache = {};
+
+  async function loadPayouts() {
+    const list = document.getElementById('payoutList');
+    const summary = document.getElementById('payoutSummaryBar');
+    summary.textContent = '読み込み中...';
+    list.innerHTML = '';
+
+    const { data: rows, error } = await supabaseClient
+      .from('shop_earnings')
+      .select('id, shop_id, net_amount, shops!inner(shop_name, stripe_account_id, stripe_payouts_enabled)')
+      .eq('status', 'pending');
+
+    if (error) {
+      console.error('売上帳簿取得エラー:', error);
+      summary.textContent = '読み込みに失敗しました';
+      return;
+    }
+
+    // 店舗ごとに未払い分を集計
+    const byShop = {};
+    (rows || []).forEach(r => {
+      if (!byShop[r.shop_id]) {
+        byShop[r.shop_id] = {
+          shopId: r.shop_id,
+          shopName: r.shops?.shop_name || '（店舗名未登録）',
+          stripeAccountId: r.shops?.stripe_account_id || null,
+          payoutsEnabled: !!r.shops?.stripe_payouts_enabled,
+          total: 0,
+          earningIds: []
+        };
+      }
+      byShop[r.shop_id].total += (r.net_amount || 0);
+      byShop[r.shop_id].earningIds.push(r.id);
+    });
+
+    payoutGroupsCache = byShop;
+    const groups = Object.values(byShop).sort((a, b) => b.total - a.total);
+    const payableCount = groups.filter(g => g.total >= PAYOUT_THRESHOLD).length;
+
+    summary.textContent = `💰 振込対象（¥${PAYOUT_THRESHOLD.toLocaleString()}以上）：${payableCount}件`;
+
+    if (groups.length === 0) {
+      list.innerHTML = '<div class="empty-state">未払いの売上はありません。</div>';
+      return;
+    }
+
+    list.innerHTML = groups.map(g => {
+      const reachedThreshold = g.total >= PAYOUT_THRESHOLD;
+      const canTransfer = reachedThreshold && g.payoutsEnabled && g.stripeAccountId;
+
+      let noteHtml = '';
+      if (!reachedThreshold) {
+        noteHtml = `<div class="shop-date">¥${PAYOUT_THRESHOLD.toLocaleString()}未満のため翌月繰越</div>`;
+      } else if (!g.payoutsEnabled || !g.stripeAccountId) {
+        noteHtml = `<div class="shop-date" style="color:#CC4444;">⚠️ Stripeの受け取り設定が未完了のため振込できません</div>`;
+      }
+
+      return `
+        <div class="shop-card" data-shop-id="${g.shopId}">
+          <div class="shop-card-header">
+            <div class="shop-name">${g.shopName}</div>
+            <div class="shop-date">未払い ¥${g.total.toLocaleString()}</div>
+          </div>
+          ${noteHtml}
+          <div class="shop-card-actions">
+            <button class="approve-btn" ${canTransfer ? '' : 'disabled style="opacity:0.45;"'}
+              onclick="executeTransfer('${g.shopId}', this)">
+              振込を実行（¥${g.total.toLocaleString()}）
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // ===== 振込実行（Stripe Transfer） =====
+  async function executeTransfer(shopId, btn) {
+    const g = payoutGroupsCache[shopId];
+    if (!g) return;
+    if (!g.stripeAccountId || !g.payoutsEnabled) {
+      alert('この店舗はStripeの受け取り設定が完了していないため、振込できません。');
+      return;
+    }
+    if (!confirm(`${g.shopName} に ¥${g.total.toLocaleString()} を振り込みます。よろしいですか？`)) return;
+
+    const originalLabel = btn ? btn.textContent : '';
+    if (btn) { btn.disabled = true; btn.textContent = '振込処理中…'; }
+
+    try {
+      const res = await fetch('/api/create-transfer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ stripeAccountId: g.stripeAccountId, amount: g.total, shopId: g.shopId })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || '振込の実行に失敗しました');
+
+      const { error: updateError } = await supabaseClient
+        .from('shop_earnings')
+        .update({ status: 'paid', stripe_transfer_id: data.transferId, paid_at: new Date().toISOString() })
+        .in('id', g.earningIds);
+
+      if (updateError) {
+        console.error('shop_earnings更新エラー:', updateError);
+        alert('振込は完了しましたが、記録の更新に失敗しました。Stripeダッシュボードと突き合わせて手動で確認してください。（Transfer ID: ' + data.transferId + '）');
+      } else {
+        alert('振込が完了しました ✓');
+      }
+      await loadPayouts();
+    } catch (err) {
+      console.error('振込エラー:', err);
+      alert('振込に失敗しました：' + err.message);
+      if (btn) { btn.disabled = false; btn.textContent = originalLabel; }
+    }
   }
 
   // ===== 承認処理 =====
